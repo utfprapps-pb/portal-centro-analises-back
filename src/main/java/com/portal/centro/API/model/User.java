@@ -1,15 +1,15 @@
 package com.portal.centro.API.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.portal.centro.API.enums.Type;
+import com.portal.centro.API.user.Type;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
@@ -45,7 +45,6 @@ public class User implements UserDetails {
     private String password;
 
     @NotNull(message = "Parameter email is required.")
-    @Email
     private String email;
 
     private Boolean status;
@@ -68,6 +67,10 @@ public class User implements UserDetails {
     private String cpf;
 
     private String cnpj;
+
+//    @Column(name = "patner_id")
+//    private Patner patner;
+
 
     @Override
     @Transient
@@ -122,6 +125,6 @@ public class User implements UserDetails {
 
     @PreUpdate
     public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now();
     }
 }
