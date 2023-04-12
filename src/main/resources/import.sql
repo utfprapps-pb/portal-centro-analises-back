@@ -17,3 +17,26 @@ INSERT INTO USERS (email, name, password, username, role) values ('pegorini@gmai
 INSERT INTO USERS (email, name, password, username, role) values ('marcotoninho@gmail.com', 'Marco Antonio', '$2a$10$Iu9s/vE3UT4SMlwuLN1tyuxkmV.TqEGEC93Knrfcm5SXYThnDuU1i', 'toninho', 1);
 INSERT INTO USERS (email, name, password, username, role) values ('fernanda@gmail.com', 'Fernanda', '$2a$10$Iu9s/vE3UT4SMlwuLN1tyuxkmV.TqEGEC93Knrfcm5SXYThnDuU1i', 'fernanda', 1);
 INSERT INTO USERS  (email, name, password, username, role) values ('cathula@gmail.com', 'Cathula', '$2a$10$Iu9s/vE3UT4SMlwuLN1tyuxkmV.TqEGEC93Knrfcm5SXYThnDuU1i', 'cathula', 1);
+<<<<<<< Updated upstream
+=======
+
+insert into user_authorities (tb_user_id, authority_id) values (1,1);
+insert into user_authorities (tb_user_id, authority_id) values (1,2);
+insert into user_authorities (tb_user_id, authority_id) values (1,3);
+insert into user_authorities (tb_user_id, authority_id) values (1,4);
+insert into user_authorities (tb_user_id, authority_id) values (1,5);
+insert into user_authorities (tb_user_id, authority_id) values (1,6);
+insert into user_authorities (tb_user_id, authority_id) values (1,7);
+insert into user_authorities (tb_user_id, authority_id) values (1,8);
+
+insert into user_authorities (tb_user_id, authority_id) values (4,1);
+insert into user_authorities (tb_user_id, authority_id) values (4,2);
+insert into user_authorities (tb_user_id, authority_id) values (4,3);
+insert into user_authorities (tb_user_id, authority_id) values (4,4);
+insert into user_authorities (tb_user_id, authority_id) values (4,5);
+insert into user_authorities (tb_user_id, authority_id) values (4,6);
+insert into user_authorities (tb_user_id, authority_id) values (4,7);
+insert into user_authorities (tb_user_id, authority_id) values (4,8);
+
+insert into PARTNERS (name) values ( 'FADEP' );
+>>>>>>> Stashed changes
