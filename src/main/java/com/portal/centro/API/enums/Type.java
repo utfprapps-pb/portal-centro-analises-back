@@ -1,4 +1,4 @@
-package com.portal.centro.API.user;
+package com.portal.centro.API.enums;
 
 public enum Type {
     PROFESSOR("professor"),
@@ -15,5 +15,4 @@ public enum Type {
     public String getContent() {
         return content;
     }
-
 }

@@ -31,6 +31,7 @@ public class WebSecurity {
     }
 
 
+
     @Bean
     @SneakyThrows
     public SecurityFilterChain filterChain(HttpSecurity http) {

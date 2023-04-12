@@ -28,14 +28,21 @@ public class Equipment {
     private String name;
 
     @NotNull
-    private Double utfprPrice;
+    private Double value_hour_utfpr;
 
     @NotNull
-    private Double externalPrice;
+    private Double value_hour_partner;
 
     @NotNull
-    private Double physicalLegalPrice;
+    private Double value_hour_pf_pj;
 
-    private String comments;
+    @NotNull
+    private Double value_sample_utfpr;
+
+    @NotNull
+    private Double value_sample_partner;
+
+    @NotNull
+    private Double value_sample_pf_pj;
 
 }
