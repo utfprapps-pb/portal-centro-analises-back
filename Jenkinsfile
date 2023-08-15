@@ -7,7 +7,8 @@ pipeline {
         DATABASE_USERNAME="${POSTGRESQL_CRED_USR}"
         DATABASE_PASSWORD="${POSTGRESQL_CRED_PSW}"
 
-        CA_FRONT_BASEURL="https://ca-dev.app.pb.utfpr.edu.br"
+        FRONT_BASEURL="https://ca-dev.app.pb.utfpr.edu.br"
+        FRONT_PORT=""
 
         MINIO_CRED = credentials('ca-minio-id')
         MINIO_ACCESS_KEY = "${MINIO_CRED_USR}"
