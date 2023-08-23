@@ -123,7 +123,7 @@ public class UserService extends GenericService<User, Long> {
 
         updateUserNewPasswordByEmail(user, recoverPasswordDTO.getNewPassword());
         recoverPasswordService.getCodeSentByEmail().remove(recoverPasswordDTO.getEmail());
-        return new DefaultResponse(HttpStatus.OK.value(), "Senha alterada com sucesso.");
+        return new DefaultResponse(HttpStatus.OK.value(), "Senha recuperada com sucesso.");
     }
 
     public DefaultResponse changePassword(ChangePasswordDTO changePasswordDTO) throws Exception {
