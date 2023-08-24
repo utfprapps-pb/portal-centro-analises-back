@@ -16,6 +16,8 @@ import com.portal.centro.API.responses.DefaultResponse;
 import com.portal.centro.API.utils.DateTimeUtil;
 import com.portal.centro.API.utils.UtilsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -183,6 +185,16 @@ public class UserService extends GenericService<User, Long> {
         user.setBalance(balance);
         userRepository.save(user);
         return userBalance;
+    }
+
+    public Page<User> findUsersByRolePaged(String role, PageRequest pageRequest) {
+        Type type;
+        try {
+            type = Type.valueOf(role);
+        } catch (Exception e) {
+            throw new RuntimeException("Role informada não existe.");
+        }
+        return userRepository.findAllByRole(type,pageRequest);
     }
 
 }

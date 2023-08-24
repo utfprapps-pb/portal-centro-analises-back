@@ -9,6 +9,9 @@ import com.portal.centro.API.responses.DefaultResponse;
 import com.portal.centro.API.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -71,6 +74,24 @@ public class UserController extends GenericController<User, Long> {
         for (User user : users)
             userDtos.add(convertEntityToDto(user));
         return userDtos;
+    }
+
+    @GetMapping("pagerole")
+    public Page<UserDto> pageUser(
+            @RequestParam(value = "page") Integer page,
+            @RequestParam(value = "size") Integer size,
+            @RequestParam(value = "order",required = false) String order,
+            @RequestParam(value = "sort",required = false) Boolean asc,
+            @RequestParam(value = "role",required = false) String role
+    ) throws Exception {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        if (order != null && asc != null) {
+            pageRequest = PageRequest.of(page, size,
+                    asc ? Sort.Direction.ASC : Sort.Direction.DESC, order);
+        }
+        Page<User> list = userService.findUsersByRolePaged(role, pageRequest);
+
+        return  list.map(item-> convertEntityToDto(item));
     }
 
 }
