@@ -107,7 +107,7 @@ public class UserService extends GenericService<User, Long> {
         emailDto.setEmailTo(email);
         emailDto.setSubject("Recuperação de senha");
         emailDto.setSubjectBody("Recuperação de senha");
-        emailDto.setContentBody("O código para recuperação da sua senha no sistema de Newsletter é <b>" + code + "</b>.");
+        emailDto.setContentBody("O código para recuperação da sua senha no sistema Portal CA é <b>" + code + "</b>.");
         return emailDto;
     }
 
