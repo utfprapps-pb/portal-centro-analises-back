@@ -1,7 +1,7 @@
 package com.portal.centro.API.service;
 
 import com.portal.centro.API.dto.EmailDto;
-import com.portal.centro.API.provider.ConfigProvider;
+import com.portal.centro.API.model.ConfigEmail;
 import com.portal.centro.API.utils.EmailMessageGenerator;
 import com.portal.centro.API.utils.UtilsService;
 import lombok.Data;
@@ -15,25 +15,25 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class EmailService {
 
-    final private UtilsService utilsService;
-    final private ConfigProvider configProvider;
-    final private EmailMessageGenerator emailMessageGenerator;
+    private final UtilsService utilsService;
+    private final ConfigEmailService configEmailService;
+    private final EmailMessageGenerator emailMessageGenerator;
 
-    public EmailService (UtilsService utils, ConfigProvider configProvider, EmailMessageGenerator emailMessageGenerator) {
+    public EmailService (UtilsService utils, ConfigEmailService configEmailService, EmailMessageGenerator emailMessageGenerator) {
         this.utilsService = utils;
-        this.configProvider = configProvider;
+        this.configEmailService = configEmailService;
         this.emailMessageGenerator = emailMessageGenerator;
     }
 
     public void sendEmail(EmailDto emailTo) {
         HtmlEmail htmlEmail = new HtmlEmail();
         try{
-
-            htmlEmail.setHostName(configProvider.getProtocol());
-            htmlEmail.setSmtpPort(configProvider.getPort());
-            htmlEmail.setAuthenticator(new DefaultAuthenticator(configProvider.getAddress(), configProvider.getPassword()));
+            ConfigEmail configEmail = configEmailService.find();
+            htmlEmail.setHostName(configEmail.getSendHost());
+            htmlEmail.setSmtpPort(configEmail.getSendPort());
+            htmlEmail.setAuthenticator(new DefaultAuthenticator(configEmail.getEmailFrom(), configEmail.getPasswordEmailFrom()));
             htmlEmail.setStartTLSEnabled(true);
-            htmlEmail.setFrom(configProvider.getAddress());
+            htmlEmail.setFrom(configEmail.getEmailFrom());
             htmlEmail.addTo(emailTo.getEmailTo());
             htmlEmail.setSubject(emailTo.getSubject());
             htmlEmail.setHtmlMsg(emailMessageGenerator.generateHTML(emailTo.getSubjectBody(), emailTo.getContentBody(), ""));
@@ -44,7 +44,7 @@ public class EmailService {
 
         } catch (Exception e) {
             log.info("erro ao enviar email....");
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
 
     }
