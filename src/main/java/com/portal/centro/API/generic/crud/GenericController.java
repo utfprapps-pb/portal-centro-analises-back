@@ -40,7 +40,7 @@ public abstract class GenericController<T, ID extends Serializable> {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity deleteById(@PathVariable ID id) {
+    public ResponseEntity deleteById(@PathVariable ID id) throws Exception {
         return ResponseEntity.ok(genericService.deleteById(id));
     }
 
