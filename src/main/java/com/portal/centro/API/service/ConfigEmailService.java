@@ -36,7 +36,17 @@ public class ConfigEmailService extends GenericService<ConfigEmail, Long> {
         User selfUser = authService.findLoggedUser();
         if (!Objects.equals(selfUser.getRole(), Type.ADMIN))
             throw new ValidationException("Somente o administrador pode realizar esta ação.");
+        validateExistenceJustOneConfigEmail(requestBody);
         return super.save(requestBody);
+    }
+
+    private void validateExistenceJustOneConfigEmail(ConfigEmail requestBody) {
+        List<ConfigEmail> existingConfigEmails = configEmailRepository.findAll();
+        if (existingConfigEmails.isEmpty())
+            return;
+        ConfigEmail existingConfigEmail = existingConfigEmails.get(0);
+        if (Objects.nonNull(existingConfigEmail) && (!Objects.equals(existingConfigEmail.getId(), requestBody.getId())))
+            throw new ValidationException("Não é possível incluir novas configurações de email, apenas uma. Para realizar esta ação atualize a existente de código " + existingConfigEmail.getId() + ".");
     }
 
 }

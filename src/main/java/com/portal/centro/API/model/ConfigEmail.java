@@ -1,6 +1,5 @@
 package com.portal.centro.API.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,7 +22,6 @@ public class ConfigEmail {
 
     @NotBlank(message = "Parameter passwordEmailFrom is required.")
     @Column(name = "password_email_from")
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String passwordEmailFrom;
 
     @NotBlank(message = "Parameter sendHost is required.")
