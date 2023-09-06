@@ -1,5 +1,6 @@
 package com.portal.centro.API.model;
 
+import com.portal.centro.API.enums.StatusInactiveActive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -45,4 +46,6 @@ public class Equipment {
 
     @Column(name="form")
     private String form;
+
+    private StatusInactiveActive status;
 }

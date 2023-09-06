@@ -1,5 +1,7 @@
 package com.portal.centro.API.controller;
 
+import com.portal.centro.API.enums.StatusInactiveActive;
+import com.portal.centro.API.exceptions.ValidationException;
 import com.portal.centro.API.enums.Type;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.service.UserService;
@@ -32,6 +34,12 @@ public class AdminController {
         return ResponseEntity.ok(userService.saveAdmin(user));
     }
 
+    //valida se o usuário é ativo ou inativo
+    //antes de deixar editar a role. Caso seja
+    //ativo deixa editar e retorna o usuário
+    //editado, caso contrario retornar uma
+    //mensagem "não é possivel editar um usuário
+    //inativo"
     @PostMapping("edit/role/{id}")
     public ResponseEntity<?> editRoleAdmin(@RequestBody @Valid String role, @PathVariable Long id) throws Exception {
         User loggedUser = userService.findSelfUser();
@@ -42,7 +50,13 @@ public class AdminController {
 
         role = role.replaceAll("\"", "");
 
-        return ResponseEntity.ok(userService.editUserRole(Type.valueOf(role), id));
+        User idUser = userService.findOneById(id);
+
+        if(idUser.getStatus().equals(StatusInactiveActive.ACTIVE)){
+            return ResponseEntity.ok(userService.editUserRole(Type.valueOf(role), id));
+        } else {
+            return new ResponseEntity<>("Não é possível editar um usuário inativo.", HttpStatus.NOT_ACCEPTABLE);
+        }
     }
 }
 

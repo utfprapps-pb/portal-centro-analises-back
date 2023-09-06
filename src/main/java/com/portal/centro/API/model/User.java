@@ -2,6 +2,7 @@ package com.portal.centro.API.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.portal.centro.API.enums.StatusInactiveActive;
 import com.portal.centro.API.enums.Type;
 import com.portal.centro.API.validations.user.UserUniqueConstraint;
 import lombok.*;
@@ -16,7 +17,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -48,7 +48,7 @@ public class User implements UserDetails {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
-    private Boolean status;
+    private StatusInactiveActive status;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
