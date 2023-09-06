@@ -1,6 +1,7 @@
 package com.portal.centro.API.service;
 
 import com.portal.centro.API.enums.Type;
+import com.portal.centro.API.exceptions.NotFoundException;
 import com.portal.centro.API.exceptions.ValidationException;
 import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.model.ConfigEmail;
@@ -27,7 +28,7 @@ public class ConfigEmailService extends GenericService<ConfigEmail, Long> {
     public ConfigEmail find() {
         List<ConfigEmail> configEmailList = configEmailRepository.findAll();
         if (configEmailList.isEmpty())
-            throw new ValidationException("Configuração de email não encontrada.");
+            throw new NotFoundException("Configuração de email não encontrada.");
         return configEmailList.get(0);
     }
 
