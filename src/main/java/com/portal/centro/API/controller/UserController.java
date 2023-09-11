@@ -3,6 +3,7 @@ package com.portal.centro.API.controller;
 import com.portal.centro.API.dto.ChangePasswordDTO;
 import com.portal.centro.API.dto.RecoverPasswordDTO;
 import com.portal.centro.API.dto.UserDto;
+import com.portal.centro.API.enums.StatusInactiveActive;
 import com.portal.centro.API.generic.crud.GenericController;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.responses.DefaultResponse;
@@ -76,6 +77,30 @@ public class UserController extends GenericController<User, Long> {
         return userDtos;
     }
 
+    //chama a função que vai inativar ou deletar o usuário
+    //dependendo dos vinculos dele com projetos
+    @Override
+    public ResponseEntity deleteById(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(userService.editUserStatusToInactiveOrDelete(id));
+    }
+
+    //mostra lista que contem somente os usuários ativos
+    @Override
+    public ResponseEntity getAll() throws Exception {
+        return ResponseEntity.ok(userService.findAllUsersActivatedOrInactivated(StatusInactiveActive.ACTIVE));
+    }
+
+    //mostra lista que contem somente os os usuários inativos
+    @GetMapping(path = "findInactive")
+    public ResponseEntity findAllInactive() throws Exception {
+        return ResponseEntity.ok(userService.findAllUsersActivatedOrInactivated(StatusInactiveActive.INACTIVE));
+    }
+
+    //torna um usuário inativo em ativo novamente
+    @PutMapping("activatedUser/{id}")
+    public ResponseEntity activeUserById(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(userService.editUserStatusToActive(id));
+    }
     @GetMapping("pagerole")
     public Page<UserDto> pageUser(
             @RequestParam(value = "page") Integer page,

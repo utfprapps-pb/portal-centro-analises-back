@@ -1,5 +1,6 @@
 package com.portal.centro.API.dto;
 
+import com.portal.centro.API.enums.StatusInactiveActive;
 import com.portal.centro.API.enums.Type;
 import lombok.Data;
 
@@ -28,7 +29,7 @@ public class UserDto {
     @Email
     private String email;
 
-    private Boolean status;
+    private StatusInactiveActive status;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

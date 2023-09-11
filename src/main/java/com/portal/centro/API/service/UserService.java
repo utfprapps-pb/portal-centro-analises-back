@@ -3,6 +3,7 @@ package com.portal.centro.API.service;
 import com.portal.centro.API.dto.ChangePasswordDTO;
 import com.portal.centro.API.dto.EmailDto;
 import com.portal.centro.API.dto.RecoverPasswordDTO;
+import com.portal.centro.API.enums.StatusInactiveActive;
 import com.portal.centro.API.enums.TransactionType;
 import com.portal.centro.API.enums.Type;
 import com.portal.centro.API.exceptions.NotFoundException;
@@ -11,6 +12,8 @@ import com.portal.centro.API.model.RecoverPassword;
 import com.portal.centro.API.model.SendEmailCodeRecoverPassword;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.model.UserBalance;
+import com.portal.centro.API.repository.ProjectRepository;
+import com.portal.centro.API.repository.StudentTeacherRepository;
 import com.portal.centro.API.repository.UserRepository;
 import com.portal.centro.API.responses.DefaultResponse;
 import com.portal.centro.API.utils.DateTimeUtil;
@@ -39,6 +42,7 @@ public class UserService extends GenericService<User, Long> {
     private final RecoverPasswordService recoverPasswordService;
     private final EmailCodeService emailCodeService;
     private final EmailService emailService;
+    private final ProjectRepository projectRepository;
 
     @Autowired
     public UserService(
@@ -46,13 +50,15 @@ public class UserService extends GenericService<User, Long> {
             UtilsService utilsService,
             EmailCodeService emailCodeService,
             RecoverPasswordService recoverPasswordService,
-            EmailService emailService) {
+            EmailService emailService,
+            ProjectRepository projectRepository) {
         super(userRepository);
         this.userRepository = userRepository;
         this.utilsService = utilsService;
         this.emailCodeService = emailCodeService;
         this.recoverPasswordService = recoverPasswordService;
         this.emailService = emailService;
+        this.projectRepository = projectRepository;
         passwordEncoder = new BCryptPasswordEncoder();
     }
 
@@ -109,7 +115,7 @@ public class UserService extends GenericService<User, Long> {
         emailDto.setEmailTo(email);
         emailDto.setSubject("Recuperação de senha");
         emailDto.setSubjectBody("Recuperação de senha");
-        emailDto.setContentBody("O código para recuperação da sua senha no sistema de Newsletter é <b>" + code + "</b>.");
+        emailDto.setContentBody("O código para recuperação da sua senha no sistema Portal CA é <b>" + code + "</b>.");
         return emailDto;
     }
 
@@ -125,7 +131,7 @@ public class UserService extends GenericService<User, Long> {
 
         updateUserNewPasswordByEmail(user, recoverPasswordDTO.getNewPassword());
         recoverPasswordService.getCodeSentByEmail().remove(recoverPasswordDTO.getEmail());
-        return new DefaultResponse(HttpStatus.OK.value(), "Senha alterada com sucesso.");
+        return new DefaultResponse(HttpStatus.OK.value(), "Senha recuperada com sucesso.");
     }
 
     public DefaultResponse changePassword(ChangePasswordDTO changePasswordDTO) throws Exception {
@@ -187,6 +193,38 @@ public class UserService extends GenericService<User, Long> {
         return userBalance;
     }
 
+    //modifica o status de um usuário de ativo para inativo
+    //dos usuário que tem vinculo e exclui os usuários sem
+    //vinculos com projetos
+    public String editUserStatusToInactiveOrDelete(Long id) throws Exception {
+        User user = userRepository.findUserById(id);
+
+        if(!projectRepository.findAllByStudentsContains(user).isEmpty()){
+            user.setStatus(StatusInactiveActive.INACTIVE);
+            super.save(user);
+            return "Usuário inativado com sucesso!";
+        } else if(!projectRepository.findAllByTeacher(user).isEmpty()){
+            user.setStatus(StatusInactiveActive.INACTIVE);
+            super.save(user);
+            return "Usuário inativado com sucesso!";
+        } else {
+            return super.deleteById(id);
+        }
+    }
+
+    //modifica o status de um usuário de inativo para ativo
+    public User editUserStatusToActive(Long id) throws Exception {
+        Optional<User> user = userRepository.findById(id);
+
+        user.get().setStatus(StatusInactiveActive.ACTIVE);
+
+        return super.save(user.get());
+    }
+
+    //cria uma lista conforme o status escolhido na classe controller
+    public List<User> findAllUsersActivatedOrInactivated(StatusInactiveActive status){
+        return userRepository.findAllByStatus(status);
+    }
     public Page<User> findUsersByRolePaged(String role, PageRequest pageRequest) {
         Type type;
         try {
