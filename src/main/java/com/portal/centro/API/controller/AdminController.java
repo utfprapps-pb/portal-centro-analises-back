@@ -5,11 +5,12 @@ import com.portal.centro.API.exceptions.ValidationException;
 import com.portal.centro.API.enums.Type;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import javax.validation.Valid;
 import static com.portal.centro.API.enums.Type.ADMIN;
 
 @RestController
@@ -40,6 +41,12 @@ public class AdminController {
     //editado, caso contrario retornar uma
     //mensagem "não é possivel editar um usuário
     //inativo"
+    @Operation(summary = "Valida se o usuário é ativo ou inativo\n" +
+            "    antes de deixar editar a role. Caso seja\n" +
+            "    ativo deixa editar e retorna o usuário\n" +
+            "    editado, caso contrario retornar uma\n" +
+            "    mensagem \"não é possivel editar um usuário\n" +
+            "    inativo\"")
     @PostMapping("edit/role/{id}")
     public ResponseEntity<?> editRoleAdmin(@RequestBody @Valid String role, @PathVariable Long id) throws Exception {
         User loggedUser = userService.findSelfUser();

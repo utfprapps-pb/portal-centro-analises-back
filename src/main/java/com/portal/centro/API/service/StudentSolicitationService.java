@@ -9,10 +9,9 @@ import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.model.StudentSolicitation;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.StudentSolicitationRepository;
+import jakarta.persistence.EntityManager;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-
-import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;

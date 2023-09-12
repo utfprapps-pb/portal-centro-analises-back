@@ -2,11 +2,11 @@ package com.portal.centro.API.model;
 
 import com.portal.centro.API.enums.SolicitationStatus;
 import com.portal.centro.API.generic.base.IModel;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.OneToOne;
 import java.time.LocalDateTime;
 
 @Entity

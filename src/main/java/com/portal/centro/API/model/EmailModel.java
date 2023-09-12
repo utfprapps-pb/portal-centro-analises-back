@@ -1,9 +1,8 @@
 package com.portal.centro.API.model;
 
 import com.portal.centro.API.enums.StatusEmail;
+import jakarta.persistence.*;
 import lombok.Data;
-
-import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;

@@ -4,14 +4,13 @@ import com.portal.centro.API.dto.StudentSolicitationDTO;
 import com.portal.centro.API.generic.crud.GenericController;
 import com.portal.centro.API.model.StudentSolicitation;
 import com.portal.centro.API.service.StudentSolicitationService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import javax.validation.Valid;
 
 @Controller
 @RequestMapping("student-solicitation")
