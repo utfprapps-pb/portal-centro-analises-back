@@ -2,6 +2,7 @@ package com.portal.centro.API.security.auth;
 
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.UserRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,4 +25,11 @@ public class AuthService implements UserDetailsService {
         }
         return user;
     }
+
+    public User findLoggedUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userRepository.findByEmail(principal.toString());
+        return user;
+    }
+
 }
