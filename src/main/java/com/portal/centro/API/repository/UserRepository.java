@@ -17,6 +17,7 @@ public interface UserRepository extends GenericRepository<User, Long> {
 
     List<User> findAllByRole(Type role);
     Page<User> findAllByRole(Type role, PageRequest pageRequest);
+    Page<User> findAllByStatus(StatusInactiveActive status, PageRequest pageRequest);
 
     List<User> findAllByStatus(StatusInactiveActive status);
 

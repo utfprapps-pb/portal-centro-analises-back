@@ -235,4 +235,8 @@ public class UserService extends GenericService<User, Long> {
         return userRepository.findAllByRole(type,pageRequest);
     }
 
+    public Page<User> findUsersByStatusPaged(StatusInactiveActive status, PageRequest pageRequest) {
+        return userRepository.findAllByStatus(status, pageRequest);
+    }
+
 }

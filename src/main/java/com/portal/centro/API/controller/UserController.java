@@ -119,4 +119,22 @@ public class UserController extends GenericController<User, Long> {
         return  list.map(item-> convertEntityToDto(item));
     }
 
+    @GetMapping("pagestatus")
+    public Page<UserDto> pageUser(
+            @RequestParam(value = "page") Integer page,
+            @RequestParam(value = "size") Integer size,
+            @RequestParam(value = "order",required = false) String order,
+            @RequestParam(value = "sort",required = false) Boolean asc,
+            @RequestParam(value = "active",required = false) Boolean active
+    ) throws Exception {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        if (order != null && asc != null) {
+            pageRequest = PageRequest.of(page, size,
+                    asc ? Sort.Direction.ASC : Sort.Direction.DESC, order);
+        }
+        Page<User> list = userService.findUsersByStatusPaged(active ? StatusInactiveActive.ACTIVE : StatusInactiveActive.INACTIVE, pageRequest);
+
+        return  list.map(item-> convertEntityToDto(item));
+    }
+
 }
