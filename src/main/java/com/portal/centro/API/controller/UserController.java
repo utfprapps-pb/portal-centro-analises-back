@@ -106,7 +106,7 @@ public class UserController extends GenericController<User, Long> {
             @RequestParam(value = "page") Integer page,
             @RequestParam(value = "size") Integer size,
             @RequestParam(value = "order",required = false) String order,
-            @RequestParam(value = "sort",required = false) Boolean asc,
+            @RequestParam(value = "asc",required = false) Boolean asc,
             @RequestParam(value = "role",required = false) String role
     ) throws Exception {
         PageRequest pageRequest = PageRequest.of(page, size);
@@ -124,7 +124,7 @@ public class UserController extends GenericController<User, Long> {
             @RequestParam(value = "page") Integer page,
             @RequestParam(value = "size") Integer size,
             @RequestParam(value = "order",required = false) String order,
-            @RequestParam(value = "sort",required = false) Boolean asc,
+            @RequestParam(value = "asc",required = false) Boolean asc,
             @RequestParam(value = "active",required = false) Boolean active
     ) throws Exception {
         PageRequest pageRequest = PageRequest.of(page, size);
