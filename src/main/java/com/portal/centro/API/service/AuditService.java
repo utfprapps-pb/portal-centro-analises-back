@@ -1,6 +1,5 @@
 package com.portal.centro.API.service;
 
-import com.portal.centro.API.enums.Type;
 import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.model.Audit;
 import com.portal.centro.API.model.User;
@@ -9,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class AuditService extends GenericService<Audit, Long> {
@@ -26,14 +24,14 @@ public class AuditService extends GenericService<Audit, Long> {
     @Override
     public List<Audit> getAll() {
         User user = userService.findSelfUser();
-
-        if (Objects.equals(user.getRole(), Type.STUDENT) || Objects.equals(user.getRole(), Type.EXTERNAL))
-            return auditRepository.findAllBySolicitation_CreatedBy(user);
-
-        if (Objects.equals(user.getRole(), Type.PROFESSOR))
-            return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_Teacher(user, user);
-
-        return super.getAll();
+        switch (user.getRole()) {
+            case ADMIN:
+                return super.getAll();
+            case PROFESSOR:
+                return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_Teacher(user, user);
+            default:
+                return auditRepository.findAllBySolicitation_CreatedBy(user);
+        }
     }
 
     public void saveAudit(Audit audit) {
