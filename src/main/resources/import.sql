@@ -39,4 +39,6 @@ INSERT INTO project (description, subject) VALUES ('PROJECT DESCRIPTION', 'PROJE
 INSERT INTO partner (name) VALUES ('FADEP');
 INSERT INTO partner (name) VALUES ('UNIMATER');
 
+-- Insere configuração de email para testes
 INSERT INTO configemail(email_from, password_email_from, send_host, send_port) VALUES ('utfproficinareturn@gmail.com', 'gihwxsvqzzrwwdtv', 'smtp.gmail.com', 587);
+
