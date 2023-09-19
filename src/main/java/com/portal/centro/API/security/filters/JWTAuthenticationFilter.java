@@ -38,14 +38,22 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             User credentials = new ObjectMapper().readValue(request.getInputStream(), User.class);
             User user = (User) authService.loadUserByUsername(credentials.getEmail());
 
-            return authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            credentials.getEmail(),
-                            credentials.getPassword(),
-                            user.getAuthorities()
-                    )
-            );
+            if(user.getEmailVerified() == null || !user.getEmailVerified()){
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Email not verified");
+                return null;
+            }else{
+                return authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(
+                                credentials.getEmail(),
+                                credentials.getPassword(),
+                                user.getAuthorities()
+                        )
+                );
+            }
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

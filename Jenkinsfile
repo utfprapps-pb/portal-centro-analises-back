@@ -7,7 +7,8 @@ pipeline {
         DATABASE_USERNAME="${POSTGRESQL_CRED_USR}"
         DATABASE_PASSWORD="${POSTGRESQL_CRED_PSW}"
 
-        CA_FRONT_BASEURL="https://ca-dev.app.pb.utfpr.edu.br"
+        FRONT_BASEURL="https://ca-dev.app.pb.utfpr.edu.br"
+        FRONT_PORT=""
 
         MINIO_CRED = credentials('ca-minio-id')
         MINIO_ACCESS_KEY = "${MINIO_CRED_USR}"
@@ -20,7 +21,7 @@ pipeline {
     stages {
         stage('Docker Compose UP') {
             steps {
-                sh 'docker compose -f docker-compose-release.yml up -d --build'
+                sh 'docker compose -f docker-compose.yml up -d --build'
             }
         }
     }
