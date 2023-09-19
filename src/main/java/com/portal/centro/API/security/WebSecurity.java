@@ -49,6 +49,7 @@ public class WebSecurity {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/users/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/emailconfirm/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/emailconfirm/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .authenticationManager(authenticationManager)

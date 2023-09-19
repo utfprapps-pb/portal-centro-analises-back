@@ -164,6 +164,10 @@ public class UserService extends GenericService<User, Long> {
         return user;
     }
 
+    public User findByEmail(@PathVariable("email") String email){
+        return this.userRepository.findByEmail(email);
+    }
+
     public List<User> findUsersByRole(@PathVariable("role") String role) {
         Type type;
         try {
