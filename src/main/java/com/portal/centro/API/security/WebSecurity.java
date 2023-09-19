@@ -50,6 +50,7 @@ public class WebSecurity {
         http.authorizeHttpRequests((authorize) -> authorize
                 .requestMatchers(antMatcher(HttpMethod.POST, "/users/**")).permitAll()
                 .requestMatchers(antMatcher(HttpMethod.GET, "/emailconfirm/**")).permitAll()
+                .requestMatchers(antMatcher(HttpMethod.POST, "/emailconfirm/**")).permitAll()
                 .requestMatchers(antMatcher("/v3/**")).permitAll()
                 .requestMatchers(antMatcher("/swagger-ui/**")).permitAll()
                 .anyRequest().authenticated()
@@ -59,21 +60,6 @@ public class WebSecurity {
                 .addFilter(new JWTAuthenticationFilter(authenticationManager, authService))
                 .addFilter(new JWTAuthorizationFilter(authenticationManager, authService))
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-//        http.csrf().disable()
-//                .exceptionHandling()
-//                    .authenticationEntryPoint(authenticationEntryPoint).and()
-//                .cors()
-//                .and()
-//                .authorizeRequests()
-//                .antMatchers(HttpMethod.POST, "/users/**").permitAll()
-//                .antMatchers(HttpMethod.GET, "/emailconfirm/**").permitAll()
-//                .anyRequest().authenticated()
-//                .and()
-//                .authenticationManager(authenticationManager)
-//                .addFilter(new JWTAuthenticationFilter(authenticationManager, authService))
-//                .addFilter(new JWTAuthorizationFilter(authenticationManager, authService))
-//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         return http.build();
     }
