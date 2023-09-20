@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.yaml.snakeyaml.events.Event;
 
 import javax.validation.Valid;
 
@@ -55,8 +56,8 @@ public class EquipmentController extends GenericController<Equipment, Long> {
     }
 
     //para que não seja permitido ao usuário editar um equipamento inativo
-    @Override
-    public ResponseEntity update(@RequestBody @Valid Equipment equipment) throws Exception {
+    @PutMapping("{id}")
+    public ResponseEntity update(@PathVariable Long id, @RequestBody @Valid Equipment equipment) throws Exception {
         if (equipment.getStatus().equals(StatusInactiveActive.ACTIVE)){
             return ResponseEntity.ok(equipmentService.save(equipment));
         } else {

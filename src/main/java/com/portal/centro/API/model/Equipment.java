@@ -47,5 +47,8 @@ public class Equipment {
     @Column(name="form")
     private String form;
 
+    @Column(name="short_name")
+    private String shortName;
+
     private StatusInactiveActive status;
 }
