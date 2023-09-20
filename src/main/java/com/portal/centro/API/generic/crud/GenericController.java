@@ -12,7 +12,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.io.Serializable;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,7 +52,7 @@ public abstract class GenericController<T, ID extends Serializable> {
             @RequestParam(value = "page") Integer page,
             @RequestParam(value = "size") Integer size,
             @RequestParam(value = "order",required = false) String order,
-            @RequestParam(value = "sort",required = false) Boolean asc
+            @RequestParam(value = "asc",required = false) Boolean asc
     ) throws Exception {
         PageRequest pageRequest = PageRequest.of(page, size);
         if (order != null && asc != null) {

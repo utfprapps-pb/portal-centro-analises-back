@@ -6,6 +6,8 @@ import com.portal.centro.API.model.Equipment;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.EquipmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,5 +49,10 @@ public class EquipmentService extends GenericService<Equipment, Long> {
     public List<Equipment> findAllEquipmentsActivatedOrInactivated(StatusInactiveActive status) {
         return equipmentRepository.findAllByStatus(status);
     }
+
+    public Page<Equipment> findEquipmentByStatusPaged(StatusInactiveActive status, PageRequest pageRequest) {
+        return equipmentRepository.findAllByStatus(status, pageRequest);
+    }
+
 }
 

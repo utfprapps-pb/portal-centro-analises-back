@@ -73,5 +73,4 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 new AuthenticationResponse(token, new UserLoginDTO((User) authResult.getPrincipal()))
         ));
     }
-
 }
