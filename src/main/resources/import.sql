@@ -38,5 +38,3 @@ INSERT INTO project (description, subject) VALUES ('PROJECT DESCRIPTION', 'PROJE
 
 INSERT INTO partner (name) VALUES ('FADEP');
 INSERT INTO partner (name) VALUES ('UNIMATER');
-
-UPDATE USERS SET email_verified = TRUE WHERE 1=1;

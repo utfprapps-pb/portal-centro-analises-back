@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +22,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
+
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 @EnableWebSecurity
@@ -45,16 +47,20 @@ public class WebSecurity {
                 .passwordEncoder( passwordEncoder() );
         AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
 
+        http.csrf(AbstractHttpConfigurer::disable);
+
         http.cors(cors -> corsConfigurationSource());
 
         http.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(authenticationEntryPoint));
         http.authorizeHttpRequests((authorize) -> authorize
-                .requestMatchers(antMatcher(HttpMethod.POST, "/users/**")).permitAll()
+                .requestMatchers(antMatcher(HttpMethod.POST,"/users/**")).permitAll()
+                .requestMatchers(antMatcher("/error/**")).permitAll()
+                .requestMatchers(antMatcher("/errors/**")).permitAll()
                 .requestMatchers(antMatcher(HttpMethod.GET, "/emailconfirm/**")).permitAll()
                 .requestMatchers(antMatcher(HttpMethod.POST, "/emailconfirm/**")).permitAll()
                 .requestMatchers(antMatcher("/v3/**")).permitAll()
                 .requestMatchers(antMatcher("/swagger-ui/**")).permitAll()
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()
         );
         http.authenticationManager(authenticationManager)
                 .addFilter(new JWTAuthenticationFilter(authenticationManager, authService))
