@@ -60,7 +60,7 @@ public class WebSecurity {
                 .requestMatchers(antMatcher(HttpMethod.POST, "/emailconfirm/**")).permitAll()
                 .requestMatchers(antMatcher("/v3/**")).permitAll()
                 .requestMatchers(antMatcher("/swagger-ui/**")).permitAll()
-                .anyRequest().permitAll()
+                .anyRequest().authenticated()
         );
         http.authenticationManager(authenticationManager)
                 .addFilter(new JWTAuthenticationFilter(authenticationManager, authService))
