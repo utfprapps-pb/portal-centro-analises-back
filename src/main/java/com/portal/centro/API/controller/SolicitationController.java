@@ -6,13 +6,12 @@ import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.generic.response.GenericResponse;
 import com.portal.centro.API.model.Solicitation;
 import com.portal.centro.API.service.SolicitationService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 
 @RestController
 @RequestMapping("solicitation")

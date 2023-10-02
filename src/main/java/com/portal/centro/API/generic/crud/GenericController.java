@@ -4,14 +4,13 @@ import com.google.common.base.Joiner;
 import com.portal.centro.API.enums.SearchOperation;
 import com.portal.centro.API.generic.specification.GenericSpecification;
 import com.portal.centro.API.generic.specification.GenericSpecificationsBuilder;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

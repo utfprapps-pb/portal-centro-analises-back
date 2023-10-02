@@ -6,8 +6,10 @@ import com.portal.centro.API.enums.Type;
 import com.portal.centro.API.repository.PermissionRepository;
 import org.springframework.stereotype.Component;
 
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
+//import javax.mail.internet.AddressException;
+//import javax.mail.internet.InternetAddress;
 import java.util.*;
 
 import static java.util.stream.Collectors.toList;

@@ -2,11 +2,10 @@ package com.portal.centro.API.model;
 
 import com.portal.centro.API.enums.StudentSolicitationStatus;
 import com.portal.centro.API.generic.base.IModel;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Getter

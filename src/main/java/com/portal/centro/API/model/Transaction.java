@@ -5,12 +5,11 @@ import com.portal.centro.API.enums.TransactionType;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "transaction")
