@@ -6,12 +6,10 @@ import com.portal.centro.API.model.DomainRole;
 import com.portal.centro.API.model.Permission;
 import com.portal.centro.API.repository.DomainRoleRepository;
 import com.portal.centro.API.repository.PermissionRepository;
-import org.springframework.stereotype.Component;
-
 import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;
-//import javax.mail.internet.AddressException;
-//import javax.mail.internet.InternetAddress;
+import org.springframework.stereotype.Component;
+
 import java.util.*;
 
 @Component
@@ -29,8 +27,7 @@ public class UtilsService {
         return "";
     }
 
-    public Type getRoleType(String email){
-//        String[] dominiosValidos = {"professores.utfpr.edu.br", "utfpr.edu.br", "alunos.utfpr.edu.br"}; //Permitidos
+    public Type getRoleType(String email) {
         List<DomainRole> validDomainRoles = domainRoleRepository.findAll();
         try {
             InternetAddress internetAddress = new InternetAddress(email);
@@ -39,15 +36,6 @@ public class UtilsService {
                                                                                 o nome do usuário e o domínio, separados
                                                                                 pelo caractere "@". Acessando a segunda
                                                                                 String do array com [1]  */
-//            for (DomainRole dominioValido : validDomainRoles) {
-//                if (dominio.equals(dominioValido.getDomain())) {
-//                    if ("professores.utfpr.edu.br".equals(dominio) || "utfpr.edu.br".equals(dominio)){
-//                        return Type.PROFESSOR;
-//                    }  else {
-//                       return Type.STUDENT;
-//                    }
-//                }
-//            }
             Optional<DomainRole> domainRoleOptional =
                     validDomainRoles
                             .stream()
@@ -55,9 +43,13 @@ public class UtilsService {
                             .findFirst();
             if (domainRoleOptional.isPresent())
                 return domainRoleOptional.get().getRole();
-            return Type.EXTERNAL;
+            else
+                return Type.EXTERNAL;
         } catch (Exception e) {
-            return Type.EXTERNAL;
+            throw new RuntimeException(
+                    "Erro ao configurar privilégio do usuário pelo domínio do e-mail. " +
+                            "Detalhes: " + e.getMessage()
+            );
         }
     }
 
