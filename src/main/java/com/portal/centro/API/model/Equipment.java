@@ -1,14 +1,13 @@
 package com.portal.centro.API.model;
 
 import com.portal.centro.API.enums.StatusInactiveActive;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 @Entity(name = "equipment")
@@ -46,6 +45,9 @@ public class Equipment {
 
     @Column(name="form")
     private String form;
+
+    @Column(name="short_name")
+    private String shortName;
 
     private StatusInactiveActive status;
 }

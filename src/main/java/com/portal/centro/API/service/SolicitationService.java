@@ -1,10 +1,10 @@
 package com.portal.centro.API.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -91,4 +91,20 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
 
         return ResponseEntity.ok(solicitationRepository.save(solicitation.get()));
     }
+
+    public Page<Solicitation> getPendingPage(PageRequest pageRequest) {
+        User user = userService.findSelfUser();
+
+        if (Objects.equals(user.getRole(), Type.STUDENT) || Objects.equals(user.getRole(), Type.EXTERNAL))
+            throw new ValidationException("Você não possui permissão para acessar este recurso.");
+
+        if (Objects.equals(user.getRole(), Type.PROFESSOR))
+            return solicitationRepository.findAllByProject_TeacherAndStatus(user, SolicitationStatus.PENDING_ADVISOR, pageRequest);
+
+        if (Objects.equals(user.getRole(), Type.ADMIN))
+            return solicitationRepository.findAllByStatus(SolicitationStatus.PENDING_LAB, pageRequest);
+
+        return new PageImpl<>(Collections.emptyList());
+    }
+
 }

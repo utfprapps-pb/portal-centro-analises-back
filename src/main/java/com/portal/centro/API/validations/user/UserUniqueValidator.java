@@ -2,9 +2,9 @@ package com.portal.centro.API.validations.user;
 
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.UserRepository;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 import java.util.Objects;
 import java.util.Optional;
 

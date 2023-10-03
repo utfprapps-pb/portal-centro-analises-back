@@ -19,6 +19,8 @@ import com.portal.centro.API.responses.DefaultResponse;
 import com.portal.centro.API.utils.DateTimeUtil;
 import com.portal.centro.API.utils.UtilsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -164,6 +166,10 @@ public class UserService extends GenericService<User, Long> {
         return user;
     }
 
+    public User findByEmail(@PathVariable("email") String email){
+        return this.userRepository.findByEmail(email);
+    }
+
     public List<User> findUsersByRole(@PathVariable("role") String role) {
         Type type;
         try {
@@ -223,4 +229,18 @@ public class UserService extends GenericService<User, Long> {
     public List<User> findAllUsersActivatedOrInactivated(StatusInactiveActive status){
         return userRepository.findAllByStatus(status);
     }
+    public Page<User> findUsersByRolePaged(String role, PageRequest pageRequest) {
+        Type type;
+        try {
+            type = Type.valueOf(role);
+        } catch (Exception e) {
+            throw new RuntimeException("Role informada não existe.");
+        }
+        return userRepository.findAllByRole(type,pageRequest);
+    }
+
+    public Page<User> findUsersByStatusPaged(StatusInactiveActive status, PageRequest pageRequest) {
+        return userRepository.findAllByStatus(status, pageRequest);
+    }
+
 }

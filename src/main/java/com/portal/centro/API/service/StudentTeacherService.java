@@ -7,6 +7,8 @@ import com.portal.centro.API.model.StudentTeacher;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.StudentTeacherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
@@ -60,6 +62,10 @@ public class StudentTeacherService extends GenericService<StudentTeacher, Long> 
         } else {
             return studentTeacherRepository.findByStudentWhere(user.getId());
         }
+    }
+
+    public Page<StudentTeacher> listByTeacherPage(Long teacherId, PageRequest pageRequest) {
+        return studentTeacherRepository.findAllByTeacherId(teacherId, pageRequest);
     }
 
 }

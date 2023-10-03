@@ -1,17 +1,19 @@
 package com.portal.centro.API.controller;
 
+import com.portal.centro.API.dto.UserDto;
 import com.portal.centro.API.enums.StatusInactiveActive;
 import com.portal.centro.API.generic.crud.GenericController;
 import com.portal.centro.API.model.Equipment;
-import com.portal.centro.API.model.User;
 import com.portal.centro.API.service.EquipmentService;
-import com.portal.centro.API.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
+import org.yaml.snakeyaml.events.Event;
 
 @RestController
 @RequestMapping("equipments")
@@ -51,13 +53,29 @@ public class EquipmentController extends GenericController<Equipment, Long> {
     }
 
     //para que não seja permitido ao usuário editar um equipamento inativo
-    @Override
-    public ResponseEntity update(@RequestBody @Valid Equipment equipment) throws Exception {
+    @PutMapping("{id}")
+    public ResponseEntity update(@PathVariable Long id, @RequestBody @Valid Equipment equipment) throws Exception {
         if (equipment.getStatus().equals(StatusInactiveActive.ACTIVE)){
             return ResponseEntity.ok(equipmentService.save(equipment));
         } else {
             return new ResponseEntity<>("Não é possível editar um equipamento inativo.", HttpStatus.NOT_ACCEPTABLE);
         }
+    }
+
+    @GetMapping("pagestatus")
+    public Page<Equipment> pageStatus(
+            @RequestParam(value = "page") Integer page,
+            @RequestParam(value = "size") Integer size,
+            @RequestParam(value = "order",required = false) String order,
+            @RequestParam(value = "asc",required = false) Boolean asc,
+            @RequestParam(value = "active",required = false) Boolean active
+    ) throws Exception {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        if (order != null && asc != null) {
+            pageRequest = PageRequest.of(page, size,
+                    asc ? Sort.Direction.ASC : Sort.Direction.DESC, order);
+        }
+        return equipmentService.findEquipmentByStatusPaged(active ? StatusInactiveActive.ACTIVE : StatusInactiveActive.INACTIVE, pageRequest);
     }
 
     //VER A EDIÇÃO DE EQUIPAMENTOS PQ PARECE QUE NÃO ESTÀ FUNCIONANDO

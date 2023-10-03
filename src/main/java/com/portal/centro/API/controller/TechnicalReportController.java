@@ -3,6 +3,7 @@ package com.portal.centro.API.controller;
 import com.portal.centro.API.generic.crud.GenericController;
 import com.portal.centro.API.model.TechnicalReport;
 import com.portal.centro.API.service.TechnicalReportService;
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,8 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @RestController
