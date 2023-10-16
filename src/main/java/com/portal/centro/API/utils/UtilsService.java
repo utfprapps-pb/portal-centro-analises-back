@@ -33,9 +33,9 @@ public class UtilsService {
         String[] dominiosValidos = {"professores.utfpr.edu.br", "utfpr.edu.br", "alunos.utfpr.edu.br"}; //Permitidos
 
         try {
-            InternetAddress internetAddress = new InternetAddress(email);
-            internetAddress.validate(); //Valida o formato do email usando as especificações RFC 5322
-            String dominio = internetAddress.getAddress().split("@")[1]; /*Separa o endereço de email em duas partes:
+            //InternetAddress internetAddress = new InternetAddress(email);
+            //internetAddress.validate(); //Valida o formato do email usando as especificações RFC 5322
+            String dominio = email.split("@")[1]; /*Separa o endereço de email em duas partes:
                                                                                 o nome do usuário e o domínio, separados
                                                                                 pelo caractere "@". Acessando a segunda
                                                                                 String do array com [1]  */
