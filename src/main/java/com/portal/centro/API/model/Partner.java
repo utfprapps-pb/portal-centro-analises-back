@@ -1,5 +1,6 @@
 package com.portal.centro.API.model;
 
+import com.portal.centro.API.enums.StatusInactiveActive;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,5 +28,8 @@ public class Partner {
     @NotBlank(message = "Name must not be empty!")
     @Size(min = 4, max = 255)
     private String name;
+
+    @NotNull
+    private StatusInactiveActive status;
 
 }
