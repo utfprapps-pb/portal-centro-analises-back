@@ -41,13 +41,20 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
                     "O campo 'Outra natureza de projeto' deve ser preenchido quando a natureza do projeto for 'Outro'.");
         }
 
-        requestBody.setCreatedBy(userService.findSelfUser());
+        User user = userService.findSelfUser();
+        requestBody.setCreatedBy(user);
 
         Solicitation output = super.save(requestBody);
         Audit audit = new Audit();
-        audit.setNewStatus(requestBody.getStatus());
-        audit.setSolicitation(output);
 
+        if(user.getRole().equals(Type.PROFESSOR)){
+            audit.setNewStatus(SolicitationStatus.PENDING_LAB);
+            output.setStatus(SolicitationStatus.PENDING_LAB);
+        } else {
+            audit.setNewStatus(requestBody.getStatus());
+        }
+
+        audit.setSolicitation(output);
         auditService.saveAudit(audit);
 
         return output;
