@@ -84,13 +84,13 @@ public class ProjectService extends GenericService<Project, Long> {
     @Override
     public List<Project> getAll() {
         User user = userService.findSelfUser();
-
-        if (Objects.equals(user.getRole(), Type.STUDENT) || Objects.equals(user.getRole(), Type.EXTERNAL))
-            throw new ValidationException("Você não possui permissão para acessar este recurso.");
-
-        if (Objects.equals(user.getRole(), Type.PROFESSOR))
-            return projectRepository.findAllByTeacher(user);
-
-        return super.getAll();
+        switch (user.getRole()) {
+            case ADMIN:
+                return super.getAll();
+            case PROFESSOR:
+                return projectRepository.findAllByTeacher(user);
+            default:
+                throw new ValidationException("Você não possui permissão para acessar este recurso.");
+        }
     }
 }

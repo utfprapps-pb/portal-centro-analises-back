@@ -4,7 +4,8 @@ public enum Type {
     PROFESSOR("professor"),
     STUDENT("student"),
     EXTERNAL("external"),
-    ADMIN("admin");
+    ADMIN("admin"),
+    PARTNER("partner");
 
     private String content;
 

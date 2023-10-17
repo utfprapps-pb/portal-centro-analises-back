@@ -26,7 +26,7 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
     private final SolicitationRepository solicitationRepository;
 
     public SolicitationService(SolicitationRepository solicitationRepository, AuditService auditService,
-            UserService userService) {
+                               UserService userService) {
         super(solicitationRepository);
         this.solicitationRepository = solicitationRepository;
         this.auditService = auditService;
@@ -68,18 +68,14 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
 
     public List<Solicitation> getPending() {
         User user = userService.findSelfUser();
-
-        if (Objects.equals(user.getRole(), Type.STUDENT) || Objects.equals(user.getRole(), Type.EXTERNAL))
-            throw new ValidationException("Você não possui permissão para acessar este recurso.");
-
-        if (Objects.equals(user.getRole(), Type.PROFESSOR)){
-            List<Solicitation> lista = solicitationRepository.findAllByProject_TeacherAndStatus(user, SolicitationStatus.PENDING_ADVISOR);
-            return lista;
+        switch (user.getRole()) {
+            case ADMIN:
+                return solicitationRepository.findAllByStatus(SolicitationStatus.PENDING_LAB);
+            case PROFESSOR:
+                return solicitationRepository.findAllByProject_TeacherAndStatus(user, SolicitationStatus.PENDING_ADVISOR);
+            default:
+                throw new ValidationException("Você não possui permissão para acessar este recurso.");
         }
-        if (Objects.equals(user.getRole(), Type.ADMIN))
-            return solicitationRepository.findAllByStatus(SolicitationStatus.PENDING_LAB);
-
-        return new ArrayList<>();
     }
 
     public ResponseEntity approveProfessor(Long id) { // Professor

@@ -18,7 +18,6 @@ INSERT INTO USERS (email, name, password, role, status) values ('marcotoninho@gm
 INSERT INTO USERS (email, name, password, role, status) values ('fernanda@gmail.com', 'Fernanda', '$2a$10$ze2T2cQAxRjql2kXEwzSZux4UMTlt/4bP.Ma/oTdekyNOqpWAUB9C', 1, 1);
 INSERT INTO USERS (email, name, password, role, status) values ('cathula@gmail.com', 'Cathula', '$2a$10$ze2T2cQAxRjql2kXEwzSZux4UMTlt/4bP.Ma/oTdekyNOqpWAUB9C', 1, 1);
 INSERT INTO USERS (email, name, password, role, status) values ('external@gmail.com', 'External', '$2a$10$ze2T2cQAxRjql2kXEwzSZux4UMTlt/4bP.Ma/oTdekyNOqpWAUB9C', 2, 1);
-INSERT INTO USERS (email, name, password, role, status) values ('lab@gmail.com', 'Lab', '$2a$10$ze2T2cQAxRjql2kXEwzSZux4UMTlt/4bP.Ma/oTdekyNOqpWAUB9C', 3, 1);
 INSERT INTO USERS (email, name, password, role, status) values ('teacher1@gmail.com', 'Teacher 1', '$2a$10$ze2T2cQAxRjql2kXEwzSZux4UMTlt/4bP.Ma/oTdekyNOqpWAUB9C', 0, 1);
 
 INSERT INTO project (description, subject) VALUES ('PROJECT DESCRIPTION', 'PROJECT SUBJECT');

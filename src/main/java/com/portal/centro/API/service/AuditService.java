@@ -29,14 +29,14 @@ public class AuditService extends GenericService<Audit, Long> {
     @Override
     public List<Audit> getAll() {
         User user = userService.findSelfUser();
-
-        if (Objects.equals(user.getRole(), Type.STUDENT) || Objects.equals(user.getRole(), Type.EXTERNAL))
-            return auditRepository.findAllBySolicitation_CreatedBy(user);
-
-        if (Objects.equals(user.getRole(), Type.PROFESSOR))
-            return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_Teacher(user, user);
-
-        return super.getAll();
+        switch (user.getRole()) {
+            case ADMIN:
+                return super.getAll();
+            case PROFESSOR:
+                return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_Teacher(user, user);
+            default:
+                return auditRepository.findAllBySolicitation_CreatedBy(user);
+        }
     }
 
     public void saveAudit(Audit audit) {
