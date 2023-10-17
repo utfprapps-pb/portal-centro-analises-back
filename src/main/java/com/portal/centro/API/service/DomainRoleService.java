@@ -9,15 +9,18 @@ import com.portal.centro.API.repository.DomainRoleRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class DomainRoleService extends GenericService<DomainRole, Long> {
 
     private final UserService userService;
+    private final DomainRoleRepository domainRoleRepository;
 
-    public DomainRoleService(DomainRoleRepository domainRoleRepository, UserService userService) {
+    public DomainRoleService(DomainRoleRepository domainRoleRepository, UserService userService, DomainRoleRepository domainRoleRepository1) {
         super(domainRoleRepository);
         this.userService = userService;
+        this.domainRoleRepository = domainRoleRepository1;
     }
 
     @Override
@@ -25,7 +28,16 @@ public class DomainRoleService extends GenericService<DomainRole, Long> {
         User selfUser = userService.findSelfUser();
         if (!Objects.equals(selfUser.getRole(), Type.ADMIN))
             throw new ValidationException("Somente o administrador pode realizar esta ação.");
-
+        validJustOneDomain(requestBody);
         return super.save(requestBody);
     }
+
+    private void validJustOneDomain(DomainRole requestBody) {
+        Optional<DomainRole> domainRoleOptional = domainRoleRepository.findByDomain(requestBody.getDomain());
+        if (domainRoleOptional.isEmpty() || Objects.equals(requestBody.getId(), domainRoleOptional.get().getId()))
+            return;
+
+        throw new ValidationException("O domínio informado já existe. Por favor, informe outro.");
+    }
+
 }
