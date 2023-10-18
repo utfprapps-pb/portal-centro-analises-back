@@ -60,6 +60,30 @@ public class WebSecurity {
                 .requestMatchers(antMatcher(HttpMethod.POST, "/emailconfirm/**")).permitAll()
                 .requestMatchers(antMatcher("/v3/**")).permitAll()
                 .requestMatchers(antMatcher("/swagger-ui/**")).permitAll()
+
+//                .requestMatchers(antMatcher("/admin/**")).hasAnyRole("ADMIN")
+//
+//                .requestMatchers(antMatcher("/project/**")).hasAnyRole("ADMIN", "PROFESSOR")
+//
+//                .requestMatchers(antMatcher(HttpMethod.POST, "/equipments/**")).hasAnyRole("ADMIN")
+//                .requestMatchers(antMatcher(HttpMethod.PUT, "/equipments/**")).hasAnyRole("ADMIN")
+//                .requestMatchers(antMatcher(HttpMethod.DELETE, "/equipments/**")).hasAnyRole("ADMIN")
+//
+//                .requestMatchers(antMatcher("/partners/**")).hasAnyRole("ADMIN")
+//
+//                .requestMatchers(antMatcher(HttpMethod.POST, "/solicitation/approve/**")).hasAnyRole("PROFESSOR")
+//                .requestMatchers(antMatcher(HttpMethod.POST, "/solicitation/approvelab/**")).hasAnyRole("ADMIN")
+//                .requestMatchers(antMatcher(HttpMethod.GET, "/solicitation/pendingpage")).hasAnyRole("ADMIN", "PROFESSOR")
+//                .requestMatchers(antMatcher(HttpMethod.GET, "/solicitation/pending")).hasAnyRole("ADMIN", "PROFESSOR")
+//
+//                .requestMatchers(antMatcher(HttpMethod.POST, "/transaction")).hasAnyRole("ADMIN")
+//
+//                .requestMatchers(antMatcher(HttpMethod.DELETE, "/users")).hasAnyRole("ADMIN")
+//                .requestMatchers(antMatcher(HttpMethod.GET, "/users/pagestatus")).hasAnyRole("ADMIN")
+//                .requestMatchers(antMatcher(HttpMethod.GET, "/users")).hasAnyRole("ADMIN", "PROFESSOR")
+//                .requestMatchers(antMatcher(HttpMethod.GET, "/users/findInactive")).hasAnyRole("ADMIN")
+//                .requestMatchers(antMatcher(HttpMethod.PUT, "/users/activatedUser/**")).hasAnyRole("ADMIN")
+
                 .anyRequest().authenticated()
         );
         http.authenticationManager(authenticationManager)
