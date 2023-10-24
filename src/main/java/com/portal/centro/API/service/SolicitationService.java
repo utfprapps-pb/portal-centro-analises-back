@@ -2,6 +2,7 @@ package com.portal.centro.API.service;
 
 import com.portal.centro.API.enums.SolicitationProjectNature;
 import com.portal.centro.API.enums.SolicitationStatus;
+import com.portal.centro.API.enums.Type;
 import com.portal.centro.API.exceptions.ValidationException;
 import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.model.Audit;
@@ -13,7 +14,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -38,9 +41,10 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
             throw new ValidationException(
                     "O campo 'Outra natureza de projeto' deve ser preenchido quando a natureza do projeto for 'Outro'.");
         }
-
-        requestBody.setCreatedBy(userService.findSelfUser());
-
+        User loggedUser = userService.findSelfUser();
+        requestBody.setCreatedBy(loggedUser);
+        setSolicitationStatusWhenUserExternalOrPartner(requestBody, loggedUser);
+        setProjectToNullIfEmpty(requestBody);
         Solicitation output = super.save(requestBody);
         Audit audit = new Audit();
         audit.setNewStatus(requestBody.getStatus());
@@ -49,6 +53,23 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         auditService.saveAudit(audit);
 
         return output;
+    }
+
+    private void setProjectToNullIfEmpty(Solicitation solicitation) {
+        if (Objects.nonNull(solicitation.getProject()) &&
+                Objects.equals(solicitation.getProject().getId(), 0L))
+            solicitation.setProject(null);
+    }
+
+    private void setSolicitationStatusWhenUserExternalOrPartner(Solicitation solicitation, User user) {
+        if (Objects.isNull(user))
+            return;
+
+        List<Type> externalTypes = Arrays.asList(Type.EXTERNAL, Type.PARTNER);
+        if (!externalTypes.contains(user.getRole()))
+            return;
+
+        solicitation.setStatus(SolicitationStatus.PENDING_LAB);
     }
 
     public Solicitation updateStatus(Long id, SolicitationStatus status) throws Exception {
