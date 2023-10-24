@@ -64,13 +64,11 @@ public class WebSecurity {
 
                 .requestMatchers(antMatcher("/admin/**")).hasRole("ADMIN")
 
-                .requestMatchers(antMatcher("/project/**")).hasAnyRole("ADMIN", "PROFESSOR")
-
                 .requestMatchers(antMatcher(HttpMethod.POST, "/equipments/**")).hasAnyRole("ADMIN")
                 .requestMatchers(antMatcher(HttpMethod.PUT, "/equipments/**")).hasAnyRole("ADMIN")
                 .requestMatchers(antMatcher(HttpMethod.DELETE, "/equipments/**")).hasAnyRole("ADMIN")
 
-                .requestMatchers(antMatcher("/partners/**")).hasAnyRole("ADMIN")
+                .requestMatchers(antMatcher(HttpMethod.GET,"/partners/**")).hasAnyRole("ADMIN")
 
                 .requestMatchers(antMatcher(HttpMethod.POST, "/solicitation/approve/**")).hasAnyRole("PROFESSOR")
                 .requestMatchers(antMatcher(HttpMethod.POST, "/solicitation/approvelab/**")).hasAnyRole("ADMIN")
@@ -81,7 +79,7 @@ public class WebSecurity {
 
                 .requestMatchers(antMatcher(HttpMethod.DELETE, "/users")).hasAnyRole("ADMIN")
                 .requestMatchers(antMatcher(HttpMethod.GET, "/users/pagestatus")).hasAnyRole("ADMIN")
-                .requestMatchers(antMatcher(HttpMethod.GET, "/users")).hasAnyRole(Type.ADMIN.toString(), "PROFESSOR")
+                .requestMatchers(antMatcher(HttpMethod.GET, "/users")).hasAnyRole("ADMIN", "PROFESSOR")
                 .requestMatchers(antMatcher(HttpMethod.GET, "/users/findInactive")).hasAnyRole("ADMIN")
                 .requestMatchers(antMatcher(HttpMethod.PUT, "/users/activatedUser/**")).hasAnyRole("ADMIN")
 
