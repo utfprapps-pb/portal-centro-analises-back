@@ -47,9 +47,14 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         setProjectToNullIfEmpty(requestBody);
         Solicitation output = super.save(requestBody);
         Audit audit = new Audit();
-        audit.setNewStatus(requestBody.getStatus());
-        audit.setSolicitation(output);
+        if (loggedUser.getRole().equals(Type.PROFESSOR)) {
+            audit.setNewStatus(SolicitationStatus.PENDING_LAB);
+            output.setStatus(SolicitationStatus.PENDING_LAB);
+        } else {
+            audit.setNewStatus(requestBody.getStatus());
+        }
 
+        audit.setSolicitation(output);
         auditService.saveAudit(audit);
 
         return output;
