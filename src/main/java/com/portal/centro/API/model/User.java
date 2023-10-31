@@ -79,11 +79,6 @@ public class User implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> list = new ArrayList<>();
         list.addAll(this.permissions);
-
-        if (this.role != null) {
-            list.add(this.role);
-        }
-
         return list;
     }
 
