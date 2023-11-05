@@ -51,7 +51,7 @@ public class DashboardService {
             lista.add(
                     new GraficoDadoDTO(
                             tuple.get(0,Long.class),
-                            tuple.get(1,String.class).split(" ")[0],
+                            tuple.get(1,String.class),
                             tuple.get(2,Long.class)
                     )
             );

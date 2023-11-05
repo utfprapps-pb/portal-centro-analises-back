@@ -6,7 +6,6 @@ import com.portal.centro.API.generic.crud.GenericRepository;
 import com.portal.centro.API.model.Solicitation;
 import com.portal.centro.API.model.User;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -44,12 +43,12 @@ public interface SolicitationRepository extends GenericRepository<Solicitation, 
     @Query(
             value = "select " +
                     "ROW_NUMBER() OVER (ORDER BY equipment_id) AS id, " +
-                    "e.name as label, count(s.equipment_id) as value " +
+                    "e.short_name as label, count(s.equipment_id) as value " +
                     "from solicitation s " +
                     "join equipment e on e.id = s.equipment_id " +
-                    "group by e.name, s.equipment_id  " +
+                    "group by e.short_name, s.equipment_id  " +
                     "order by count(s.equipment_id) desc " +
-                    "limit 10",
+                    "limit 5",
             nativeQuery = true)
     List<Tuple> findGraficoEquipamentoSolicitacaoNative();
 
