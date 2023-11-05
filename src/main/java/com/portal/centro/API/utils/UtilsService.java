@@ -30,9 +30,9 @@ public class UtilsService {
     public Type getRoleType(String email) {
         List<DomainRole> validDomainRoles = domainRoleRepository.findAll();
         try {
-            InternetAddress internetAddress = new InternetAddress(email);
-            internetAddress.validate(); //Valida o formato do email usando as especificações RFC 5322
-            String dominio = internetAddress.getAddress().split("@")[1]; /*Separa o endereço de email em duas partes:
+            //InternetAddress internetAddress = new InternetAddress(email);
+            //internetAddress.validate(); //Valida o formato do email usando as especificações RFC 5322
+            String dominio = email.split("@")[1]; /*Separa o endereço de email em duas partes:
                                                                                 o nome do usuário e o domínio, separados
                                                                                 pelo caractere "@". Acessando a segunda
                                                                                 String do array com [1]  */

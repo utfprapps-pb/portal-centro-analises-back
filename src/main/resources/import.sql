@@ -19,6 +19,10 @@ INSERT INTO USERS (email, name, password, role, status) values ('fernanda@gmail.
 INSERT INTO USERS (email, name, password, role, status) values ('cathula@gmail.com', 'Cathula', '$2a$10$ze2T2cQAxRjql2kXEwzSZux4UMTlt/4bP.Ma/oTdekyNOqpWAUB9C', 1, 1);
 INSERT INTO USERS (email, name, password, role, status) values ('external@gmail.com', 'External', '$2a$10$ze2T2cQAxRjql2kXEwzSZux4UMTlt/4bP.Ma/oTdekyNOqpWAUB9C', 2, 1);
 INSERT INTO USERS (email, name, password, role, status) values ('teacher1@gmail.com', 'Teacher 1', '$2a$10$ze2T2cQAxRjql2kXEwzSZux4UMTlt/4bP.Ma/oTdekyNOqpWAUB9C', 0, 1);
+INSERT INTO USERS (email, name, password, role, status) values ('partner@partner.com', 'Partner', '$2a$10$ze2T2cQAxRjql2kXEwzSZux4UMTlt/4bP.Ma/oTdekyNOqpWAUB9C', 4, 1);
+
+-- Insere domínio de teste para vincular o type PARTNER quando criar um usuário com esse domínio no e-mail
+INSERT INTO domain_role (domain, role) VALUES('partner.com', 4);
 
 INSERT INTO project (description, subject) VALUES ('PROJECT DESCRIPTION', 'PROJECT SUBJECT');
 

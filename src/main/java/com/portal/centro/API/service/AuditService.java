@@ -1,7 +1,7 @@
 package com.portal.centro.API.service;
 
 import com.portal.centro.API.enums.SolicitationStatus;
-import com.portal.centro.API.enums.Type;
+import com.portal.centro.API.exceptions.ValidationException;
 import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.model.Audit;
 import com.portal.centro.API.model.User;
@@ -11,8 +11,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class AuditService extends GenericService<Audit, Long> {
@@ -49,25 +49,35 @@ public class AuditService extends GenericService<Audit, Long> {
     public List<Audit> findHistoryById(Long id, SolicitationStatus status) {
         User user = userService.findSelfUser();
 
-        if (Objects.equals(user.getRole(), Type.STUDENT) || Objects.equals(user.getRole(), Type.EXTERNAL))
-            return auditRepository.findAllBySolicitation_CreatedByAndSolicitationIdAndNewStatusIsNotOrderByNewStatus(user, id, status);
-
-        if (Objects.equals(user.getRole(), Type.PROFESSOR))
-            return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_TeacherAndSolicitationIdAndNewStatusIsNotOrderByNewStatus(user, user, id, status);
-
-        return auditRepository.findAllBySolicitationIdAndNewStatusIsNotOrderByNewStatus(id, status);
+        switch (user.getRole()) {
+            case STUDENT:
+            case EXTERNAL:
+            case PARTNER:
+                return auditRepository.findAllBySolicitation_CreatedByAndSolicitationIdAndNewStatusIsNotOrderByNewStatus(user, id, status);
+            case PROFESSOR:
+                return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_TeacherAndSolicitationIdAndNewStatusIsNotOrderByNewStatus(user, user, id, status);
+            case ADMIN:
+                return auditRepository.findAllBySolicitationIdAndNewStatusIsNotOrderByNewStatus(id, status);
+            default:
+                return new ArrayList<>();
+        }
     }
 
     public Page<Audit> page(PageRequest pageRequest) {
         User user = userService.findSelfUser();
 
-        if (Objects.equals(user.getRole(), Type.STUDENT) || Objects.equals(user.getRole(), Type.EXTERNAL))
-            return auditRepository.findAllBySolicitation_CreatedBy(user, pageRequest);
-
-        if (Objects.equals(user.getRole(), Type.PROFESSOR))
-            return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_Teacher(user, user, pageRequest);
-
-        return auditRepository.findAll(pageRequest);
+        switch (user.getRole()) {
+            case STUDENT:
+            case EXTERNAL:
+            case PARTNER:
+                return auditRepository.findAllBySolicitation_CreatedBy(user, pageRequest);
+            case PROFESSOR:
+                return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_Teacher(user, user, pageRequest);
+            case ADMIN:
+                return auditRepository.findAll(pageRequest);
+            default:
+                throw new ValidationException("Você não possui permissão para acessar este recurso.");
+        }
     }
 
 }
