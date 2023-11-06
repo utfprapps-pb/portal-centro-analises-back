@@ -42,7 +42,7 @@ public interface UserRepository extends GenericRepository<User, Long> {
                     "group by u.role " +
                     "order by u.role",
             nativeQuery = true)
-    List<Tuple> findGraficoUsuarioSituacaoNative();
+    List<Tuple> findGraficoUsuarioTipoNative();
 
     @Query(
             value = "select " +
@@ -56,5 +56,5 @@ public interface UserRepository extends GenericRepository<User, Long> {
                     "from users u " +
                     "group by u.status",
             nativeQuery = true)
-    List<Tuple> findGraficoUsuarioTipoNative();
+    List<Tuple> findGraficoUsuarioSituacaoNative();
 }

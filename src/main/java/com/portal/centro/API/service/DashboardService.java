@@ -40,7 +40,7 @@ public class DashboardService {
                     )
             );
         }
-        GraficoDTO graficoDTO = new GraficoDTO("Solicitação", lista);
+        GraficoDTO graficoDTO = new GraficoDTO("Solicitações", lista);
         return graficoDTO;
     }
 
@@ -72,7 +72,7 @@ public class DashboardService {
                     )
             );
         }
-        GraficoDTO graficoDTO = new GraficoDTO("Usuários por situações", lista);
+        GraficoDTO graficoDTO = new GraficoDTO("Situações de usuários", lista);
         return graficoDTO;
     }
 
@@ -88,7 +88,7 @@ public class DashboardService {
             );
         }
 
-        GraficoDTO graficoDTO = new GraficoDTO("Usuários por tipo", lista);
+        GraficoDTO graficoDTO = new GraficoDTO("Tipos de usuários", lista);
         return graficoDTO;
     }
 
@@ -105,7 +105,7 @@ public class DashboardService {
                     )
             );
         }
-        GraficoDTO graficoDTO = new GraficoDTO("Equipamentos por situações", lista);
+        GraficoDTO graficoDTO = new GraficoDTO("Situações de equipamentos", lista);
         return graficoDTO;
     }
 
