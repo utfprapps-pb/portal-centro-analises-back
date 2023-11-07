@@ -47,7 +47,7 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         setProjectToNullIfEmpty(requestBody);
         Solicitation output = super.save(requestBody);
         Audit audit = new Audit();
-        if (loggedUser.getRole().equals(Type.PROFESSOR)) {
+        if (loggedUser.getRole().equals(Type.ROLE_PROFESSOR)) {
             audit.setNewStatus(SolicitationStatus.PENDING_LAB);
             output.setStatus(SolicitationStatus.PENDING_LAB);
         } else {
@@ -70,7 +70,7 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         if (Objects.isNull(user))
             return;
 
-        List<Type> externalTypes = Arrays.asList(Type.EXTERNAL, Type.PARTNER);
+        List<Type> externalTypes = Arrays.asList(Type.ROLE_EXTERNAL, Type.ROLE_PARTNER);
         if (!externalTypes.contains(user.getRole()))
             return;
 
@@ -93,9 +93,9 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
     public List<Solicitation> getPending() {
         User user = userService.findSelfUser();
         switch (user.getRole()) {
-            case ADMIN:
+            case ROLE_ADMIN:
                 return solicitationRepository.findAllByStatus(SolicitationStatus.PENDING_LAB);
-            case PROFESSOR:
+            case ROLE_PROFESSOR:
                 return solicitationRepository.findAllByProject_TeacherAndStatus(user, SolicitationStatus.PENDING_ADVISOR);
             default:
                 throw new ValidationException("Você não possui permissão para acessar este recurso.");
@@ -120,9 +120,9 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         User user = userService.findSelfUser();
 
         switch (user.getRole()) {
-            case PROFESSOR:
+            case ROLE_PROFESSOR:
                 return solicitationRepository.findAllByProject_TeacherAndStatus(user, SolicitationStatus.PENDING_ADVISOR, pageRequest);
-            case ADMIN:
+            case ROLE_ADMIN:
                 return solicitationRepository.findAllByStatus(SolicitationStatus.PENDING_LAB, pageRequest);
             default:
                 throw new ValidationException("Você não possui permissão para acessar este recurso.");

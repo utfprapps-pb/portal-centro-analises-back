@@ -30,9 +30,9 @@ public class AuditService extends GenericService<Audit, Long> {
     public List<Audit> getAll() {
         User user = userService.findSelfUser();
         switch (user.getRole()) {
-            case ADMIN:
+            case ROLE_ADMIN:
                 return super.getAll();
-            case PROFESSOR:
+            case ROLE_PROFESSOR:
                 return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_Teacher(user, user);
             default:
                 return auditRepository.findAllBySolicitation_CreatedBy(user);
@@ -50,13 +50,13 @@ public class AuditService extends GenericService<Audit, Long> {
         User user = userService.findSelfUser();
 
         switch (user.getRole()) {
-            case STUDENT:
-            case EXTERNAL:
-            case PARTNER:
+            case ROLE_STUDENT:
+            case ROLE_EXTERNAL:
+            case ROLE_PARTNER:
                 return auditRepository.findAllBySolicitation_CreatedByAndSolicitationIdAndNewStatusIsNotOrderByNewStatus(user, id, status);
-            case PROFESSOR:
+            case ROLE_PROFESSOR:
                 return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_TeacherAndSolicitationIdAndNewStatusIsNotOrderByNewStatus(user, user, id, status);
-            case ADMIN:
+            case ROLE_ADMIN:
                 return auditRepository.findAllBySolicitationIdAndNewStatusIsNotOrderByNewStatus(id, status);
             default:
                 return new ArrayList<>();
@@ -67,13 +67,13 @@ public class AuditService extends GenericService<Audit, Long> {
         User user = userService.findSelfUser();
 
         switch (user.getRole()) {
-            case STUDENT:
-            case EXTERNAL:
-            case PARTNER:
+            case ROLE_STUDENT:
+            case ROLE_EXTERNAL:
+            case ROLE_PARTNER:
                 return auditRepository.findAllBySolicitation_CreatedBy(user, pageRequest);
-            case PROFESSOR:
+            case ROLE_PROFESSOR:
                 return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_Teacher(user, user, pageRequest);
-            case ADMIN:
+            case ROLE_ADMIN:
                 return auditRepository.findAll(pageRequest);
             default:
                 throw new ValidationException("Você não possui permissão para acessar este recurso.");

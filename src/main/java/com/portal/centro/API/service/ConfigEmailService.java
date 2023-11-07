@@ -35,7 +35,7 @@ public class ConfigEmailService extends GenericService<ConfigEmail, Long> {
     @Override
     public ConfigEmail save(ConfigEmail requestBody) throws Exception {
         User selfUser = authService.findLoggedUser();
-        if (!Objects.equals(selfUser.getRole(), Type.ADMIN))
+        if (!Objects.equals(selfUser.getRole(), Type.ROLE_ADMIN))
             throw new ValidationException("Somente o administrador pode realizar esta ação.");
         validateExistenceJustOneConfigEmail(requestBody);
         return super.save(requestBody);

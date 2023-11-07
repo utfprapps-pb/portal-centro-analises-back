@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import static com.portal.centro.API.enums.Type.ADMIN;
+import static com.portal.centro.API.enums.Type.ROLE_ADMIN;
 
 @RestController
 @RequestMapping("admin")
@@ -26,7 +26,7 @@ public class AdminController {
     public ResponseEntity<?> addNewUserAdmin(@Valid @RequestBody User user) throws Exception {
         User loggedUser = userService.findSelfUser();
 
-        if(loggedUser.getRole() != ADMIN) {
+        if(loggedUser.getRole() != ROLE_ADMIN) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
@@ -43,7 +43,7 @@ public class AdminController {
     public ResponseEntity<?> editRoleAdmin(@RequestBody @Valid String role, @PathVariable Long id) throws Exception {
         User loggedUser = userService.findSelfUser();
 
-        if(loggedUser.getRole() != ADMIN) {
+        if(loggedUser.getRole() != ROLE_ADMIN) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 

@@ -30,7 +30,7 @@ public class TransactionService  extends GenericService<Transaction, Long> {
     @Override
     public List<Transaction> getAll() {
         User selfUser = userService.findSelfUser();
-        if (Objects.equals(selfUser.getRole(), Type.ADMIN))
+        if (Objects.equals(selfUser.getRole(), Type.ROLE_ADMIN))
             return transactionRepository.findAllByOrderByUserCreatedAtDesc();
 
         return transactionRepository.findAllByUser_IdOrderByCreatedAtDesc(selfUser.getId());

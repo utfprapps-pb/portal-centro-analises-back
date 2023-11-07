@@ -1,11 +1,11 @@
 package com.portal.centro.API.enums;
 
 public enum Type {
-    PROFESSOR("professor"),
-    STUDENT("student"),
-    EXTERNAL("external"),
-    ADMIN("admin"),
-    PARTNER("partner");
+    ROLE_PROFESSOR("ROLE_PROFESSOR"),
+    ROLE_STUDENT("ROLE_PROFESSOR"),
+    ROLE_EXTERNAL("ROLE_PROFESSOR"),
+    ROLE_ADMIN("ROLE_PROFESSOR"),
+    ROLE_PARTNER("ROLE_PROFESSOR");
 
     private String content;
 
