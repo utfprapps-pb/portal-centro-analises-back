@@ -9,9 +9,16 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,6 +33,7 @@ import java.util.List;
         @UniqueConstraint(name = "setuniqueemail", columnNames = "email")
 })
 @UserUniqueConstraint
+@EntityListeners(AuditingEntityListener.class)
 public class User implements UserDetails {
 
     @Id
@@ -51,10 +59,16 @@ public class User implements UserDetails {
     private StatusInactiveActive status;
 
     @Column(name = "created_at")
+    @CreatedDate
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    @Column(name = "modified_at")
+    @LastModifiedDate
+    private LocalDateTime modifiedAt;
+
+    @Column(name = "modified_by")
+    @LastModifiedBy
+    private String modifiedby;
 
     @Column(name = "email_verified")
     private Boolean emailVerified;
@@ -117,15 +131,5 @@ public class User implements UserDetails {
     @JsonIgnore
     public boolean isEnabled() {
         return true;
-    }
-
-    @PrePersist
-    public void prePersist() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
     }
 }
