@@ -33,8 +33,6 @@ public class TransactionController extends GenericController<Transaction, Long> 
         User selfUser = userService.findSelfUser();
         if (!Objects.equals(selfUser.getRole(), Type.ADMIN))
             throw new ValidationException("Somente o administrador pode realizar esta ação.");
-        requestBody.setCreatedAt(LocalDateTime.now());
-        requestBody.setCreatedBy(selfUser);
         UserBalance userBalance = userService.updateBalance(
                 requestBody.getUser().getId(),
                 requestBody.getType(),

@@ -10,12 +10,16 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "transaction")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class Transaction {
 
     @Id
@@ -25,12 +29,13 @@ public class Transaction {
     @NotNull(message = "Parameter value is required.")
     private BigDecimal value;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
+    @CreatedDate
     private LocalDateTime createdAt;
 
-    @ManyToOne
-    @JoinColumn(name = "create_by")
-    private User createdBy;
+    @Column(name = "created_by", updatable = false)
+    @CreatedBy
+    private String createdBy;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
