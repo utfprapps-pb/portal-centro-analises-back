@@ -8,14 +8,21 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "project")
+@EntityListeners(AuditingEntityListener.class)
 public class Project extends IModel {
-
 
     @NotNull()
     @Size(min = 4, max = 255)
@@ -36,4 +43,20 @@ public class Project extends IModel {
             inverseJoinColumns = @JoinColumn(
                     name = "user_id", referencedColumnName = "id"))
     private List<User> students;
+
+    @Column(name = "created_at", updatable = false)
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @Column(name = "created_by", updatable = false)
+    @CreatedBy
+    private String createdby;
+
+    @Column(name = "modified_at")
+    @LastModifiedDate
+    private LocalDateTime modifiedAt;
+
+    @Column(name = "modified_by")
+    @LastModifiedBy
+    private String modifiedby;
 }
