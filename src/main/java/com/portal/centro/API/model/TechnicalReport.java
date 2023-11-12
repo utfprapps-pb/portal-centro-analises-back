@@ -7,6 +7,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -16,6 +22,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class TechnicalReport extends IModel {
 
     @NotNull(message = "Parameter description is required.")
@@ -39,5 +46,21 @@ public class TechnicalReport extends IModel {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "technical_report_id")
     private List<MultiPartFileList> multiPartFileLists; //adicionar coluna nova no banco
+
+    @Column(name = "created_at", updatable = false)
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @Column(name = "created_by", updatable = false)
+    @CreatedBy
+    private String createdby;
+
+    @Column(name = "modified_at")
+    @LastModifiedDate
+    private LocalDateTime modifiedAt;
+
+    @Column(name = "modified_by")
+    @LastModifiedBy
+    private String modifiedby;
 
 }
