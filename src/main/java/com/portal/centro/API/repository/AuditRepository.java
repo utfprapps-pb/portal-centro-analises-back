@@ -28,8 +28,30 @@ public interface AuditRepository extends GenericRepository<Audit, Long> {
     @Query(nativeQuery = true, value = "select a.* from audit a " +
            "where a.change_date in (select max(change_date) from audit group by solicitation_id) " +
            "group by a.id",
-            countQuery = "select a.* from audit a " +
+            countQuery = "select count(a.*) from audit a " +
                     "where a.change_date in (select max(change_date) from audit group by solicitation_id) " +
                     "group by a.id")
     Page<Audit> findAllDistinctByOrderByUserCreatedAtDesc(PageRequest pageRequest);
+
+    @Query(nativeQuery = true, value = "select " +
+            "a.* " +
+            "from audit a " +
+            "join solicitation s on s.id = a.solicitation_id " +
+            "join project p on p.id = s.project_id " +
+            "where a.change_date in ( " +
+            "select max(change_date) from audit group by solicitation_id  " +
+            ") and (s.creator_id = :userid or p.teacher_id = :userid) " +
+            "group by  " +
+            "a.id",
+            countQuery = "select " +
+                    "count(a.*) " +
+                    "from audit a " +
+                    "join solicitation s on s.id = a.solicitation_id " +
+                    "join project p on p.id = s.project_id " +
+                    "where a.change_date in ( " +
+                    "select max(change_date) from audit group by solicitation_id  " +
+                    ") and (s.creator_id = :userid or p.teacher_id = :userid) " +
+                    "group by  " +
+                    "a.id")
+    Page<Audit> findAllDistinctByOrderByUserCreatedAtDescCreatedByUser(Long userid, PageRequest pageRequest);
 }

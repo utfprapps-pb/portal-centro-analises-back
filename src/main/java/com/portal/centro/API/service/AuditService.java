@@ -70,7 +70,7 @@ public class AuditService extends GenericService<Audit, Long> {
             case STUDENT:
             case EXTERNAL:
             case PARTNER:
-                return auditRepository.findAllBySolicitation_CreatedBy(user, pageRequest);
+                return auditRepository.findAllDistinctByOrderByUserCreatedAtDescCreatedByUser(user.getId(), pageRequest);
             case PROFESSOR:
                 return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_Teacher(user, user, pageRequest);
             case ADMIN:
