@@ -74,7 +74,7 @@ public class AuditService extends GenericService<Audit, Long> {
             case PROFESSOR:
                 return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_Teacher(user, user, pageRequest);
             case ADMIN:
-                return auditRepository.findAll(pageRequest);
+                return auditRepository.findAllDistinctByOrderByUserCreatedAtDesc(pageRequest);
             default:
                 throw new ValidationException("Você não possui permissão para acessar este recurso.");
         }

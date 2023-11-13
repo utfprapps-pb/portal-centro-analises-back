@@ -3,9 +3,11 @@ package com.portal.centro.API.repository;
 import com.portal.centro.API.enums.SolicitationStatus;
 import com.portal.centro.API.generic.crud.GenericRepository;
 import com.portal.centro.API.model.Audit;
+import com.portal.centro.API.model.Transaction;
 import com.portal.centro.API.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -23,4 +25,11 @@ public interface AuditRepository extends GenericRepository<Audit, Long> {
 
     List<Audit> findAllBySolicitationIdAndNewStatusIsNotOrderByNewStatus(Long id, SolicitationStatus newStatus);
 
+    @Query(nativeQuery = true, value = "select a.* from audit a " +
+           "where a.change_date in (select max(change_date) from audit group by solicitation_id) " +
+           "group by a.id",
+            countQuery = "select a.* from audit a " +
+                    "where a.change_date in (select max(change_date) from audit group by solicitation_id) " +
+                    "group by a.id")
+    Page<Audit> findAllDistinctByOrderByUserCreatedAtDesc(PageRequest pageRequest);
 }
