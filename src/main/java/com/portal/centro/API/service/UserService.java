@@ -68,6 +68,7 @@ public class UserService extends GenericService<User, Long> {
         Type role = utilsService.getRoleType(requestBody.getEmail());
         requestBody.setPermissions(utilsService.getPermissionsByRole(role));
         requestBody.setRole(role);
+        requestBody.setStatus(StatusInactiveActive.ACTIVE);
         this.validate(requestBody);
         User user = super.save(requestBody);
         this.emailCodeService.createCode(user);
