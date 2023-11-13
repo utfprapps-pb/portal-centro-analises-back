@@ -79,6 +79,7 @@ public class UserService extends GenericService<User, Long> {
     public User saveAdmin(User requestBody) throws Exception {
         encryptPassword(requestBody);
         requestBody.setPermissions(utilsService.getPermissionsByRole(requestBody.getRole()));
+        requestBody.setStatus(StatusInactiveActive.ACTIVE);
         this.validate(requestBody);
         User user = super.save(requestBody);
         this.emailCodeService.createCode(user);
