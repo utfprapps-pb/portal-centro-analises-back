@@ -3,7 +3,6 @@ package com.portal.centro.API.repository;
 import com.portal.centro.API.enums.SolicitationStatus;
 import com.portal.centro.API.generic.crud.GenericRepository;
 import com.portal.centro.API.model.Audit;
-import com.portal.centro.API.model.Transaction;
 import com.portal.centro.API.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,25 +32,27 @@ public interface AuditRepository extends GenericRepository<Audit, Long> {
                     "group by a.id")
     Page<Audit> findAllDistinctByOrderByUserCreatedAtDesc(PageRequest pageRequest);
 
-    @Query(nativeQuery = true, value = "select " +
-            "a.* " +
-            "from audit a " +
+    @Query(nativeQuery = true, value = "select a.* from audit a " +
+            "join solicitation s on s.id = a.solicitation_id " +
+            "where a.change_date in (select max(change_date) from audit group by solicitation_id) and s.creator_id = :userid" +
+            "group by a.id",
+            countQuery = "select count(a.*) from audit a " +
+                    "join solicitation s on s.id = a.solicitation_id " +
+                    "where a.change_date in (select max(change_date) from audit group by solicitation_id) and s.creator_id = :userid" +
+                    "group by a.id")
+    Page<Audit> findAllDistinctByOrderByUserCreatedAtDescCreatedByUser(Long userid, PageRequest pageRequest);
+
+    @Query(nativeQuery = true, value = "select a.* from audit a " +
             "join solicitation s on s.id = a.solicitation_id " +
             "join project p on p.id = s.project_id " +
-            "where a.change_date in ( " +
-            "select max(change_date) from audit group by solicitation_id  " +
-            ") and (s.creator_id = :userid or p.teacher_id = :userid) " +
-            "group by  " +
-            "a.id",
-            countQuery = "select " +
-                    "count(a.*) " +
-                    "from audit a " +
+            "where a.change_date in ( select max(change_date) from audit group by solicitation_id ) and " +
+            "(s.creator_id = :userid or p.teacher_id = :userid) " +
+            "group by a.id",
+            countQuery = "select count(a.*) from audit a " +
                     "join solicitation s on s.id = a.solicitation_id " +
                     "join project p on p.id = s.project_id " +
-                    "where a.change_date in ( " +
-                    "select max(change_date) from audit group by solicitation_id  " +
-                    ") and (s.creator_id = :userid or p.teacher_id = :userid) " +
-                    "group by  " +
-                    "a.id")
-    Page<Audit> findAllDistinctByOrderByUserCreatedAtDescCreatedByUser(Long userid, PageRequest pageRequest);
+                    "where a.change_date in ( select max(change_date) from audit group by solicitation_id ) and " +
+                    "(s.creator_id = :userid or p.teacher_id = :userid) " +
+                    "group by a.id")
+    Page<Audit> findAllDistinctByOrderByUserCreatedAtDescCreatedByUserOrTeacherInProject(Long userid, PageRequest pageRequest);
 }
