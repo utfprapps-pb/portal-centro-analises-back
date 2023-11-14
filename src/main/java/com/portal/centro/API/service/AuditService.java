@@ -53,11 +53,11 @@ public class AuditService extends GenericService<Audit, Long> {
             case STUDENT:
             case EXTERNAL:
             case PARTNER:
-                return auditRepository.findAllBySolicitation_CreatedByAndSolicitationIdAndNewStatusIsNotOrderByNewStatus(user, id, status);
+                return auditRepository.findAllBySolicitation_CreatedByAndSolicitationIdAndNewStatusIsNotOrderByChangeDateDesc(user, id, status);
             case PROFESSOR:
-                return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_TeacherAndSolicitationIdAndNewStatusIsNotOrderByNewStatus(user, user, id, status);
+                return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_TeacherAndSolicitationIdAndNewStatusIsNotOrderByChangeDateDesc(user, user, id, status);
             case ADMIN:
-                return auditRepository.findAllBySolicitationIdAndNewStatusIsNotOrderByNewStatus(id, status);
+                return auditRepository.findAllBySolicitationIdAndNewStatusIsNotOrderByChangeDateDesc(id, status);
             default:
                 return new ArrayList<>();
         }
