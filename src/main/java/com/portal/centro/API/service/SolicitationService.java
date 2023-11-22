@@ -1,5 +1,6 @@
 package com.portal.centro.API.service;
 
+import com.portal.centro.API.dto.SolicitationResponseDto;
 import com.portal.centro.API.enums.SolicitationProjectNature;
 import com.portal.centro.API.enums.SolicitationStatus;
 import com.portal.centro.API.enums.Type;
@@ -77,12 +78,12 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         solicitation.setStatus(SolicitationStatus.PENDING_LAB);
     }
 
-    public Solicitation updateStatus(Long id, SolicitationStatus status) throws Exception {
-        Solicitation solicitation = this.findOneById(id);
-        solicitation.setStatus(status);
+    public Solicitation updateStatus(SolicitationResponseDto responseDto) throws Exception {
+        Solicitation solicitation = this.findOneById(responseDto.getId());
+        solicitation.setStatus(responseDto.getStatus());
 
         Audit audit = new Audit();
-        audit.setNewStatus(status);
+        audit.setNewStatus(responseDto.getStatus());
         audit.setSolicitation(solicitation);
 
         auditService.saveAudit(audit);
