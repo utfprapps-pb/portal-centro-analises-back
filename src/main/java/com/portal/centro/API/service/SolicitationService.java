@@ -82,6 +82,10 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         Solicitation solicitation = this.findOneById(responseDto.getId());
         solicitation.setStatus(responseDto.getStatus());
 
+        if (solicitation.getStatus() == SolicitationStatus.REFUSED) {
+            solicitation.setRejection_reason(responseDto.getReason());
+        }
+
         Audit audit = new Audit();
         audit.setNewStatus(responseDto.getStatus());
         audit.setSolicitation(solicitation);
