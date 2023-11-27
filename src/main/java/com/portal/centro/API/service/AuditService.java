@@ -53,11 +53,11 @@ public class AuditService extends GenericService<Audit, Long> {
             case STUDENT:
             case EXTERNAL:
             case PARTNER:
-                return auditRepository.findAllBySolicitation_CreatedByAndSolicitationIdAndNewStatusIsNotOrderByNewStatus(user, id, status);
+                return auditRepository.findAllBySolicitation_CreatedByAndSolicitationIdAndNewStatusIsNotOrderByChangeDateDesc(user, id, status);
             case PROFESSOR:
-                return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_TeacherAndSolicitationIdAndNewStatusIsNotOrderByNewStatus(user, user, id, status);
+                return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_TeacherAndSolicitationIdAndNewStatusIsNotOrderByChangeDateDesc(user, user, id, status);
             case ADMIN:
-                return auditRepository.findAllBySolicitationIdAndNewStatusIsNotOrderByNewStatus(id, status);
+                return auditRepository.findAllBySolicitationIdAndNewStatusIsNotOrderByChangeDateDesc(id, status);
             default:
                 return new ArrayList<>();
         }
@@ -70,11 +70,11 @@ public class AuditService extends GenericService<Audit, Long> {
             case STUDENT:
             case EXTERNAL:
             case PARTNER:
-                return auditRepository.findAllBySolicitation_CreatedBy(user, pageRequest);
+                return auditRepository.findAllDistinctByOrderByUserCreatedAtDescCreatedByUser(user.getId(), pageRequest);
             case PROFESSOR:
-                return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_Teacher(user, user, pageRequest);
+                return auditRepository.findAllDistinctByOrderByUserCreatedAtDescCreatedByUserOrTeacherInProject(user.getId(), pageRequest);
             case ADMIN:
-                return auditRepository.findAll(pageRequest);
+                return auditRepository.findAllDistinctByOrderByUserCreatedAtDesc(pageRequest);
             default:
                 throw new ValidationException("Você não possui permissão para acessar este recurso.");
         }
