@@ -68,6 +68,7 @@ public class UserService extends GenericService<User, Long> {
         Type role = utilsService.getRoleType(requestBody.getEmail());
         requestBody.setPermissions(utilsService.getPermissionsByRole(role));
         requestBody.setRole(role);
+        requestBody.setStatus(StatusInactiveActive.ACTIVE);
         this.validate(requestBody);
         User user = super.save(requestBody);
         this.emailCodeService.createCode(user);
@@ -78,6 +79,7 @@ public class UserService extends GenericService<User, Long> {
     public User saveAdmin(User requestBody) throws Exception {
         encryptPassword(requestBody);
         requestBody.setPermissions(utilsService.getPermissionsByRole(requestBody.getRole()));
+        requestBody.setStatus(StatusInactiveActive.ACTIVE);
         this.validate(requestBody);
         User user = super.save(requestBody);
         this.emailCodeService.createCode(user);
@@ -197,22 +199,31 @@ public class UserService extends GenericService<User, Long> {
         return userBalance;
     }
 
-    //modifica o status de um usuário de ativo para inativo
-    //dos usuário que tem vinculo e exclui os usuários sem
-    //vinculos com projetos
+    /* Modifica o status de um usuário de ativo para inativo
+     * dos usuário que tem vinculo com projetos e exclui os
+     * usuários sem vinculos com projetos, para o caso dos
+     * professores ele não pode ser deletado, então procura
+     * o tipo de usuário antes de inativa-lo ou deleta-lo
+     * */
     public String editUserStatusToInactiveOrDelete(Long id) throws Exception {
         User user = userRepository.findUserById(id);
 
-        if(!projectRepository.findAllByStudentsContains(user).isEmpty()){
-            user.setStatus(StatusInactiveActive.INACTIVE);
-            super.save(user);
-            return "Usuário inativado com sucesso!";
-        } else if(!projectRepository.findAllByTeacher(user).isEmpty()){
+        if(user.getRole().getContent().toString().equals("professor")){
             user.setStatus(StatusInactiveActive.INACTIVE);
             super.save(user);
             return "Usuário inativado com sucesso!";
         } else {
-            return super.deleteById(id);
+            if(!projectRepository.findAllByStudentsContains(user).isEmpty()){
+                user.setStatus(StatusInactiveActive.INACTIVE);
+                super.save(user);
+                return "Usuário inativado com sucesso!";
+            } else if(!projectRepository.findAllByTeacher(user).isEmpty()){
+                user.setStatus(StatusInactiveActive.INACTIVE);
+                super.save(user);
+                return "Usuário inativado com sucesso!";
+            } else {
+                return super.deleteById(id);
+            }
         }
     }
 
