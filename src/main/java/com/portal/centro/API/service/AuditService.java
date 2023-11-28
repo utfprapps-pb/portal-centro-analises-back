@@ -33,9 +33,9 @@ public class AuditService extends GenericService<Audit, Long> {
             case ADMIN:
                 return super.getAll();
             case PROFESSOR:
-                return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_Teacher(user, user);
+                return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_Teacher(user.getEmail(), user);
             default:
-                return auditRepository.findAllBySolicitation_CreatedBy(user);
+                return auditRepository.findAllBySolicitation_CreatedBy(user.getEmail());
         }
     }
 
@@ -53,9 +53,9 @@ public class AuditService extends GenericService<Audit, Long> {
             case STUDENT:
             case EXTERNAL:
             case PARTNER:
-                return auditRepository.findAllBySolicitation_CreatedByAndSolicitationIdAndNewStatusIsNotOrderByNewStatus(user, id, status);
+                return auditRepository.findAllBySolicitation_CreatedByAndSolicitationIdAndNewStatusIsNotOrderByNewStatus(user.getEmail(), id, status);
             case PROFESSOR:
-                return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_TeacherAndSolicitationIdAndNewStatusIsNotOrderByNewStatus(user, user, id, status);
+                return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_TeacherAndSolicitationIdAndNewStatusIsNotOrderByNewStatus(user.getEmail(), user, id, status);
             case ADMIN:
                 return auditRepository.findAllBySolicitationIdAndNewStatusIsNotOrderByNewStatus(id, status);
             default:
@@ -70,9 +70,9 @@ public class AuditService extends GenericService<Audit, Long> {
             case STUDENT:
             case EXTERNAL:
             case PARTNER:
-                return auditRepository.findAllBySolicitation_CreatedBy(user, pageRequest);
+                return auditRepository.findAllBySolicitation_CreatedBy(user.getEmail(), pageRequest);
             case PROFESSOR:
-                return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_Teacher(user, user, pageRequest);
+                return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_Teacher(user.getEmail(), user, pageRequest);
             case ADMIN:
                 return auditRepository.findAll(pageRequest);
             default:

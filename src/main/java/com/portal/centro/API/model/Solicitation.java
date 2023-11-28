@@ -26,10 +26,6 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public class Solicitation extends IModel {
 
-//    @ManyToOne
-//    @JoinColumn(name = "creator_id")
-//    private User createdBy;
-
     @NotNull(message = "Equipment must not be null")
     @OneToOne
     @JoinColumn(name = "equipment_id")
@@ -67,7 +63,7 @@ public class Solicitation extends IModel {
 
     @Column(name = "created_by", updatable = false)
     @CreatedBy
-    private String createdby;
+    private String createdBy;
 
     @Column(name = "modified_at")
     @LastModifiedDate
