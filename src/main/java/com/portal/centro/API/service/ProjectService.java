@@ -85,9 +85,9 @@ public class ProjectService extends GenericService<Project, Long> {
     public List<Project> getAll() {
         User user = userService.findSelfUser();
         switch (user.getRole()) {
-            case ADMIN:
+            case ROLE_ADMIN:
                 return super.getAll();
-            case PROFESSOR:
+            case ROLE_PROFESSOR:
                 return projectRepository.findAllByTeacher(user);
             default:
                 throw new ValidationException("Você não possui permissão para acessar este recurso.");
