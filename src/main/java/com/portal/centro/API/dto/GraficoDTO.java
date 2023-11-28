@@ -14,6 +14,7 @@ import java.util.List;
 public class GraficoDTO {
 
     private String titulo;
-    private List<GraficoDadoDTO> dados;
+    private List<String> labels;
+    private List<GraficoDadoDTO> datasets;
 
 }

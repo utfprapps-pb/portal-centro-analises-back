@@ -30,82 +30,125 @@ public class DashboardService {
 
     public GraficoDTO getGraficoSolicitacao(){
         List<Tuple> dados = solicitationRepository.findGraficoSolicitacoesNative();
+
+        GraficoDTO graficoDTO = new GraficoDTO();
+        graficoDTO.setTitulo("Solicitações");
+
         List<GraficoDadoDTO> lista = new ArrayList<>();
+        GraficoDadoDTO dadoDTO = new GraficoDadoDTO();
+
+        List<Long> data = new ArrayList<>();
+        List<String> labels = new ArrayList<>();
         for (Tuple tuple : dados){
-            lista.add(
-                    new GraficoDadoDTO(
-                            tuple.get(0,Long.class),
-                            tuple.get(1,String.class),
-                            tuple.get(2,Long.class)
-                    )
-            );
+            labels.add(tuple.get(1,String.class));
+            data.add(tuple.get(2,Long.class));
         }
-        GraficoDTO graficoDTO = new GraficoDTO("Solicitações", lista);
+        dadoDTO.setData(data);
+
+        lista.add(dadoDTO);
+
+        graficoDTO.setDatasets(lista);
+        graficoDTO.setLabels(labels);
+
         return graficoDTO;
     }
 
     public GraficoDTO getGraficoEquipamentoSolicitacao(){
         List<Tuple> dados = solicitationRepository.findGraficoEquipamentoSolicitacaoNative();
+
+        GraficoDTO graficoDTO = new GraficoDTO();
+        graficoDTO.setTitulo("Equipamentos em solicitações");
+
         List<GraficoDadoDTO> lista = new ArrayList<>();
+        GraficoDadoDTO dadoDTO = new GraficoDadoDTO();
+
+        List<Long> data = new ArrayList<>();
+        List<String> labels = new ArrayList<>();
         for (Tuple tuple : dados){
-            lista.add(
-                    new GraficoDadoDTO(
-                            tuple.get(0,Long.class),
-                            tuple.get(1,String.class),
-                            tuple.get(2,Long.class)
-                    )
-            );
+            labels.add(tuple.get(1,String.class));
+            data.add(tuple.get(2,Long.class));
         }
-        GraficoDTO graficoDTO = new GraficoDTO("Equipamentos em solicitações", lista);
+        dadoDTO.setData(data);
+
+        lista.add(dadoDTO);
+
+        graficoDTO.setDatasets(lista);
+        graficoDTO.setLabels(labels);
+
         return graficoDTO;
     }
 
     public GraficoDTO getGraficoUsuarioSituacao(){
         List<Tuple> dados = userRepository.findGraficoUsuarioSituacaoNative();
+
+        GraficoDTO graficoDTO = new GraficoDTO();
+        graficoDTO.setTitulo("Situações de usuários");
+
         List<GraficoDadoDTO> lista = new ArrayList<>();
+        GraficoDadoDTO dadoDTO = new GraficoDadoDTO();
+
+        List<Long> data = new ArrayList<>();
+        List<String> labels = new ArrayList<>();
         for (Tuple tuple : dados){
-            lista.add(
-                    new GraficoDadoDTO(
-                            tuple.get(0,Long.class),
-                            tuple.get(1,String.class),
-                            tuple.get(2,Long.class)
-                    )
-            );
+            labels.add(tuple.get(1,String.class));
+            data.add(tuple.get(2,Long.class));
         }
-        GraficoDTO graficoDTO = new GraficoDTO("Situações de usuários", lista);
+        dadoDTO.setData(data);
+
+        lista.add(dadoDTO);
+
+        graficoDTO.setDatasets(lista);
+        graficoDTO.setLabels(labels);
+
         return graficoDTO;
     }
 
     public GraficoDTO getGraficoUsuarioRole(){
         List<Tuple> dados = userRepository.findGraficoUsuarioTipoNative();
-        List<GraficoDadoDTO> lista = new ArrayList<>();
-        for (Tuple tuple : dados){
-            lista.add(
-                new GraficoDadoDTO(
-                        tuple.get(0,Long.class),
-                        tuple.get(1,String.class),
-                        tuple.get(2,Long.class))
-            );
-        }
 
-        GraficoDTO graficoDTO = new GraficoDTO("Tipos de usuários", lista);
+        GraficoDTO graficoDTO = new GraficoDTO();
+        graficoDTO.setTitulo("Tipos de usuários");
+
+        List<GraficoDadoDTO> lista = new ArrayList<>();
+        GraficoDadoDTO dadoDTO = new GraficoDadoDTO();
+
+        List<Long> data = new ArrayList<>();
+        List<String> labels = new ArrayList<>();
+        for (Tuple tuple : dados){
+            labels.add(tuple.get(1,String.class));
+            data.add(tuple.get(2,Long.class));
+        }
+        dadoDTO.setData(data);
+
+        lista.add(dadoDTO);
+
+        graficoDTO.setDatasets(lista);
+        graficoDTO.setLabels(labels);
+
         return graficoDTO;
     }
 
     public GraficoDTO getGraficoEquipamentoSituacao(){
         List<Tuple> dados = equipmentRepository.findGraficoEquipamentoSituacaoNative();
 
+        GraficoDTO graficoDTO = new GraficoDTO();
+        graficoDTO.setTitulo("Situações de equipamentos");
+
         List<GraficoDadoDTO> lista = new ArrayList<>();
+        GraficoDadoDTO dadoDTO = new GraficoDadoDTO();
+
+        List<Long> data = new ArrayList<>();
+        List<String> labels = new ArrayList<>();
         for (Tuple tuple : dados){
-            lista.add(
-                    new GraficoDadoDTO(
-                            tuple.get(0,Long.class),
-                            tuple.get(1,String.class),
-                            tuple.get(2,Long.class)
-                    )
-            );
+            labels.add(tuple.get(1,String.class));
+            data.add(tuple.get(2,Long.class));
         }
-        GraficoDTO graficoDTO = new GraficoDTO("Situações de equipamentos", lista);
+        dadoDTO.setData(data);
+        lista.add(dadoDTO);
+
+        graficoDTO.setDatasets(lista);
+        graficoDTO.setLabels(labels);
+
         return graficoDTO;
     }
 
