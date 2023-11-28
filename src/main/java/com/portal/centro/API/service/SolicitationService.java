@@ -42,7 +42,6 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
                     "O campo 'Outra natureza de projeto' deve ser preenchido quando a natureza do projeto for 'Outro'.");
         }
         User loggedUser = userService.findSelfUser();
-        requestBody.setCreatedBy(loggedUser);
         setSolicitationStatusWhenUserExternalOrPartner(requestBody, loggedUser);
         setProjectToNullIfEmpty(requestBody);
         Solicitation output = super.save(requestBody);
