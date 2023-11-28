@@ -71,5 +71,5 @@ public class Solicitation extends IModel {
 
     @Column(name = "modified_by")
     @LastModifiedBy
-    private String modifiedby;
+    private String modifiedBy;
 }

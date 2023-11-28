@@ -68,7 +68,7 @@ public class User implements UserDetails {
 
     @Column(name = "modified_by")
     @LastModifiedBy
-    private String modifiedby;
+    private String modifiedBy;
 
     @Column(name = "email_verified")
     private Boolean emailVerified;

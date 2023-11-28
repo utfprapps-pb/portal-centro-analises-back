@@ -43,7 +43,7 @@ public class Partner {
 
     @Column(name = "created_by", updatable = false)
     @CreatedBy
-    private String createdby;
+    private String createdBy;
 
     @Column(name = "modified_at")
     @LastModifiedDate
@@ -51,6 +51,6 @@ public class Partner {
 
     @Column(name = "modified_by")
     @LastModifiedBy
-    private String modifiedby;
+    private String modifiedBy;
 
 }

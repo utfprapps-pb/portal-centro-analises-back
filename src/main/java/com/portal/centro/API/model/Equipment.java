@@ -65,7 +65,7 @@ public class Equipment {
 
     @Column(name = "created_by", updatable = false)
     @CreatedBy
-    private String createdby;
+    private String createdBy;
 
     @Column(name = "modified_at")
     @LastModifiedDate
@@ -73,5 +73,5 @@ public class Equipment {
 
     @Column(name = "modified_by")
     @LastModifiedBy
-    private String modifiedby;
+    private String modifiedBy;
 }

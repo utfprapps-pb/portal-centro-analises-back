@@ -36,5 +36,5 @@ public class EmailModel implements Serializable {
 
     @Column(name = "created_by", updatable = false)
     @CreatedBy
-    private String createdby;
+    private String createdBy;
 }
