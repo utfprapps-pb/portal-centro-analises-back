@@ -56,5 +56,5 @@ public class Solicitation extends IModel {
 
     @Column(name = "rejection_reason")
     @Size(max = 500)
-    private String rejection_reason;
+    private String rejectionReason;
 }
