@@ -26,7 +26,7 @@ public class DomainRoleService extends GenericService<DomainRole, Long> {
     @Override
     public DomainRole save(DomainRole requestBody) throws Exception {
         User selfUser = userService.findSelfUser();
-        if (!Objects.equals(selfUser.getRole(), Type.ADMIN))
+        if (!Objects.equals(selfUser.getRole(), Type.ROLE_ADMIN))
             throw new ValidationException("Somente o administrador pode realizar esta ação.");
         validJustOneDomain(requestBody);
         return super.save(requestBody);

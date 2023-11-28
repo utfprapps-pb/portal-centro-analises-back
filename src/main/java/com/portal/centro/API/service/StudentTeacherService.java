@@ -57,7 +57,7 @@ public class StudentTeacherService extends GenericService<StudentTeacher, Long> 
     public List<StudentTeacher> getAllByUser() {
         User user = userService.findSelfUser();
 
-        if(user.getRole() == Type.PROFESSOR) {
+        if(user.getRole() == Type.ROLE_PROFESSOR) {
             return studentTeacherRepository.listByTeacherWhere(user.getId());
         } else {
             return studentTeacherRepository.findByStudentWhere(user.getId());
