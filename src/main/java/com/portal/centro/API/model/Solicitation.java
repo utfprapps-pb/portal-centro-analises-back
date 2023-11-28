@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -52,4 +53,8 @@ public class Solicitation extends IModel {
     private TypeUser typeUser;
 
     private BigDecimal value;
+
+    @Column(name = "scheduledate")
+    private LocalDateTime scheduleDate;
+
 }
