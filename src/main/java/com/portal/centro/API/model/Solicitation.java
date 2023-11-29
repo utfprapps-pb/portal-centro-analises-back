@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -57,4 +58,8 @@ public class Solicitation extends IModel {
     @Column(name = "rejection_reason")
     @Size(max = 500)
     private String rejectionReason;
+
+    @Column(name = "scheduledate")
+    private LocalDateTime scheduleDate;
+
 }

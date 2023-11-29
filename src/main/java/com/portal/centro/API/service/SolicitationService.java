@@ -1,20 +1,17 @@
 package com.portal.centro.API.service;
 
 import com.portal.centro.API.dto.SolicitationResponseDto;
-import com.portal.centro.API.enums.SolicitationProjectNature;
-import com.portal.centro.API.enums.SolicitationStatus;
-import com.portal.centro.API.enums.Type;
+import com.portal.centro.API.enums.*;
 import com.portal.centro.API.exceptions.ValidationException;
 import com.portal.centro.API.generic.crud.GenericService;
-import com.portal.centro.API.model.Audit;
-import com.portal.centro.API.model.Solicitation;
-import com.portal.centro.API.model.User;
+import com.portal.centro.API.model.*;
 import com.portal.centro.API.repository.SolicitationRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -26,13 +23,20 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
     private final AuditService auditService;
     private final UserService userService;
     private final SolicitationRepository solicitationRepository;
+    private final RequestValueService requestValueService;
+    private final TechnicalReportService technicalReportService;
 
     public SolicitationService(SolicitationRepository solicitationRepository, AuditService auditService,
-                               UserService userService) {
+                               UserService userService,
+                               TransactionService transactionService,
+                               RequestValueService requestValueService,
+                               TechnicalReportService technicalReportService) {
         super(solicitationRepository);
         this.solicitationRepository = solicitationRepository;
         this.auditService = auditService;
         this.userService = userService;
+        this.requestValueService = requestValueService;
+        this.technicalReportService = technicalReportService;
     }
 
     @Override
@@ -86,6 +90,16 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
             solicitation.setRejectionReason(responseDto.getReason());
         }
 
+        if(SolicitationStatus.PENDING_PAYMENT.equals(responseDto.getStatus()) && TypeUser.UTFPR.equals(solicitation.getTypeUser())) {
+
+            TechnicalReport report = technicalReportService.findBySolicitationId(solicitation.getId());
+            userService.updateBalance(solicitation.getProject().getTeacher().getId(), TransactionType.WITHDRAW,
+                    requestValueService.calculate(report)
+            );
+        }
+        if(responseDto.getData() != null && SolicitationStatus.APPROVED.equals(responseDto.getStatus())){
+            solicitation.setScheduleDate(responseDto.getData());
+        }
         Audit audit = new Audit();
         audit.setNewStatus(responseDto.getStatus());
         audit.setSolicitation(solicitation);
