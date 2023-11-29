@@ -1,10 +1,7 @@
 package com.portal.centro.API.service;
 
 import com.portal.centro.API.dto.SolicitationResponseDto;
-import com.portal.centro.API.enums.SolicitationProjectNature;
-import com.portal.centro.API.enums.SolicitationStatus;
-import com.portal.centro.API.enums.TransactionType;
-import com.portal.centro.API.enums.Type;
+import com.portal.centro.API.enums.*;
 import com.portal.centro.API.exceptions.ValidationException;
 import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.model.*;
@@ -26,7 +23,6 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
     private final AuditService auditService;
     private final UserService userService;
     private final SolicitationRepository solicitationRepository;
-    private final TransactionService transactionService;
     private final RequestValueService requestValueService;
     private final TechnicalReportService technicalReportService;
 
@@ -39,7 +35,6 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         this.solicitationRepository = solicitationRepository;
         this.auditService = auditService;
         this.userService = userService;
-        this.transactionService = transactionService;
         this.requestValueService = requestValueService;
         this.technicalReportService = technicalReportService;
     }
@@ -95,21 +90,12 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
             solicitation.setRejectionReason(responseDto.getReason());
         }
 
-        if(SolicitationStatus.PENDING_PAYMENT.equals(responseDto.getStatus())) {
+        if(SolicitationStatus.PENDING_PAYMENT.equals(responseDto.getStatus()) && TypeUser.UTFPR.equals(solicitation.getTypeUser())) {
+
             TechnicalReport report = technicalReportService.findBySolicitationId(solicitation.getId());
-            User teacher = solicitation.getProject().getTeacher();
-            Transaction transaction = new Transaction();
-            transaction.setSolicitation(solicitation);
-            transaction.setType(TransactionType.WITHDRAW);
-            transaction.setCreatedAt(LocalDateTime.now());
-            transaction.setValue(requestValueService.calculate(report));
-            transaction.setDescription(solicitation.getProjectNature().getContent());
-            transaction.setUser(teacher);
-            try {
-                transactionService.save(transaction);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            userService.updateBalance(solicitation.getProject().getTeacher().getId(), TransactionType.WITHDRAW,
+                    requestValueService.calculate(report)
+            );
         }
         if(responseDto.getData() != null && SolicitationStatus.APPROVED.equals(responseDto.getStatus())){
             solicitation.setScheduleDate(responseDto.getData());
