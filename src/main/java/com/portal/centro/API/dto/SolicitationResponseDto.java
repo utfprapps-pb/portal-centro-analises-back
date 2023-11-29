@@ -3,15 +3,18 @@ package com.portal.centro.API.dto;
 import com.portal.centro.API.enums.SolicitationStatus;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SolicitationResponseDto {
@@ -21,6 +24,9 @@ public class SolicitationResponseDto {
 
     @Enumerated
     private SolicitationStatus status;
+
+    @Size(max = 500)
+    private String reason;
 
     private LocalDateTime data;
 

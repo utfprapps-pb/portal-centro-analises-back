@@ -3,6 +3,7 @@ package com.portal.centro.API.controller;
 import com.portal.centro.API.dto.SolicitationResponseDto;
 import com.portal.centro.API.enums.SolicitationStatus;
 import com.portal.centro.API.enums.TransactionType;
+import com.portal.centro.API.dto.SolicitationResponseDto;
 import com.portal.centro.API.generic.crud.GenericController;
 import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.generic.response.GenericResponse;

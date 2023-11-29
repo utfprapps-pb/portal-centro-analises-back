@@ -90,6 +90,11 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
     public Solicitation updateStatus(SolicitationResponseDto responseDto) throws Exception {
         Solicitation solicitation = this.findOneById(responseDto.getId());
         solicitation.setStatus(responseDto.getStatus());
+
+        if (solicitation.getStatus() == SolicitationStatus.REFUSED) {
+            solicitation.setRejectionReason(responseDto.getReason());
+        }
+
         if(SolicitationStatus.PENDING_PAYMENT.equals(responseDto.getStatus())) {
             TechnicalReport report = technicalReportService.findBySolicitationId(solicitation.getId());
             User teacher = solicitation.getProject().getTeacher();

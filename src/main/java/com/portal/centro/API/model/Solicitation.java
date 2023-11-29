@@ -7,6 +7,7 @@ import com.portal.centro.API.generic.base.IModel;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -53,6 +54,10 @@ public class Solicitation extends IModel {
     private TypeUser typeUser;
 
     private BigDecimal value;
+
+    @Column(name = "rejection_reason")
+    @Size(max = 500)
+    private String rejectionReason;
 
     @Column(name = "scheduledate")
     private LocalDateTime scheduleDate;
