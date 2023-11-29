@@ -1,6 +1,6 @@
 package com.portal.centro.API.controller;
 
-import com.portal.centro.API.enums.SolicitationStatus;
+import com.portal.centro.API.dto.SolicitationResponseDto;
 import com.portal.centro.API.generic.crud.GenericController;
 import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.generic.response.GenericResponse;
@@ -24,9 +24,9 @@ public class SolicitationController extends GenericController<Solicitation, Long
         this.solicitationService = solicitationService;
     }
 
-    @PostMapping("/{id}/status")
-    public GenericResponse approve(@PathVariable Long id, @RequestBody @Valid String status) throws Exception {
-        this.solicitationService.updateStatus(id, SolicitationStatus.valueOf(status));
+    @PostMapping("/status")
+    public GenericResponse alterStatus(@RequestBody @Valid SolicitationResponseDto responseDto) throws Exception {
+        this.solicitationService.updateStatus(responseDto);
         return new GenericResponse("Status atualizado.");
     }
 
