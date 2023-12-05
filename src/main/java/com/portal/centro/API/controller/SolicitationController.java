@@ -70,4 +70,9 @@ public class SolicitationController extends GenericController<Solicitation, Long
         return solicitationService.getPendingPage(pageRequest);
     }
 
+    @GetMapping("/approved")
+    public ResponseEntity getApproved() {
+        return ResponseEntity.ok(solicitationService.getApproved());
+    }
+
 }

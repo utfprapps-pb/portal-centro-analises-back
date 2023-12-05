@@ -148,4 +148,15 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         }
     }
 
+    public List<Solicitation> getApproved() {
+        User user = userService.findSelfUser();
+
+        switch (user.getRole()) {
+            case ROLE_ADMIN:
+                return solicitationRepository.findAllByStatus(SolicitationStatus.APPROVED);
+            default:
+                throw new ValidationException("Você não possui permissão para acessar este recurso.");
+        }
+    }
+
 }
