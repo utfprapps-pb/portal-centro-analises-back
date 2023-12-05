@@ -37,5 +37,4 @@ public class StudentSolicitationController extends GenericController<StudentSoli
     public ResponseEntity<StudentSolicitation> refuse(@PathVariable("id") Long studentSolicitationId) throws Exception {
         return ResponseEntity.ok(studentSolicitationService.refuse(studentSolicitationId));
     }
-
 }
