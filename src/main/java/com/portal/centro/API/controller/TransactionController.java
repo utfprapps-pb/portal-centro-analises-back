@@ -55,4 +55,9 @@ public class TransactionController extends GenericController<Transaction, Long> 
         throw new ValidationException("Não é possível excluir uma transação, somente inseri-las.");
     }
 
+    @GetMapping("/user/{id}")
+    public ResponseEntity getByUserId(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(transactionService.getAllByUserId(id));
+    }
+
 }
