@@ -4,14 +4,16 @@ import com.portal.centro.API.dto.SolicitationResponseDto;
 import com.portal.centro.API.enums.*;
 import com.portal.centro.API.exceptions.ValidationException;
 import com.portal.centro.API.generic.crud.GenericService;
-import com.portal.centro.API.model.*;
+import com.portal.centro.API.model.Audit;
+import com.portal.centro.API.model.Solicitation;
+import com.portal.centro.API.model.TechnicalReport;
+import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.SolicitationRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -41,6 +43,9 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
 
     @Override
     public Solicitation save(Solicitation requestBody) throws Exception {
+        if (isEditing(requestBody))
+            validateSolicitationWhenEditing(requestBody);
+
         if (requestBody.getProjectNature().equals(SolicitationProjectNature.OTHER)
                 && (requestBody.getOtherProjectNature() == null || requestBody.getOtherProjectNature().isEmpty())) {
             throw new ValidationException(
@@ -63,6 +68,33 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         auditService.saveAudit(audit);
 
         return output;
+    }
+
+    private boolean isEditing(Solicitation solicitation) {
+        return (Objects.nonNull(solicitation.getId()) && solicitation.getId() > 0);
+    }
+
+    private void validateSolicitationWhenEditing(Solicitation solicitation) {
+        validateSolicitationCreatorPresent(solicitation);
+        validateOnlyStatusRefusedWhenEdit(solicitation);
+        validateOnlyUserSolicitationCreatorCanEdit(solicitation);
+    }
+
+    private void validateSolicitationCreatorPresent(Solicitation solicitation) {
+        User responsibleUser = solicitation.getCreatedBy();
+        if (Objects.isNull(responsibleUser))
+            throw new ValidationException("É obrigatório informar o responsável pela solicitação.");
+    }
+
+    private void validateOnlyStatusRefusedWhenEdit(Solicitation solicitation) {
+        if (!Objects.equals(solicitation.getStatus(), SolicitationStatus.REFUSED) )
+            throw new ValidationException("Não é possível editar uma solicitação com status diferente de 'Recusado'.");
+    }
+
+    private void validateOnlyUserSolicitationCreatorCanEdit(Solicitation solicitation) {
+        User loggedUser = userService.findSelfUser();
+        if (!Objects.equals(solicitation.getCreatedBy().getId(), loggedUser.getId()))
+            throw new ValidationException("Somente o responsável pela solicitação pode realizar essa ação.");
     }
 
     private void setProjectToNullIfEmpty(Solicitation solicitation) {
