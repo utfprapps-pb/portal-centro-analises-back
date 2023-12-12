@@ -26,7 +26,7 @@ public class Project extends IModel {
     private String subject;
 
     @ManyToOne
-    @JoinColumn(name = "teacher_id")
+    @JoinColumn(name = "teacher_id", updatable = false)
     private User teacher;
 
     @ManyToMany
