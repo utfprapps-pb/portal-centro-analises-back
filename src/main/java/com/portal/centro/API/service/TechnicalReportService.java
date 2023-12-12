@@ -47,33 +47,30 @@ public class TechnicalReportService extends GenericService<TechnicalReport, Long
         return  this.technicalReportRepository;
     }
 
-    public TechnicalReport save(TechnicalReport entity, List<MultipartFile> file) throws Exception {
+    public TechnicalReport save(TechnicalReport entity, MultipartFile file) throws Exception {
 
         List<MultiPartFileList> fileLists = new ArrayList<>();
 
-        file.forEach((multipartFile) -> {
-            String fileType = FileTypeUtils.getFileType(multipartFile);
-            FileResponse fileResponse = minioService.putObject(multipartFile, "central-de-analises", fileType);
-            MultiPartFileList fileList = new MultiPartFileList();
-            fileList.setFileName(fileResponse.getFilename());
-            fileList.setContentType(fileResponse.getContentType());
-            fileLists.add(fileList);
-        });
+        String fileType = FileTypeUtils.getFileType(file);
+        FileResponse fileResponse = minioService.putObject(file, "central-de-analises", fileType);
+        MultiPartFileList fileList = new MultiPartFileList();
+        fileList.setFileName(fileResponse.getFilename());
+        fileList.setContentType(fileResponse.getContentType());
+        fileLists.add(fileList);
 
         entity.setMultiPartFileLists(fileLists);
         return super.save(entity);
     }
 
-    public  void downloadFile(Long id, HttpServletResponse response) {
+    public  void downloadFile(TechnicalReport technicalReport, HttpServletResponse response) {
         InputStream in = null;
         try {
-            TechnicalReport technicalReport = this.findOneById(id);
 
             for (MultiPartFileList multiPartFileList : technicalReport.getMultiPartFileLists()) {
 
                 in = minioService.downloadObject("central-de-analises", multiPartFileList.getFileName());
                 try {
-                    response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(multiPartFileList.getFileName(), "UTF-8"));
+                    response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(multiPartFileList.getFileName() + multiPartFileList.getContentType(), "UTF-8"));
                     response.setCharacterEncoding("UTF-8");
                     // Remove bytes from InputStream Copied to the OutputStream.
                     IOUtils.copy(in, response.getOutputStream());
