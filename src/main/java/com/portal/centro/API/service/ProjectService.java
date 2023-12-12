@@ -3,19 +3,18 @@ package com.portal.centro.API.service;
 import com.portal.centro.API.dto.ProjectDTO;
 import com.portal.centro.API.dto.RetrieveProjectInfo;
 import com.portal.centro.API.dto.TeacherDTO;
-import com.portal.centro.API.enums.Type;
 import com.portal.centro.API.exceptions.ValidationException;
 import com.portal.centro.API.generic.crud.GenericRepository;
 import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.model.Project;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.ProjectRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -82,13 +81,13 @@ public class ProjectService extends GenericService<Project, Long> {
     }
 
     @Override
-    public List<Project> getAll() {
+    public Page<Project> page(PageRequest pageRequest) {
         User user = userService.findSelfUser();
         switch (user.getRole()) {
             case ROLE_ADMIN:
-                return super.getAll();
+                return super.page(pageRequest);
             case ROLE_PROFESSOR:
-                return projectRepository.findAllByTeacher(user);
+                return projectRepository.findAllByTeacher(user, pageRequest);
             default:
                 throw new ValidationException("Você não possui permissão para acessar este recurso.");
         }
