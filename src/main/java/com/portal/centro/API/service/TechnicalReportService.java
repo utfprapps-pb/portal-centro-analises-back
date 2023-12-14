@@ -70,7 +70,7 @@ public class TechnicalReportService extends GenericService<TechnicalReport, Long
 
                 in = minioService.downloadObject("central-de-analises", multiPartFileList.getFileName());
                 try {
-                    response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(multiPartFileList.getFileName() + multiPartFileList.getContentType(), "UTF-8"));
+                    response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(multiPartFileList.getFileName(), "UTF-8"));
                     response.setCharacterEncoding("UTF-8");
                     // Remove bytes from InputStream Copied to the OutputStream.
                     IOUtils.copy(in, response.getOutputStream());
