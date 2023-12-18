@@ -55,7 +55,7 @@ public class AuditService extends GenericService<Audit, Long> {
             case ROLE_PARTNER:
                 return auditRepository.findAllBySolicitation_CreatedByAndSolicitationIdAndNewStatusIsNotOrderByChangeDateDesc(user, id, status);
             case ROLE_PROFESSOR:
-                return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_TeacherAndSolicitationIdAndNewStatusIsNotOrderByChangeDateDesc(user, user, id, status);
+                return auditRepository.findAllBySolicitation_Project_TeacherAndSolicitationIdAndNewStatusIsNotOrderByChangeDateDesc(user, id, status);
             case ROLE_ADMIN:
                 return auditRepository.findAllBySolicitationIdAndNewStatusIsNotOrderByChangeDateDesc(id, status);
             default:

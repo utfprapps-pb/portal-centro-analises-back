@@ -7,7 +7,6 @@ import com.portal.centro.API.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,7 +20,7 @@ public interface AuditRepository extends GenericRepository<Audit, Long> {
 
     List<Audit> findAllBySolicitation_CreatedByOrSolicitation_Project_Teacher(User user, User teacher);
     Page<Audit> findAllBySolicitation_CreatedByOrSolicitation_Project_Teacher(User user, User teacher, PageRequest pageRequest);
-    List<Audit> findAllBySolicitation_CreatedByOrSolicitation_Project_TeacherAndSolicitationIdAndNewStatusIsNotOrderByChangeDateDesc(User user, User teacher, Long id, SolicitationStatus newStatus);
+    List<Audit> findAllBySolicitation_Project_TeacherAndSolicitationIdAndNewStatusIsNotOrderByChangeDateDesc(User teacher, Long id, SolicitationStatus newStatus);
 
     List<Audit> findAllBySolicitationIdAndNewStatusIsNotOrderByChangeDateDesc(Long id, SolicitationStatus newStatus);
 
