@@ -30,13 +30,15 @@ public class TechnicalReportController extends GenericController<TechnicalReport
     private  final ModelMapper modelMapper;
 
     @PostMapping(value = "upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE})
-    public  TechnicalReport saveTechnicalReport(@RequestPart("technical_report") @Valid TechnicalReport entity, @RequestPart("image") @Valid List<MultipartFile> file) throws Exception {
+    public TechnicalReport saveTechnicalReport(@RequestPart("technical_report") @Valid TechnicalReport entity, @RequestPart("image") @Valid MultipartFile file) throws Exception {
         return technicalReportService.save(entity, file);
     }
     //A requisição HTTP GET irá vir com o código do produto e irá retornar a imagem no corpo da resposta.
     @GetMapping(value = "download/{id}")
     public  void downloadFile(@PathVariable("id") Long id, HttpServletResponse response) {
-        technicalReportService.downloadFile(id, response);
+        TechnicalReport technicalReport = technicalReportService.findBySolicitationId(id);
+        if(technicalReport != null)
+        technicalReportService.downloadFile(technicalReport, response);
     }
 
     @PostMapping(path = "text")
@@ -48,6 +50,11 @@ public class TechnicalReportController extends GenericController<TechnicalReport
         }
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping(path = "vinculado/{id}")
+    public Boolean vinculadoASolicitacao(@PathVariable Long id){
+        return technicalReportService.findBySolicitationId(id) == null;
     }
 
 }
