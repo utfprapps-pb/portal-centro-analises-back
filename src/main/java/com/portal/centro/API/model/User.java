@@ -17,6 +17,7 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.math.BigDecimal;
@@ -91,9 +92,14 @@ public class User implements UserDetails {
     @Transient
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> list = new ArrayList<>();
-        list.addAll(this.permissions);
-        return list;
+//        List<GrantedAuthority> list = new ArrayList<>();
+//        list.addAll(this.permissions);
+//        return list;
+
+        List<GrantedAuthority> authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority(role.name()));
+        // Você pode adicionar permissions aqui, se necessário
+        return authorities;
     }
 
     @Override

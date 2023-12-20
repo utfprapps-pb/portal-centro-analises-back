@@ -38,9 +38,10 @@ public class EmailCodeService extends GenericService<EmailCode, Long> {
     }
 
     public EmailCode createCode(User user) throws Exception {
-        String hashKey = this.hashingService.generateHashKey(user.getEmail());
+        LocalDateTime dateTime = LocalDateTime.now();
+        String hashKey = this.hashingService.generateHashKey(user.getEmail() + dateTime);
 
-        EmailCode emailCode = EmailCode.builder().code(hashKey).user(user).build();
+        EmailCode emailCode = EmailCode.builder().code(hashKey).user(user).createdAt(dateTime).build();
 
         //ENVIO DE EMAIL
         EmailDto emailDto = new EmailDto();

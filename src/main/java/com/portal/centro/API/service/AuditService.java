@@ -30,9 +30,9 @@ public class AuditService extends GenericService<Audit, Long> {
     public List<Audit> getAll() {
         User user = userService.findSelfUser();
         switch (user.getRole()) {
-            case ADMIN:
+            case ROLE_ADMIN:
                 return super.getAll();
-            case PROFESSOR:
+            case ROLE_PROFESSOR:
                 return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_Teacher(user.getEmail(), user);
             default:
                 return auditRepository.findAllBySolicitation_CreatedBy(user.getEmail());
@@ -50,14 +50,14 @@ public class AuditService extends GenericService<Audit, Long> {
         User user = userService.findSelfUser();
 
         switch (user.getRole()) {
-            case STUDENT:
-            case EXTERNAL:
-            case PARTNER:
-                return auditRepository.findAllBySolicitation_CreatedByAndSolicitationIdAndNewStatusIsNotOrderByNewStatus(user.getEmail(), id, status);
-            case PROFESSOR:
-                return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_TeacherAndSolicitationIdAndNewStatusIsNotOrderByNewStatus(user.getEmail(), user, id, status);
-            case ADMIN:
-                return auditRepository.findAllBySolicitationIdAndNewStatusIsNotOrderByNewStatus(id, status);
+            case ROLE_STUDENT:
+            case ROLE_EXTERNAL:
+            case ROLE_PARTNER:
+                return auditRepository.findAllBySolicitation_CreatedByAndSolicitationIdAndNewStatusIsNotOrderByChangeDateDesc(user.getEmail(), id, status);
+            case ROLE_PROFESSOR:
+                return auditRepository.findAllBySolicitation_Project_TeacherAndSolicitationIdAndNewStatusIsNotOrderByChangeDateDesc(user.getEmail(), id, status);
+            case ROLE_ADMIN:
+                return auditRepository.findAllBySolicitationIdAndNewStatusIsNotOrderByChangeDateDesc(id, status);
             default:
                 return new ArrayList<>();
         }
@@ -67,14 +67,14 @@ public class AuditService extends GenericService<Audit, Long> {
         User user = userService.findSelfUser();
 
         switch (user.getRole()) {
-            case STUDENT:
-            case EXTERNAL:
-            case PARTNER:
-                return auditRepository.findAllBySolicitation_CreatedBy(user.getEmail(), pageRequest);
-            case PROFESSOR:
-                return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_Teacher(user.getEmail(), user, pageRequest);
-            case ADMIN:
-                return auditRepository.findAll(pageRequest);
+            case ROLE_STUDENT:
+            case ROLE_EXTERNAL:
+            case ROLE_PARTNER:
+                return auditRepository.findAllDistinctByOrderByUserCreatedAtDescCreatedByUser(user.getEmail(), pageRequest);
+            case ROLE_PROFESSOR:
+                return auditRepository.findAllDistinctByOrderByUserCreatedAtDescCreatedByUserOrTeacherInProject(user.getEmail(), pageRequest);
+            case ROLE_ADMIN:
+                return auditRepository.findAllDistinctByOrderByUserCreatedAtDesc(pageRequest);
             default:
                 throw new ValidationException("Você não possui permissão para acessar este recurso.");
         }

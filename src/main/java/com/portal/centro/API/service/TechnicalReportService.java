@@ -118,4 +118,8 @@ public class TechnicalReportService extends GenericService<TechnicalReport, Long
         return map;
     }
 
+    public TechnicalReport findBySolicitationId(Long id){
+        return technicalReportRepository.findBySolicitationId(id);
+    }
+
 }

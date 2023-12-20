@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TechnicalReportRepository extends GenericRepository<TechnicalReport, Long> {
+
+    public TechnicalReport findBySolicitationId(Long id);
 }

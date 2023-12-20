@@ -1,12 +1,12 @@
 package com.portal.centro.API.service;
 
-import com.portal.centro.API.enums.SolicitationProjectNature;
-import com.portal.centro.API.enums.SolicitationStatus;
-import com.portal.centro.API.enums.Type;
+import com.portal.centro.API.dto.SolicitationResponseDto;
+import com.portal.centro.API.enums.*;
 import com.portal.centro.API.exceptions.ValidationException;
 import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.model.Audit;
 import com.portal.centro.API.model.Solicitation;
+import com.portal.centro.API.model.TechnicalReport;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.SolicitationRepository;
 import org.springframework.data.domain.Page;
@@ -25,17 +25,27 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
     private final AuditService auditService;
     private final UserService userService;
     private final SolicitationRepository solicitationRepository;
+    private final RequestValueService requestValueService;
+    private final TechnicalReportService technicalReportService;
 
     public SolicitationService(SolicitationRepository solicitationRepository, AuditService auditService,
-                               UserService userService) {
+                               UserService userService,
+                               TransactionService transactionService,
+                               RequestValueService requestValueService,
+                               TechnicalReportService technicalReportService) {
         super(solicitationRepository);
         this.solicitationRepository = solicitationRepository;
         this.auditService = auditService;
         this.userService = userService;
+        this.requestValueService = requestValueService;
+        this.technicalReportService = technicalReportService;
     }
 
     @Override
     public Solicitation save(Solicitation requestBody) throws Exception {
+        if (isEditing(requestBody))
+            validateSolicitationWhenEditing(requestBody);
+
         if (requestBody.getProjectNature().equals(SolicitationProjectNature.OTHER)
                 && (requestBody.getOtherProjectNature() == null || requestBody.getOtherProjectNature().isEmpty())) {
             throw new ValidationException(
@@ -46,7 +56,7 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         setProjectToNullIfEmpty(requestBody);
         Solicitation output = super.save(requestBody);
         Audit audit = new Audit();
-        if (loggedUser.getRole().equals(Type.PROFESSOR)) {
+        if (loggedUser.getRole().equals(Type.ROLE_PROFESSOR)) {
             audit.setNewStatus(SolicitationStatus.PENDING_LAB);
             output.setStatus(SolicitationStatus.PENDING_LAB);
         } else {
@@ -59,6 +69,33 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         return output;
     }
 
+    private boolean isEditing(Solicitation solicitation) {
+        return (Objects.nonNull(solicitation.getId()) && solicitation.getId() > 0);
+    }
+
+    private void validateSolicitationWhenEditing(Solicitation solicitation) {
+        validateSolicitationCreatorPresent(solicitation);
+        validateOnlyStatusRefusedWhenEdit(solicitation);
+        validateOnlyUserSolicitationCreatorCanEdit(solicitation);
+    }
+
+    private void validateSolicitationCreatorPresent(Solicitation solicitation) {
+        User responsibleUser = solicitation.getCreatedBy();
+        if (Objects.isNull(responsibleUser))
+            throw new ValidationException("É obrigatório informar o responsável pela solicitação.");
+    }
+
+    private void validateOnlyStatusRefusedWhenEdit(Solicitation solicitation) {
+        if (!Objects.equals(solicitation.getStatus(), SolicitationStatus.REFUSED) )
+            throw new ValidationException("Não é possível editar uma solicitação com status diferente de 'Recusado'.");
+    }
+
+    private void validateOnlyUserSolicitationCreatorCanEdit(Solicitation solicitation) {
+        User loggedUser = userService.findSelfUser();
+        if (!Objects.equals(solicitation.getCreatedBy().getId(), loggedUser.getId()))
+            throw new ValidationException("Somente o responsável pela solicitação pode realizar essa ação.");
+    }
+
     private void setProjectToNullIfEmpty(Solicitation solicitation) {
         if (Objects.nonNull(solicitation.getProject()) &&
                 Objects.equals(solicitation.getProject().getId(), 0L))
@@ -69,19 +106,33 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         if (Objects.isNull(user))
             return;
 
-        List<Type> externalTypes = Arrays.asList(Type.EXTERNAL, Type.PARTNER);
+        List<Type> externalTypes = Arrays.asList(Type.ROLE_EXTERNAL, Type.ROLE_PARTNER);
         if (!externalTypes.contains(user.getRole()))
             return;
 
         solicitation.setStatus(SolicitationStatus.PENDING_LAB);
     }
 
-    public Solicitation updateStatus(Long id, SolicitationStatus status) throws Exception {
-        Solicitation solicitation = this.findOneById(id);
-        solicitation.setStatus(status);
+    public Solicitation updateStatus(SolicitationResponseDto responseDto) throws Exception {
+        Solicitation solicitation = this.findOneById(responseDto.getId());
+        solicitation.setStatus(responseDto.getStatus());
 
+        if (solicitation.getStatus() == SolicitationStatus.REFUSED) {
+            solicitation.setRejectionReason(responseDto.getReason());
+        }
+
+        if(SolicitationStatus.PENDING_PAYMENT.equals(responseDto.getStatus()) && TypeUser.UTFPR.equals(solicitation.getTypeUser())) {
+
+            TechnicalReport report = technicalReportService.findBySolicitationId(solicitation.getId());
+            userService.updateBalance(solicitation.getProject().getTeacher().getId(), TransactionType.WITHDRAW,
+                    requestValueService.calculate(report)
+            );
+        }
+        if(responseDto.getData() != null && SolicitationStatus.APPROVED.equals(responseDto.getStatus())){
+            solicitation.setScheduleDate(responseDto.getData());
+        }
         Audit audit = new Audit();
-        audit.setNewStatus(status);
+        audit.setNewStatus(responseDto.getStatus());
         audit.setSolicitation(solicitation);
 
         auditService.saveAudit(audit);
@@ -92,9 +143,9 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
     public List<Solicitation> getPending() {
         User user = userService.findSelfUser();
         switch (user.getRole()) {
-            case ADMIN:
+            case ROLE_ADMIN:
                 return solicitationRepository.findAllByStatus(SolicitationStatus.PENDING_LAB);
-            case PROFESSOR:
+            case ROLE_PROFESSOR:
                 return solicitationRepository.findAllByProject_TeacherAndStatus(user, SolicitationStatus.PENDING_ADVISOR);
             default:
                 throw new ValidationException("Você não possui permissão para acessar este recurso.");
@@ -119,9 +170,9 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         User user = userService.findSelfUser();
 
         switch (user.getRole()) {
-            case PROFESSOR:
+            case ROLE_PROFESSOR:
                 return solicitationRepository.findAllByProject_TeacherAndStatus(user, SolicitationStatus.PENDING_ADVISOR, pageRequest);
-            case ADMIN:
+            case ROLE_ADMIN:
                 return solicitationRepository.findAllByStatus(SolicitationStatus.PENDING_LAB, pageRequest);
             default:
                 throw new ValidationException("Você não possui permissão para acessar este recurso.");

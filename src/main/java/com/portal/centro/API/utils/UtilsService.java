@@ -44,7 +44,7 @@ public class UtilsService {
             if (domainRoleOptional.isPresent())
                 return domainRoleOptional.get().getRole();
             else
-                return Type.EXTERNAL;
+                return Type.ROLE_EXTERNAL;
         } catch (Exception e) {
             throw new RuntimeException(
                     "Erro ao configurar privilégio do usuário pelo domínio do e-mail. " +
@@ -56,9 +56,9 @@ public class UtilsService {
     public List<Permission> getPermissionsByRole(final Type role) {
         List<Permission> permissionList = permissionRepository.findAll();
 
-        if(Type.STUDENT.equals(role)) {
+        if(Type.ROLE_STUDENT.equals(role)) {
             return permissionList.stream().filter(permission -> permission.getAction().equals(Action.READ)).toList();
-        } else if (Type.PROFESSOR.equals(role)) {
+        } else if (Type.ROLE_PROFESSOR.equals(role)) {
             return permissionList;
         } else {
             return permissionList.stream().filter(permission -> permission.getAction().equals(Action.CREATE) || permission.getAction().equals(Action.READ)).toList();

@@ -54,7 +54,7 @@ public class StudentSolicitationService extends GenericService<StudentSolicitati
     }
 
     private void validateLoggedUserIsSoliciting(User user) {
-        if (!Objects.equals(user.getRole(), Type.STUDENT))
+        if (!Objects.equals(user.getRole(), Type.ROLE_STUDENT))
             throw new ValidationException("Apenas o estudante pode realizar a solicitação.");
     }
 
@@ -71,21 +71,21 @@ public class StudentSolicitationService extends GenericService<StudentSolicitati
     }
 
     private StudentSolicitationStatus getStudentSolicitationStatusByUserRole(Type userRole, boolean approving) {
-        if (Objects.equals(userRole, Type.PROFESSOR))
+        if (Objects.equals(userRole, Type.ROLE_PROFESSOR))
             return approving ? StudentSolicitationStatus.APPROVED_ADVISOR : StudentSolicitationStatus.REFUSED_ADVISOR;
 
-        if (Objects.equals(userRole, Type.ADMIN))
+        if (Objects.equals(userRole, Type.ROLE_ADMIN))
             return approving ? StudentSolicitationStatus.APPROVED_LAB : StudentSolicitationStatus.REFUSED_LAB;
 
         throw new ValidationException(MESSAGE_VALIDATION_APPROVE_ADVISOR_AND_LAB);
     }
 
     private void validateLoggedUserIsApprovingOrRefusing(User userApprove, User solicitedTo) {
-        if ((!Objects.equals(userApprove.getRole(), Type.PROFESSOR)) &&
-                (!Objects.equals(userApprove.getRole(), Type.ADMIN)))
+        if ((!Objects.equals(userApprove.getRole(), Type.ROLE_PROFESSOR)) &&
+                (!Objects.equals(userApprove.getRole(), Type.ROLE_ADMIN)))
             throw new ValidationException(MESSAGE_VALIDATION_APPROVE_ADVISOR_AND_LAB);
 
-        if ((Objects.equals(userApprove.getRole(), Type.PROFESSOR)) &&
+        if ((Objects.equals(userApprove.getRole(), Type.ROLE_PROFESSOR)) &&
                 (!Objects.equals(userApprove.getId(), solicitedTo.getId())))
             throw new ValidationException("O Orientador informado não é o mesmo solicitado na solicitação, somente o mesmo pode aprovar ou recusar.");
     }
