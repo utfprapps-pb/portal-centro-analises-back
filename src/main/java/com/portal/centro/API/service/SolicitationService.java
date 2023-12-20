@@ -80,7 +80,7 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
     }
 
     private void validateSolicitationCreatorPresent(Solicitation solicitation) {
-        User responsibleUser = solicitation.getCreatedBy();
+        String responsibleUser = solicitation.getCreatedBy();
         if (Objects.isNull(responsibleUser))
             throw new ValidationException("É obrigatório informar o responsável pela solicitação.");
     }
@@ -92,7 +92,7 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
 
     private void validateOnlyUserSolicitationCreatorCanEdit(Solicitation solicitation) {
         User loggedUser = userService.findSelfUser();
-        if (!Objects.equals(solicitation.getCreatedBy().getId(), loggedUser.getId()))
+        if (!Objects.equals(solicitation.getCreatedBy(), loggedUser.getEmail()))
             throw new ValidationException("Somente o responsável pela solicitação pode realizar essa ação.");
     }
 
