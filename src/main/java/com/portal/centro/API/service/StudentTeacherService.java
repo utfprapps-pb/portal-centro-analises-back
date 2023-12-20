@@ -48,7 +48,7 @@ public class StudentTeacherService extends GenericService<StudentTeacher, Long> 
     }
 
     public List<User> listStudentsByTeacher(Long teacherId) {
-        return studentTeacherRepository.listStudentsByTeacher(teacherId);
+        return studentTeacherRepository.listStudentsByTeacher(teacherId, true);
     }
     public List<StudentTeacher> findByStudent(Long studentId) {
         return studentTeacherRepository.findByStudentWhere(studentId);

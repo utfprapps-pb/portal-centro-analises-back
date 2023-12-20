@@ -17,8 +17,8 @@ public interface StudentTeacherRepository extends GenericRepository<StudentTeach
     @Query(nativeQuery = true,value ="Select * From student_teacher  where teacher=:teacherId")
     List<StudentTeacher> listByTeacherWhere(Long teacherId);
 
-    @Query(value = "Select st.student From student_teacher as st where st.teacher.id=:teacherId")
-    List<User> listStudentsByTeacher(Long teacherId);
+    @Query(value = "Select st.student From student_teacher as st where st.teacher.id=:teacherId and st.aproved=:aprovedStatus")
+    List<User> listStudentsByTeacher(Long teacherId, Boolean aprovedStatus);
 
     @Query(nativeQuery = true ,value = "Select * From student_teacher where student=:studentId")
     List<StudentTeacher> findByStudentWhere(Long studentId);
