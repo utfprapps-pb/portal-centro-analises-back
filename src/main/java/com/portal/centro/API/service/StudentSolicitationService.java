@@ -39,7 +39,6 @@ public class StudentSolicitationService extends GenericService<StudentSolicitati
 
     private void setDefaultValuesWhenSave(StudentSolicitation requestBody) {
         if (Objects.isNull(requestBody.getId()) || Objects.equals(requestBody.getId(), 0)) {
-            requestBody.setCreationDate(LocalDateTime.now());
             requestBody.setStatus(StudentSolicitationStatus.PENDING);
         }
     }
@@ -50,7 +49,6 @@ public class StudentSolicitationService extends GenericService<StudentSolicitati
         StudentSolicitation studentSolicitation = modelMapper.map(studentSolicitationDTO, StudentSolicitation.class);
         studentSolicitation.setSolicitatedBy(userService.findSelfUser());
         validateLoggedUserIsSoliciting(studentSolicitation.getSolicitatedBy());
-        studentSolicitation.setCreationDate(LocalDateTime.now());
         studentSolicitation.setStatus(StudentSolicitationStatus.PENDING);
         return save(studentSolicitation);
     }

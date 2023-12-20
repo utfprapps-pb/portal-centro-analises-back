@@ -33,9 +33,9 @@ public class AuditService extends GenericService<Audit, Long> {
             case ROLE_ADMIN:
                 return super.getAll();
             case ROLE_PROFESSOR:
-                return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_Teacher(user, user);
+                return auditRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_Teacher(user.getEmail(), user);
             default:
-                return auditRepository.findAllBySolicitation_CreatedBy(user);
+                return auditRepository.findAllBySolicitation_CreatedBy(user.getEmail());
         }
     }
 
@@ -53,7 +53,7 @@ public class AuditService extends GenericService<Audit, Long> {
             case ROLE_STUDENT:
             case ROLE_EXTERNAL:
             case ROLE_PARTNER:
-                return auditRepository.findAllBySolicitation_CreatedByAndSolicitationIdAndNewStatusIsNotOrderByChangeDateDesc(user, id, status);
+                return auditRepository.findAllBySolicitation_CreatedByAndSolicitationIdAndNewStatusIsNotOrderByChangeDateDesc(user.getEmail(), id, status);
             case ROLE_PROFESSOR:
                 return auditRepository.findAllBySolicitation_Project_TeacherAndSolicitationIdAndNewStatusIsNotOrderByChangeDateDesc(user, id, status);
             case ROLE_ADMIN:
@@ -70,9 +70,9 @@ public class AuditService extends GenericService<Audit, Long> {
             case ROLE_STUDENT:
             case ROLE_EXTERNAL:
             case ROLE_PARTNER:
-                return auditRepository.findAllDistinctByOrderByUserCreatedAtDescCreatedByUser(user.getId(), pageRequest);
+                return auditRepository.findAllDistinctByOrderByUserCreatedAtDescCreatedByUser(user.getEmail(), pageRequest);
             case ROLE_PROFESSOR:
-                return auditRepository.findAllDistinctByOrderByUserCreatedAtDescCreatedByUserOrTeacherInProject(user.getId(), pageRequest);
+                return auditRepository.findAllDistinctByOrderByUserCreatedAtDescCreatedByUserOrTeacherInProject(user.getEmail(), pageRequest);
             case ROLE_ADMIN:
                 return auditRepository.findAllDistinctByOrderByUserCreatedAtDesc(pageRequest);
             default:
