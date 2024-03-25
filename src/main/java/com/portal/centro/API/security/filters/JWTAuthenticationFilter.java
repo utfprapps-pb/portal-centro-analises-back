@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.portal.centro.API.dto.UserLoginDTO;
+import com.portal.centro.API.exceptions.GenericException;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.security.AuthenticationResponse;
 import com.portal.centro.API.security.SecurityConstants;
@@ -15,7 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
@@ -33,16 +33,15 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @Override
     public Authentication attemptAuthentication(
-            HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+            HttpServletRequest request, HttpServletResponse response) throws RuntimeException {
         try {
             User credentials = new ObjectMapper().readValue(request.getInputStream(), User.class);
+
             User user = (User) authService.loadUserByUsername(credentials.getEmail());
 
-            if(user.getEmailVerified() == null || !user.getEmailVerified()){
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Email not verified");
-                return null;
-            }else{
+            if (user.getEmailVerified() == null || !user.getEmailVerified()) {
+                throw new GenericException("E-mail do usuário não foi validado!");
+            } else {
                 return authenticationManager.authenticate(
                         new UsernamePasswordAuthenticationToken(
                                 credentials.getEmail(),
@@ -51,8 +50,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                         )
                 );
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (GenericException ge) {
+            throw new RuntimeException("mapped|GenericException|" + ge.getMessage());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
