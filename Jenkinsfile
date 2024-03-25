@@ -3,7 +3,7 @@ pipeline {
     environment {
         SERVER_PORT=8810
         POSTGRESQL_CRED = credentials('postgres-id')
-        DATABASE_URL="jdbc:postgresql://postgresql:5432/ca_lab"
+        DATABASE_URL="jdbc:postgresql://postgresql:5432/apioficina"
         DATABASE_USERNAME="${POSTGRESQL_CRED_USR}"
         DATABASE_PASSWORD="${POSTGRESQL_CRED_PSW}"
 
@@ -16,7 +16,7 @@ pipeline {
         MINIO_ENDPOINT = "https://minio.app.pb.utfpr.edu.br"
         MINIO_PORT=443
         MINIO_SECURE=true
-        MINIO_BUCKET_NAME="ca_lab"
+        MINIO_BUCKET_NAME="apioficina"
     }
     stages {
         stage('Docker Compose UP') {
