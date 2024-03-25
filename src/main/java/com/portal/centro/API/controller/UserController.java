@@ -2,18 +2,23 @@ package com.portal.centro.API.controller;
 
 import com.portal.centro.API.dto.ChangePasswordDTO;
 import com.portal.centro.API.dto.RecoverPasswordDTO;
+import com.portal.centro.API.dto.RequestCodeEmailDto;
 import com.portal.centro.API.dto.UserDto;
 import com.portal.centro.API.enums.StatusInactiveActive;
 import com.portal.centro.API.generic.crud.GenericController;
+import com.portal.centro.API.model.ObjectReturn;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.responses.DefaultResponse;
+import com.portal.centro.API.service.EmailCodeService;
 import com.portal.centro.API.service.UserService;
 import jakarta.validation.Valid;
+import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,12 +29,14 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController extends GenericController<User, Long> {
 
+    private final EmailCodeService emailCodeService;
     private final UserService userService;
     private ModelMapper modelMapper;
 
     @Autowired
-    public UserController(UserService userService, ModelMapper modelMapper) {
+    public UserController(EmailCodeService emailCodeService, UserService userService, ModelMapper modelMapper) {
         super(userService);
+        this.emailCodeService = emailCodeService;
         this.userService = userService;
         this.modelMapper = modelMapper;
     }
@@ -54,11 +61,6 @@ public class UserController extends GenericController<User, Long> {
     @GetMapping(path = "/findSelfUser")
     public ResponseEntity<UserDto> findSelfUser() {
         return ResponseEntity.ok(convertEntityToDto(userService.findSelfUser()));
-    }
-
-    @Override
-    public ResponseEntity update(@RequestBody User requestBody) throws Exception {
-        return super.update(requestBody);
     }
 
     @GetMapping(path = "role/{role}")
@@ -136,6 +138,18 @@ public class UserController extends GenericController<User, Long> {
         Page<User> list = userService.findUsersByStatusPaged(active ? StatusInactiveActive.ACTIVE : StatusInactiveActive.INACTIVE, pageRequest);
 
         return list.map(item -> convertEntityToDto(item));
+    }
+
+    @PostMapping("/request_verification")
+    public ResponseEntity requestVerification(@NotNull @RequestBody RequestCodeEmailDto emailDto) throws Exception {
+        User user = userService.findByEmail(emailDto.getEmail());
+
+        if (user != null) {
+            this.emailCodeService.createCode(user);
+            return ResponseEntity.ok(new ObjectReturn("OK"));
+        }
+
+        return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
 }

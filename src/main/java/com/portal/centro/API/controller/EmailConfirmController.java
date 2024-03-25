@@ -28,15 +28,4 @@ public class EmailConfirmController {
         return ResponseEntity.ok(this.emailCodeService.confirmEmail(hash));
     }
 
-    @PostMapping("/request_verification")
-    public ResponseEntity requestVerification(@NotNull @RequestBody RequestCodeEmailDto emailDto) throws Exception {
-        User user = userService.findByEmail(emailDto.getEmail());
-
-        if (user != null) {
-            this.emailCodeService.createCode(user);
-            return ResponseEntity.ok(new ObjectReturn("OK"));
-        }
-
-        return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
-    }
 }
