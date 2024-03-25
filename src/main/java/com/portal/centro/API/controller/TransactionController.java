@@ -11,7 +11,9 @@ import com.portal.centro.API.service.TransactionService;
 import com.portal.centro.API.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -30,9 +32,14 @@ public class TransactionController extends GenericController<Transaction, Long> 
 
     @Override
     public ResponseEntity save(@RequestBody @Valid Transaction requestBody) throws Exception {
+
         User selfUser = userService.findSelfUser();
-        if (!Objects.equals(selfUser.getRole(), Type.ROLE_ADMIN))
+        if (!Objects.equals(selfUser.getRole(), Type.ROLE_ADMIN)) {
             throw new ValidationException("Somente o administrador pode realizar esta ação.");
+        }
+        if (!ObjectUtils.isEmpty(requestBody.getId())) {
+            throw new ValidationException("Não é possível atualizar uma transação, somente inseri-las.");
+        }
         requestBody.setCreatedAt(LocalDateTime.now());
         requestBody.setCreatedBy(selfUser);
         UserBalance userBalance = userService.updateBalance(
@@ -43,11 +50,6 @@ public class TransactionController extends GenericController<Transaction, Long> 
         requestBody.setOldBalance(userBalance.getOld());
         requestBody.setCurrentBalance(userBalance.getCurrent());
         return ResponseEntity.ok(transactionService.save(requestBody));
-    }
-
-    @Override
-    public ResponseEntity update(@RequestBody @Valid Transaction requestBody) {
-        throw new ValidationException("Não é possível atualizar uma transação, somente inseri-las.");
     }
 
     @Override
