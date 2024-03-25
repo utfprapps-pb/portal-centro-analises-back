@@ -97,8 +97,8 @@ public class UserService extends GenericService<User, Long> {
 
     private void validate(User user) throws Exception {
         User userDb = this.userRepository.findByEmail(user.getEmail());
-        if (userDb != null && userDb.getId() != user.getId()) {
-            throw new Exception("Email já cadastrado.");
+        if (userDb != null && !Objects.equals(userDb.getId(), user.getId())) {
+            throw new GenericException("Email já cadastrado.");
         }
     }
 
