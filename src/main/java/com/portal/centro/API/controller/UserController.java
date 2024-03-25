@@ -16,11 +16,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("users")
+@RequestMapping("/users")
 public class UserController extends GenericController<User, Long> {
 
     private final UserService userService;
@@ -33,25 +34,25 @@ public class UserController extends GenericController<User, Long> {
         this.modelMapper = modelMapper;
     }
 
-    @PostMapping(path = "send-code-recover-password/email/{email}")
+    @PostMapping(path = "/send-code-recover-password/email/{email}")
     public ResponseEntity sendEmailCodeRecoverPassword(@PathVariable("email") String email) throws Exception {
         return ResponseEntity.ok(userService.sendEmailCodeRecoverPassword(email));
     }
 
-    @PostMapping(path = "recover-password")
+    @PostMapping(path = "/recover-password")
     public ResponseEntity recoverPassword(@RequestBody @Valid RecoverPasswordDTO recoverPasswordDTO) throws Exception {
         DefaultResponse defaultResponse = userService.recoverPassword(recoverPasswordDTO);
         return ResponseEntity.status(defaultResponse.getHttpStatus()).body(defaultResponse);
     }
 
-    @PostMapping(path = "change-password")
+    @PostMapping(path = "/change-password")
     public ResponseEntity changePassword(@RequestBody @Valid ChangePasswordDTO changePasswordDTO) throws Exception {
         DefaultResponse defaultResponse = userService.changePassword(changePasswordDTO);
         return ResponseEntity.status(defaultResponse.getHttpStatus()).body(defaultResponse);
     }
 
     @GetMapping(path = "/findSelfUser")
-    public ResponseEntity<UserDto> findSelfUser(){
+    public ResponseEntity<UserDto> findSelfUser() {
         return ResponseEntity.ok(convertEntityToDto(userService.findSelfUser()));
     }
 
@@ -100,13 +101,14 @@ public class UserController extends GenericController<User, Long> {
     public ResponseEntity activeUserById(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(userService.editUserStatusToActive(id));
     }
+
     @GetMapping("pagerole")
     public Page<UserDto> pageUser(
             @RequestParam(value = "page") Integer page,
             @RequestParam(value = "size") Integer size,
-            @RequestParam(value = "order",required = false) String order,
-            @RequestParam(value = "asc",required = false) Boolean asc,
-            @RequestParam(value = "role",required = false) String role
+            @RequestParam(value = "order", required = false) String order,
+            @RequestParam(value = "asc", required = false) Boolean asc,
+            @RequestParam(value = "role", required = false) String role
     ) throws Exception {
         PageRequest pageRequest = PageRequest.of(page, size);
         if (order != null && asc != null) {
@@ -115,16 +117,16 @@ public class UserController extends GenericController<User, Long> {
         }
         Page<User> list = userService.findUsersByRolePaged(role, pageRequest);
 
-        return  list.map(item-> convertEntityToDto(item));
+        return list.map(item -> convertEntityToDto(item));
     }
 
     @GetMapping("pagestatus")
     public Page<UserDto> pageUser(
             @RequestParam(value = "page") Integer page,
             @RequestParam(value = "size") Integer size,
-            @RequestParam(value = "order",required = false) String order,
-            @RequestParam(value = "asc",required = false) Boolean asc,
-            @RequestParam(value = "active",required = false) Boolean active
+            @RequestParam(value = "order", required = false) String order,
+            @RequestParam(value = "asc", required = false) Boolean asc,
+            @RequestParam(value = "active", required = false) Boolean active
     ) throws Exception {
         PageRequest pageRequest = PageRequest.of(page, size);
         if (order != null && asc != null) {
@@ -133,7 +135,7 @@ public class UserController extends GenericController<User, Long> {
         }
         Page<User> list = userService.findUsersByStatusPaged(active ? StatusInactiveActive.ACTIVE : StatusInactiveActive.INACTIVE, pageRequest);
 
-        return  list.map(item-> convertEntityToDto(item));
+        return list.map(item -> convertEntityToDto(item));
     }
 
 }
