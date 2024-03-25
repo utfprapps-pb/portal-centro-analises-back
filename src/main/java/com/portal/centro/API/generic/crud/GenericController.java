@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,18 +24,14 @@ public abstract class GenericController<T, ID extends Serializable> {
         this.genericService = genericService;
     }
 
-    @PostMapping
+    @PostMapping("/save")
     public ResponseEntity save(@RequestBody @Valid T requestBody) throws Exception {
-        return saveOrUpdate(requestBody);
-    }
-
-    @PutMapping
-    public ResponseEntity update(@RequestBody @Valid T requestBody) throws Exception {
-        return saveOrUpdate(requestBody);
-    }
-
-    private ResponseEntity saveOrUpdate(@RequestBody T requestBody) throws Exception {
         return ResponseEntity.ok(genericService.save(requestBody));
+    }
+
+    @PostMapping("{id}")
+    public ResponseEntity findOneById(@PathVariable ID id) {
+        return ResponseEntity.ok(genericService.findOneById(id));
     }
 
     @DeleteMapping("{id}")
@@ -51,8 +48,8 @@ public abstract class GenericController<T, ID extends Serializable> {
     public Page<T> search(
             @RequestParam(value = "page") Integer page,
             @RequestParam(value = "size") Integer size,
-            @RequestParam(value = "order",required = false) String order,
-            @RequestParam(value = "asc",required = false) Boolean asc
+            @RequestParam(value = "order", required = false) String order,
+            @RequestParam(value = "asc", required = false) Boolean asc
     ) throws Exception {
         PageRequest pageRequest = PageRequest.of(page, size);
         if (order != null && asc != null) {
@@ -66,8 +63,8 @@ public abstract class GenericController<T, ID extends Serializable> {
     public Page<T> search(
             @RequestParam(value = "page") Integer page,
             @RequestParam(value = "size") Integer size,
-            @RequestParam(value = "order",required = false) String order,
-            @RequestParam(value = "asc",required = false) Boolean asc,
+            @RequestParam(value = "order", required = false) String order,
+            @RequestParam(value = "asc", required = false) Boolean asc,
             @RequestParam(value = "search", required = false) String search
     ) throws Exception {
         Specification<T> spec = resolveSpecification(search);
@@ -87,11 +84,6 @@ public abstract class GenericController<T, ID extends Serializable> {
             specBuilder.with(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(5), matcher.group(4), matcher.group(6));
         }
         return specBuilder.build(GenericSpecification<T>::new);
-    }
-
-    @PostMapping("{id}")
-    public ResponseEntity findOneById(@PathVariable ID id) {
-        return ResponseEntity.ok(genericService.findOneById(id));
     }
 
 }
