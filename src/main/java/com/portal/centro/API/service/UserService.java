@@ -6,6 +6,7 @@ import com.portal.centro.API.dto.RecoverPasswordDTO;
 import com.portal.centro.API.enums.StatusInactiveActive;
 import com.portal.centro.API.enums.TransactionType;
 import com.portal.centro.API.enums.Type;
+import com.portal.centro.API.exceptions.GenericException;
 import com.portal.centro.API.exceptions.NotFoundException;
 import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.model.RecoverPassword;
@@ -13,7 +14,6 @@ import com.portal.centro.API.model.SendEmailCodeRecoverPassword;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.model.UserBalance;
 import com.portal.centro.API.repository.ProjectRepository;
-import com.portal.centro.API.repository.StudentTeacherRepository;
 import com.portal.centro.API.repository.UserRepository;
 import com.portal.centro.API.responses.DefaultResponse;
 import com.portal.centro.API.utils.DateTimeUtil;
@@ -128,8 +128,9 @@ public class UserService extends GenericService<User, Long> {
 
         RecoverPassword recoverPassword = recoverPasswordService.getCodeSentByEmail().getOrDefault(recoverPasswordDTO.getEmail(), new RecoverPassword());
         Boolean codesMatch = Objects.equals(recoverPasswordDTO.getCode(), recoverPassword.getCode());
-        if (!codesMatch)
-            return new DefaultResponse(HttpStatus.BAD_REQUEST.value(), "Código inválido.");
+        if (!codesMatch) {
+            throw new GenericException("Código inválido.");
+        }
 
         updateUserNewPasswordByEmail(user, recoverPasswordDTO.getNewPassword());
         recoverPasswordService.getCodeSentByEmail().remove(recoverPasswordDTO.getEmail());
@@ -168,7 +169,7 @@ public class UserService extends GenericService<User, Long> {
         return user;
     }
 
-    public User findByEmail(@PathVariable("email") String email){
+    public User findByEmail(@PathVariable("email") String email) {
         return this.userRepository.findByEmail(email);
     }
 
@@ -208,16 +209,16 @@ public class UserService extends GenericService<User, Long> {
     public String editUserStatusToInactiveOrDelete(Long id) throws Exception {
         User user = userRepository.findUserById(id);
 
-        if(user.getRole().getContent().toString().equals("professor")){
+        if (user.getRole().getContent().toString().equals("professor")) {
             user.setStatus(StatusInactiveActive.INACTIVE);
             super.save(user);
             return "Usuário inativado com sucesso!";
         } else {
-            if(!projectRepository.findAllByStudentsContains(user).isEmpty()){
+            if (!projectRepository.findAllByStudentsContains(user).isEmpty()) {
                 user.setStatus(StatusInactiveActive.INACTIVE);
                 super.save(user);
                 return "Usuário inativado com sucesso!";
-            } else if(!projectRepository.findAllByTeacher(user).isEmpty()){
+            } else if (!projectRepository.findAllByTeacher(user).isEmpty()) {
                 user.setStatus(StatusInactiveActive.INACTIVE);
                 super.save(user);
                 return "Usuário inativado com sucesso!";
@@ -237,9 +238,10 @@ public class UserService extends GenericService<User, Long> {
     }
 
     //cria uma lista conforme o status escolhido na classe controller
-    public List<User> findAllUsersActivatedOrInactivated(StatusInactiveActive status){
+    public List<User> findAllUsersActivatedOrInactivated(StatusInactiveActive status) {
         return userRepository.findAllByStatus(status);
     }
+
     public Page<User> findUsersByRolePaged(String role, PageRequest pageRequest) {
         Type type;
         try {
@@ -247,7 +249,7 @@ public class UserService extends GenericService<User, Long> {
         } catch (Exception e) {
             throw new RuntimeException("Role informada não existe.");
         }
-        return userRepository.findAllByRole(type,pageRequest);
+        return userRepository.findAllByRole(type, pageRequest);
     }
 
     public Page<User> findUsersByStatusPaged(StatusInactiveActive status, PageRequest pageRequest) {
