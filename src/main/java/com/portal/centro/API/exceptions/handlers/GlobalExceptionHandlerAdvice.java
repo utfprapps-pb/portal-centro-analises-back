@@ -64,6 +64,7 @@ public class GlobalExceptionHandlerAdvice {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     private ApiError handlerRuntimeExceptionError(
             RuntimeException exception, HttpServletRequest request) {
+        exception.printStackTrace();
         return new ApiError(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getMessage(), request.getServletPath());
     }
 
@@ -71,7 +72,7 @@ public class GlobalExceptionHandlerAdvice {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     private ApiError handlerGenericExceptionError(
             GenericException exception, HttpServletRequest request) {
-        return new ApiError(HttpStatus.BAD_REQUEST.value(), exception.getMessage(), request.getServletPath());
+        return new ApiError(exception, request.getServletPath());
     }
 
 }
