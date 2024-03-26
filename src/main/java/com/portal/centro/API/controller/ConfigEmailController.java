@@ -19,7 +19,7 @@ public class ConfigEmailController extends GenericController<ConfigEmail, Long> 
     }
 
     @Override
-    public ResponseEntity getAll() {
+    public ResponseEntity getAll() throws Exception {
         return ResponseEntity.ok(configEmailService.find());
     }
 

@@ -25,7 +25,8 @@ public class EmailService {
         this.emailMessageGenerator = emailMessageGenerator;
     }
 
-    public void sendEmail(EmailDto emailTo) {
+    public void sendEmail(EmailDto emailTo) throws Exception {
+        this.configEmailService.validateIfExistsEmailConfig();
         HtmlEmail htmlEmail = new HtmlEmail();
         try{
             ConfigEmail configEmail = configEmailService.find();

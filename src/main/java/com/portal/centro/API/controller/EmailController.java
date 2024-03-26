@@ -23,9 +23,9 @@ public class EmailController {
     }
 
     @PostMapping("/send")
-    public ResponseEntity<?> sendingEmail(@RequestBody @Valid EmailDto emailDto) { //Test
+    public ResponseEntity<?> sendingEmail(@RequestBody @Valid EmailDto emailDto) throws Exception {
         log.info("processando envio de email....");
         emailService.sendEmail(emailDto);
-        return new ResponseEntity<>( HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

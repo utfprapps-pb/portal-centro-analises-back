@@ -1,6 +1,7 @@
 package com.portal.centro.API.service;
 
 import com.portal.centro.API.enums.Type;
+import com.portal.centro.API.exceptions.GenericException;
 import com.portal.centro.API.exceptions.NotFoundException;
 import com.portal.centro.API.exceptions.ValidationException;
 import com.portal.centro.API.generic.crud.GenericService;
@@ -9,6 +10,7 @@ import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.ConfigEmailRepository;
 import com.portal.centro.API.security.auth.AuthService;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -25,11 +27,17 @@ public class ConfigEmailService extends GenericService<ConfigEmail, Long> {
         this.authService = authService;
     }
 
-    public ConfigEmail find() {
+    public ConfigEmail find() throws Exception {
+        this.validateIfExistsEmailConfig();
         List<ConfigEmail> configEmailList = configEmailRepository.findAll();
-        if (configEmailList.isEmpty())
-            throw new NotFoundException("Configuração de email não encontrada.");
         return configEmailList.get(0);
+    }
+
+    public void validateIfExistsEmailConfig() throws Exception {
+        List<ConfigEmail> configEmailList = configEmailRepository.findAll();
+        if (ObjectUtils.isEmpty(configEmailList)) {
+            throw new GenericException("Configuração de email não encontrada.");
+        }
     }
 
     @Override

@@ -33,7 +33,7 @@ public class GlobalExceptionHandlerAdvice {
                     fieldError.getDefaultMessage());
         }
 
-        return new ApiError(HttpStatus.BAD_REQUEST.value(), "validation error", request.getServletPath(), validationErrors);
+        return new ApiError(exception, request.getServletPath(), validationErrors);
     }
 
     @ExceptionHandler({ValidationException.class})
