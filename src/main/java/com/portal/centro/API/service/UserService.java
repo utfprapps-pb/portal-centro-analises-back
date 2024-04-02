@@ -218,7 +218,7 @@ public class UserService extends GenericService<User, Long> {
                 user.setStatus(StatusInactiveActive.INACTIVE);
                 super.save(user);
                 return "Usuário inativado com sucesso!";
-            } else if (!projectRepository.findAllByTeacher(user).isEmpty()) {
+            } else if (!projectRepository.findAllByUser(user).isEmpty()) {
                 user.setStatus(StatusInactiveActive.INACTIVE);
                 super.save(user);
                 return "Usuário inativado com sucesso!";

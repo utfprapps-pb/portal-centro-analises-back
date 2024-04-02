@@ -167,6 +167,13 @@
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>2.1.0</version>
 		</dependency>
+
+        <!-- dependency required for jsonb-->
+		<dependency>
+			<groupId>io.hypersistence</groupId>
+			<artifactId>hypersistence-utils-hibernate-62</artifactId>
+			<version>3.7.3</version>
+		</dependency>
 	</dependencies>
 
 	<build>

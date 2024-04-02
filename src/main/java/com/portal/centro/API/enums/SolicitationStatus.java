@@ -1,5 +1,8 @@
 package com.portal.centro.API.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum SolicitationStatus {
     PENDING_ADVISOR("Aguardando Confirmação do Orientador"),
     PENDING_CORRECTION("Aguardando Correção"),
@@ -10,14 +13,10 @@ public enum SolicitationStatus {
     REFUSED("Recusado"),
     FINISHED("Concluído");
 
-    private String content;
+    private final String content;
 
     SolicitationStatus(String content) {
         this.content = content;
-    }
-
-    public String getContent() {
-        return content;
     }
 
 }

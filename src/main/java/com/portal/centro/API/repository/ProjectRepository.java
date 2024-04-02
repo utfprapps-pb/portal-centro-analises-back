@@ -14,8 +14,8 @@ public interface ProjectRepository extends GenericRepository<Project, Long> {
 
     List<Project> findAllByStudentsContains(User user);
 
-    List<Project> findAllByTeacher(User teacher);
+    List<Project> findAllByUser(User user);
 
-    Page<Project> findAllByTeacher(User teacher, PageRequest pageRequest);
+    Page<Project> findAllByUser(User user, PageRequest pageRequest);
 
 }

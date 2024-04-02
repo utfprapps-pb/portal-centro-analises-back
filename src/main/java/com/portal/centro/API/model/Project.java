@@ -16,7 +16,6 @@ import java.util.List;
 @Entity(name = "project")
 public class Project extends IModel {
 
-
     @NotNull()
     @Size(min = 4, max = 255)
     private String description;
@@ -26,8 +25,8 @@ public class Project extends IModel {
     private String subject;
 
     @ManyToOne
-    @JoinColumn(name = "teacher_id", updatable = false)
-    private User teacher;
+    @JoinColumn(name = "user_id", updatable = false)
+    private User user;
 
     @ManyToMany
     @JoinTable(name = "project_student",

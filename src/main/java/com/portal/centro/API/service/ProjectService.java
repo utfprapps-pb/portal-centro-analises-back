@@ -49,9 +49,9 @@ public class ProjectService extends GenericService<Project, Long> {
 
         if(!projects.isEmpty()) {
             teacher = TeacherDTO.builder()
-                    .name(projects.get(0).getTeacher().getName())
-                    .id(projects.get(0).getTeacher().getId())
-                    .email(projects.get(0).getTeacher().getEmail())
+                    .name(projects.get(0).getUser().getName())
+                    .id(projects.get(0).getUser().getId())
+                    .email(projects.get(0).getUser().getEmail())
                     .build();
         }
 
@@ -87,7 +87,7 @@ public class ProjectService extends GenericService<Project, Long> {
             case ROLE_ADMIN:
                 return super.page(pageRequest);
             case ROLE_PROFESSOR:
-                return projectRepository.findAllByTeacher(user, pageRequest);
+                return projectRepository.findAllByUser(user, pageRequest);
             default:
                 throw new ValidationException("Você não possui permissão para acessar este recurso.");
         }

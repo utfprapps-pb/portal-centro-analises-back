@@ -13,20 +13,23 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "users")
 @Table(uniqueConstraints = {
-        @UniqueConstraint(name = "setuniqueemail", columnNames = "email")
+        @UniqueConstraint(name = "set_unique_email", columnNames = "email")
 })
 @UserUniqueConstraint
+@Builder
 public class User implements UserDetails {
 
     @Id
@@ -51,40 +54,37 @@ public class User implements UserDetails {
 
     private StatusInactiveActive status;
 
+    @Column(name = "email_verified")
+    private Boolean emailVerified;
+
+    private BigDecimal balance;
+
+    @Column(name = "ra_siape")
+    private String raSiape;
+
+    @Column(name = "cpf_cnpj")
+    private String cpfCnpj;
+
+    @ManyToOne
+    @JoinColumn(name = "partner_id")
+    private Partner partner;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private List<Permission> permissions;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "email_verified")
-    private Boolean emailVerified;
-
-    private BigDecimal balance;
-
-    private String ra;
-
-    private String siape;
-
-    private String cpf;
-
-    private String cnpj;
-
-    @ManyToOne
-    @JoinColumn(name = "partner_id")
-    private Partner partner;
-
     @Override
     @Transient
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
-//        List<GrantedAuthority> list = new ArrayList<>();
-//        list.addAll(this.permissions);
-//        return list;
-
         List<GrantedAuthority> authorities = new ArrayList<>();
-            authorities.add(new SimpleGrantedAuthority(role.name()));
-        // Você pode adicionar permissions aqui, se necessário
+        authorities.add(new SimpleGrantedAuthority(role.name()));
         return authorities;
     }
 
@@ -92,10 +92,6 @@ public class User implements UserDetails {
     public String getUsername() {
         return this.email;
     }
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
-    private List<Permission> permissions;
 
     @Override
     @Transient

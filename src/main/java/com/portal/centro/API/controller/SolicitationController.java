@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("solicitation")
+@RequestMapping("solicitations")
 public class SolicitationController extends GenericController<Solicitation, Long> {
 
     private final SolicitationService solicitationService;

@@ -4,14 +4,13 @@ import com.portal.centro.API.enums.StatusInactiveActive;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.math.BigDecimal;
 
-@Entity(name = "equipment")
-@Data
+@Entity(name = "tb_equipment")
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,14 +24,22 @@ public class Equipment {
     @NotEmpty
     private String name;
 
+    @Column(name="short_name")
+    private String shortName;
+
+    @Column(name="model")
+    private String model;
+
+    private StatusInactiveActive status;
+
     @Column(name="value_hour_utfpr")
     private BigDecimal valueHourUtfpr;
 
     @Column(name="value_hour_partner")
     private BigDecimal valueHourPartner;
 
-    @Column(name="value_hour_pf_pj")
-    private BigDecimal valueHourPfPj;
+    @Column(name="value_hour_external")
+    private BigDecimal valueHourExternal;
 
     @Column(name="value_sample_utfpr")
     private BigDecimal valueSampleUtfpr;
@@ -40,14 +47,7 @@ public class Equipment {
     @Column(name="value_sample_partner")
     private BigDecimal valueSamplePartner;
 
-    @Column(name="value_sample_pf_pj")
-    private BigDecimal valueSamplePfPj;
+    @Column(name="value_sample_external")
+    private BigDecimal valueSampleExternal;
 
-    @Column(name="form")
-    private String form;
-
-    @Column(name="short_name")
-    private String shortName;
-
-    private StatusInactiveActive status;
 }

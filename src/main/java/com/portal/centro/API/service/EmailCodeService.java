@@ -2,7 +2,6 @@ package com.portal.centro.API.service;
 
 import com.portal.centro.API.dto.EmailDto;
 import com.portal.centro.API.generic.crud.GenericService;
-import com.portal.centro.API.model.ConfigEmail;
 import com.portal.centro.API.model.EmailCode;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.provider.ConfigFrontProvider;
@@ -20,17 +19,17 @@ public class EmailCodeService extends GenericService<EmailCode, Long> {
     private final ConfigFrontProvider configFrontProvider;
     private final EmailCodeRepository emailCodeRepository;
     private final UserRepository userRepository;
-    private final ConfigEmailService configEmailService;
+    private final EmailConfigService emailConfigService;
 
     @Autowired
-    public EmailCodeService(EmailCodeRepository emailCodeRepository, HashingService hashingService, UserRepository userRepository, EmailService emailService, ConfigFrontProvider configFrontProvider, ConfigEmailService configEmailService) {
+    public EmailCodeService(EmailCodeRepository emailCodeRepository, HashingService hashingService, UserRepository userRepository, EmailService emailService, ConfigFrontProvider configFrontProvider, EmailConfigService emailConfigService) {
         super(emailCodeRepository);
         this.hashingService = hashingService;
         this.emailCodeRepository = emailCodeRepository;
         this.userRepository = userRepository;
         this.emailService = emailService;
         this.configFrontProvider = configFrontProvider;
-        this.configEmailService = configEmailService;
+        this.emailConfigService = emailConfigService;
     }
 
     @Override
@@ -39,7 +38,7 @@ public class EmailCodeService extends GenericService<EmailCode, Long> {
     }
 
     public EmailCode createCode(User user) throws Exception {
-        this.configEmailService.validateIfExistsEmailConfig();
+        this.emailConfigService.validateIfExistsEmailConfig();
         LocalDateTime dateTime = LocalDateTime.now();
         String hashKey = this.hashingService.generateHashKey(user.getEmail() + dateTime);
 

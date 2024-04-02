@@ -4,9 +4,8 @@ import com.portal.centro.API.dto.SolicitationResponseDto;
 import com.portal.centro.API.enums.*;
 import com.portal.centro.API.exceptions.ValidationException;
 import com.portal.centro.API.generic.crud.GenericService;
-import com.portal.centro.API.model.Audit;
+import com.portal.centro.API.model.SolicitationHistoric;
 import com.portal.centro.API.model.Solicitation;
-import com.portal.centro.API.model.TechnicalReport;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.SolicitationRepository;
 import org.springframework.data.domain.Page;
@@ -22,20 +21,20 @@ import java.util.Optional;
 @Service
 public class SolicitationService extends GenericService<Solicitation, Long> {
 
-    private final AuditService auditService;
+    private final SolicitationHistoricService solicitationHistoricService;
     private final UserService userService;
     private final SolicitationRepository solicitationRepository;
     private final RequestValueService requestValueService;
     private final TechnicalReportService technicalReportService;
 
-    public SolicitationService(SolicitationRepository solicitationRepository, AuditService auditService,
+    public SolicitationService(SolicitationRepository solicitationRepository, SolicitationHistoricService solicitationHistoricService,
                                UserService userService,
                                TransactionService transactionService,
                                RequestValueService requestValueService,
                                TechnicalReportService technicalReportService) {
         super(solicitationRepository);
         this.solicitationRepository = solicitationRepository;
-        this.auditService = auditService;
+        this.solicitationHistoricService = solicitationHistoricService;
         this.userService = userService;
         this.requestValueService = requestValueService;
         this.technicalReportService = technicalReportService;
@@ -56,16 +55,16 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         setSolicitationStatusWhenUserExternalOrPartner(requestBody, loggedUser);
         setProjectToNullIfEmpty(requestBody);
         Solicitation output = super.save(requestBody);
-        Audit audit = new Audit();
+        SolicitationHistoric solicitationHistoric = new SolicitationHistoric();
         if (loggedUser.getRole().equals(Type.ROLE_PROFESSOR)) {
-            audit.setNewStatus(SolicitationStatus.PENDING_LAB);
+            solicitationHistoric.setStatus(SolicitationStatus.PENDING_LAB);
             output.setStatus(SolicitationStatus.PENDING_LAB);
         } else {
-            audit.setNewStatus(requestBody.getStatus());
+            solicitationHistoric.setStatus(requestBody.getStatus());
         }
 
-        audit.setSolicitation(output);
-        auditService.saveAudit(audit);
+        solicitationHistoric.setSolicitation(output);
+        solicitationHistoricService.saveAudit(solicitationHistoric);
 
         return output;
     }
@@ -119,24 +118,25 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         solicitation.setStatus(responseDto.getStatus());
 
         if (solicitation.getStatus() == SolicitationStatus.REFUSED) {
-            solicitation.setRejectionReason(responseDto.getReason());
+            // TODO save in históric.
+            // solicitation.setRejectionReason(responseDto.getReason());
         }
 
-        if(SolicitationStatus.PENDING_PAYMENT.equals(responseDto.getStatus()) && TypeUser.UTFPR.equals(solicitation.getTypeUser())) {
-
-            TechnicalReport report = technicalReportService.findBySolicitationId(solicitation.getId());
-            userService.updateBalance(solicitation.getProject().getTeacher().getId(), TransactionType.WITHDRAW,
-                    requestValueService.calculate(report)
-            );
-        }
+//        if(SolicitationStatus.PENDING_PAYMENT.equals(responseDto.getStatus()) && TypeUser.UTFPR.equals(solicitation.getTypeUser())) {
+//            // TODO VERIFICAR PAGAMENTO
+////            TechnicalReport report = technicalReportService.findBySolicitationId(solicitation.getId());
+////            userService.updateBalance(solicitation.getProject().getTeacher().getId(), TransactionType.WITHDRAW,
+////                    requestValueService.calculate(report)
+////            );
+//        }
         if(responseDto.getData() != null && SolicitationStatus.APPROVED.equals(responseDto.getStatus())){
             solicitation.setScheduleDate(responseDto.getData());
         }
-        Audit audit = new Audit();
-        audit.setNewStatus(responseDto.getStatus());
-        audit.setSolicitation(solicitation);
+        SolicitationHistoric solicitationHistoric = new SolicitationHistoric();
+        solicitationHistoric.setStatus(responseDto.getStatus());
+        solicitationHistoric.setSolicitation(solicitation);
 
-        auditService.saveAudit(audit);
+        solicitationHistoricService.saveAudit(solicitationHistoric);
 
         return super.save(solicitation);
     }
@@ -147,7 +147,7 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
             case ROLE_ADMIN:
                 return solicitationRepository.findAllByStatus(SolicitationStatus.PENDING_LAB);
             case ROLE_PROFESSOR:
-                return solicitationRepository.findAllByProject_TeacherAndStatus(user, SolicitationStatus.PENDING_ADVISOR);
+                return solicitationRepository.findAllByProject_UserAndStatus(user, SolicitationStatus.PENDING_ADVISOR);
             default:
                 throw new ValidationException("Você não possui permissão para acessar este recurso.");
         }
@@ -172,7 +172,7 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
 
         switch (user.getRole()) {
             case ROLE_PROFESSOR:
-                return solicitationRepository.findAllByProject_TeacherAndStatus(user, SolicitationStatus.PENDING_ADVISOR, pageRequest);
+                return solicitationRepository.findAllByProject_UserAndStatus(user, SolicitationStatus.PENDING_ADVISOR, pageRequest);
             case ROLE_ADMIN:
                 return solicitationRepository.findAllByStatus(SolicitationStatus.PENDING_LAB, pageRequest);
             default:

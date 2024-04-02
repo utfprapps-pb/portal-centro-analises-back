@@ -8,16 +8,14 @@ import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "partner")
+@Entity(name = "tb_partner")
 public class Partner {
 
     @Id
@@ -28,6 +26,8 @@ public class Partner {
     @NotBlank(message = "Name must not be empty!")
     @Size(min = 4, max = 255)
     private String name;
+
+    private String cnpj;
 
     @NotNull
     private StatusInactiveActive status;
