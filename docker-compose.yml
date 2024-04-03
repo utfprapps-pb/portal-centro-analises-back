@@ -39,7 +39,7 @@ services:
     labels:
       # Traefik Config
       - "traefik.enable=true"
-      - "traefik.http.routers.ca-api-dev.rule=Host(`ca-api-dev.app.pb.utfpr.edu.br`)"
+      - "traefik.http.routers.ca-api-dev.rule=Host(`ca-api-dev-v2.app.pb.utfpr.edu.br`)"
       - "traefik.http.routers.ca-api-dev.tls.certresolver=letsencrypt"
       - "traefik.http.routers.ca-api-dev.entrypoints=websecure"
     restart: unless-stopped

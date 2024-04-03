@@ -3,11 +3,11 @@ pipeline {
     environment {
         SERVER_PORT=8610
         POSTGRESQL_CRED = credentials('postgres-id')
-        DATABASE_URL="jdbc:postgresql://postgresql:5432/ca_lab"
+        DATABASE_URL="jdbc:postgresql://postgresql:5432/ca_lab_v2"
         DATABASE_USERNAME="${POSTGRESQL_CRED_USR}"
         DATABASE_PASSWORD="${POSTGRESQL_CRED_PSW}"
 
-        FRONT_BASEURL="https://ca-dev.app.pb.utfpr.edu.br"
+        FRONT_BASEURL="https://ca-dev-v2.app.pb.utfpr.edu.br"
 
         MINIO_CRED = credentials('ca-minio-id')
         MINIO_ACCESS_KEY = "${MINIO_CRED_USR}"
