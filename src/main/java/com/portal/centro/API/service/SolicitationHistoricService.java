@@ -39,11 +39,12 @@ public class SolicitationHistoricService extends GenericService<SolicitationHist
         }
     }
 
-    public void saveAudit(SolicitationHistoric solicitationHistoric) {
+    @Override
+    public SolicitationHistoric save(SolicitationHistoric solicitationHistoric) {
         solicitationHistoric.setCreatedAt(LocalDateTime.now());
-
         solicitationHistoric.setCreatedBy(userService.findSelfUser());
-        solicitationHistoricRepository.save(solicitationHistoric);
+
+        return solicitationHistoricRepository.save(solicitationHistoric);
     }
 
     public List<SolicitationHistoric> findHistoryById(Long id, SolicitationStatus status) {

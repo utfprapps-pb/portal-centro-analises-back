@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 @Getter
 @Setter
 @Table(
-        name = "domain_role",
+        name = "tb_domain_role",
         uniqueConstraints = {
                 @UniqueConstraint(name = "unique_domain_role", columnNames = "domain")
         }

@@ -10,18 +10,18 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Entity(name = "student_solicitation")
+@Entity(name = "tb_student_solicitation")
 public class StudentSolicitation extends IModel {
 
     @ManyToOne
-    @JoinColumn(name = "solicitated_by")
+    @JoinColumn(name = "solicited_by")
     @NotNull
-    private User solicitatedBy;
+    private User solicitedBy;
 
     @ManyToOne
-    @JoinColumn(name = "solicitated_to")
+    @JoinColumn(name = "solicited_to")
     @NotNull
-    private User solicitatedTo;
+    private User solicitedTo;
 
     @ManyToOne
     @JoinColumn(name = "finished_by")

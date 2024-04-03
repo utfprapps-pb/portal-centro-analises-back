@@ -38,7 +38,7 @@ public interface UserRepository extends GenericRepository<User, Long> {
                     "   else null " +
                     "end as label, " +
                     "count(u.role) as value " +
-                    "from users u  " +
+                    "from tb_user u  " +
                     "group by u.role " +
                     "order by u.role",
             nativeQuery = true)
@@ -53,7 +53,7 @@ public interface UserRepository extends GenericRepository<User, Long> {
                     "   else null " +
                     "end as label, " +
                     "count(u.id) as value " +
-                    "from users u " +
+                    "from tb_user u " +
                     "group by u.status",
             nativeQuery = true)
     List<Tuple> findGraficoUsuarioSituacaoNative();

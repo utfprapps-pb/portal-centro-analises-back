@@ -29,7 +29,7 @@ public class AuditController extends GenericController<SolicitationHistoric, Lon
 
     @Override
     @GetMapping("page")
-    public Page<SolicitationHistoric> search(
+    public ResponseEntity<Page<SolicitationHistoric>> search(
             @RequestParam(value = "page") Integer page,
             @RequestParam(value = "size") Integer size,
             @RequestParam(value = "order",required = false) String order,
@@ -40,7 +40,7 @@ public class AuditController extends GenericController<SolicitationHistoric, Lon
             pageRequest = PageRequest.of(page, size,
                     asc ? Sort.Direction.ASC : Sort.Direction.DESC, order);
         }
-        return solicitationHistoricService.page(pageRequest);
+        return ResponseEntity.ok(solicitationHistoricService.page(pageRequest));
     }
 
 }

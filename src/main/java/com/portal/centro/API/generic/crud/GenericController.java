@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,27 +26,27 @@ public abstract class GenericController<T, ID extends Serializable> {
     }
 
     @PostMapping("/save")
-    public ResponseEntity save(@RequestBody @Valid T requestBody) throws Exception {
+    public ResponseEntity<T> save(@RequestBody @Valid T requestBody) throws Exception {
         return ResponseEntity.ok(genericService.save(requestBody));
     }
 
     @PostMapping("{id}")
-    public ResponseEntity findOneById(@PathVariable ID id) {
+    public ResponseEntity<T> findOneById(@PathVariable ID id) {
         return ResponseEntity.ok(genericService.findOneById(id));
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity deleteById(@PathVariable ID id) throws Exception {
+    public ResponseEntity<?> deleteById(@PathVariable ID id) throws Exception {
         return ResponseEntity.ok(genericService.deleteById(id));
     }
 
     @GetMapping
-    public ResponseEntity getAll() throws Exception {
+    public ResponseEntity<?> getAll() throws Exception {
         return ResponseEntity.ok(genericService.getAll());
     }
 
     @GetMapping("page")
-    public Page<T> search(
+    public ResponseEntity<Page<T>> search(
             @RequestParam(value = "page") Integer page,
             @RequestParam(value = "size") Integer size,
             @RequestParam(value = "order", required = false) String order,
@@ -56,11 +57,11 @@ public abstract class GenericController<T, ID extends Serializable> {
             pageRequest = PageRequest.of(page, size,
                     asc ? Sort.Direction.ASC : Sort.Direction.DESC, order);
         }
-        return genericService.page(pageRequest);
+        return ResponseEntity.ok(genericService.page(pageRequest));
     }
 
     @GetMapping("search")
-    public Page<T> search(
+    public ResponseEntity<Page<T>> search(
             @RequestParam(value = "page") Integer page,
             @RequestParam(value = "size") Integer size,
             @RequestParam(value = "order", required = false) String order,
@@ -73,7 +74,7 @@ public abstract class GenericController<T, ID extends Serializable> {
             pageRequest = PageRequest.of(page, size,
                     asc ? Sort.Direction.ASC : Sort.Direction.DESC, order);
         }
-        return genericService.search(spec, pageRequest);
+        return ResponseEntity.ok(genericService.search(spec, pageRequest));
     }
 
     protected Specification<T> resolveSpecification(String searchParameters) {

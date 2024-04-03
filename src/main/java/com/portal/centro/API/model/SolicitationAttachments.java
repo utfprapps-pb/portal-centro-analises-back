@@ -3,13 +3,15 @@ package com.portal.centro.API.model;
 import com.portal.centro.API.enums.SolicitationFileType;
 import com.portal.centro.API.generic.base.IModel;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name = "tb_solicitation_attachments")
 @Setter
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class SolicitationAttachments extends IModel {
 
     @Column(name = "file_name")

@@ -7,7 +7,9 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Table(name = "tb_email_code")
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,11 +18,11 @@ public class EmailCode {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @NotNull
     @NotEmpty
-    @Setter
-    @Getter
     private String code;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

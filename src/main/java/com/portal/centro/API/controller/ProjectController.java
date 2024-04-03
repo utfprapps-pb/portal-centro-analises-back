@@ -1,5 +1,6 @@
 package com.portal.centro.API.controller;
 
+import com.portal.centro.API.dto.RetrieveProjectInfo;
 import com.portal.centro.API.generic.crud.GenericController;
 import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.model.Project;
@@ -9,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("project")
+@RequestMapping("projects")
 public class ProjectController extends GenericController<Project, Long> {
 
     private final ProjectService projectService;
@@ -20,17 +21,17 @@ public class ProjectController extends GenericController<Project, Long> {
     }
 
     @GetMapping(value = "all")
-    public ResponseEntity getAllProjects() {
-        return projectService.getAllProjects();
+    public ResponseEntity<RetrieveProjectInfo> getAllProjects() {
+        return ResponseEntity.ok( projectService.getAllProjects() );
     }
 
     @PostMapping(value = "add/student/{id}")
-    public ResponseEntity addUser(@PathVariable Long id, @Valid @RequestBody Project project) {
-        return projectService.linkUserToProject(id, project);
+    public ResponseEntity<Project> addUser(@PathVariable Long id, @Valid @RequestBody Project project) {
+        return ResponseEntity.ok(projectService.linkUserToProject(id, project));
     }
 
     @Override
-    public ResponseEntity save(@RequestBody @Valid Project requestBody) throws Exception {
+    public ResponseEntity<Project> save(@RequestBody @Valid Project requestBody) throws Exception {
         return ResponseEntity.ok(projectService.save(requestBody));
     }
 

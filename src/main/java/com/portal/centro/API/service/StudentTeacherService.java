@@ -3,69 +3,67 @@ package com.portal.centro.API.service;
 import com.portal.centro.API.enums.Type;
 import com.portal.centro.API.exceptions.ValidationException;
 import com.portal.centro.API.generic.crud.GenericService;
-import com.portal.centro.API.model.StudentTeacher;
+import com.portal.centro.API.model.StudentProfessor;
 import com.portal.centro.API.model.User;
-import com.portal.centro.API.repository.StudentTeacherRepository;
+import com.portal.centro.API.repository.StudentProfessorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Service
-public class StudentTeacherService extends GenericService<StudentTeacher, Long> {
+public class StudentTeacherService extends GenericService<StudentProfessor, Long> {
 
-    private final StudentTeacherRepository studentTeacherRepository;
+    private final StudentProfessorRepository studentProfessorRepository;
     private final UserService userService;
 
     @Autowired
     public StudentTeacherService(
-            StudentTeacherRepository studentTeacherRepository, UserService userService) {
-        super(studentTeacherRepository);
+            StudentProfessorRepository studentProfessorRepository, UserService userService) {
+        super(studentProfessorRepository);
         this.userService = userService;
-        this.studentTeacherRepository = studentTeacherRepository;
+        this.studentProfessorRepository = studentProfessorRepository;
     }
 
     @Override
-    public StudentTeacher save(StudentTeacher requestBody) throws Exception {
+    public StudentProfessor save(StudentProfessor requestBody) throws Exception {
 
-        StudentTeacher studentTeacherDb = studentTeacherRepository.findByStudentIdAndAproved(requestBody.getStudent().getId(), true);
-        if (studentTeacherDb != null) {
+        StudentProfessor studentProfessorDb = studentProfessorRepository.findByStudentIdAndApproved(requestBody.getStudent().getId(), true);
+        if (studentProfessorDb != null) {
             throw new ValidationException("Este aluno já esta vinculado a um professor.");
         }
 
         requestBody.setCreatedAt(LocalDate.now());
-        StudentTeacher studentTeacher = super.save(requestBody);
 
-        return studentTeacher;
+        return super.save(requestBody);
     }
 
-    public List<StudentTeacher> listByTeacher(Long teacherId) {
-        return studentTeacherRepository.listByTeacherWhere(teacherId);
+    public List<StudentProfessor> listByProfessor(Long professorId) {
+        return studentProfessorRepository.listByTeacherWhere(professorId);
     }
 
-    public List<User> listStudentsByTeacher(Long teacherId) {
-        return studentTeacherRepository.listStudentsByTeacher(teacherId, true);
+    public List<User> listStudentsByTeacher(Long professorId) {
+        return studentProfessorRepository.listStudentsByProfessor(professorId, true);
     }
-    public List<StudentTeacher> findByStudent(Long studentId) {
-        return studentTeacherRepository.findByStudentWhere(studentId);
+    public List<StudentProfessor> findByStudent(Long studentId) {
+        return studentProfessorRepository.findByStudentWhere(studentId);
     }
 
-    public List<StudentTeacher> getAllByUser() {
+    public List<StudentProfessor> getAllByUser() {
         User user = userService.findSelfUser();
 
         if(user.getRole() == Type.ROLE_PROFESSOR) {
-            return studentTeacherRepository.listByTeacherWhere(user.getId());
+            return studentProfessorRepository.listByTeacherWhere(user.getId());
         } else {
-            return studentTeacherRepository.findByStudentWhere(user.getId());
+            return studentProfessorRepository.findByStudentWhere(user.getId());
         }
     }
 
-    public Page<StudentTeacher> listByTeacherPage(Long teacherId, PageRequest pageRequest) {
-        return studentTeacherRepository.findAllByTeacherId(teacherId, pageRequest);
+    public Page<StudentProfessor> listByTeacherPage(Long teacherId, PageRequest pageRequest) {
+        return studentProfessorRepository.findAllByProfessorId(teacherId, pageRequest);
     }
 
 }

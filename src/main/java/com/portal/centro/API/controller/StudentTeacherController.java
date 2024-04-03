@@ -1,7 +1,7 @@
 package com.portal.centro.API.controller;
 
 import com.portal.centro.API.generic.crud.GenericController;
-import com.portal.centro.API.model.StudentTeacher;
+import com.portal.centro.API.model.StudentProfessor;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.service.StudentTeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("student-teacher")
-public class StudentTeacherController extends GenericController<StudentTeacher, Long> {
+public class StudentTeacherController extends GenericController<StudentProfessor, Long> {
 
     private final StudentTeacherService studentTeacherService;
 
@@ -27,8 +27,8 @@ public class StudentTeacherController extends GenericController<StudentTeacher, 
 
     // busca a lista de VINCULOS pelo id do professor
     @GetMapping(path = "/listByTeacher/{idProfessor}")
-    public ResponseEntity<List<StudentTeacher>> listByTeacher(@PathVariable Long idProfessor){
-        return ResponseEntity.ok(studentTeacherService.listByTeacher(idProfessor));
+    public ResponseEntity<List<StudentProfessor>> listByTeacher(@PathVariable Long idProfessor){
+        return ResponseEntity.ok(studentTeacherService.listByProfessor(idProfessor));
     }
 
     // busca a lista de ALUNOS pelo id do professor
@@ -39,7 +39,7 @@ public class StudentTeacherController extends GenericController<StudentTeacher, 
 
     // busca o professor pelo id do aluno
     @GetMapping(path = "/findByStudent/{idAluno}")
-    public ResponseEntity<List<StudentTeacher>> findByStudent(@PathVariable Long idAluno){
+    public ResponseEntity<List<StudentProfessor>> findByStudent(@PathVariable Long idAluno){
         return ResponseEntity.ok(studentTeacherService.findByStudent(idAluno));
     }
 
@@ -49,7 +49,7 @@ public class StudentTeacherController extends GenericController<StudentTeacher, 
     }
 
     @GetMapping(path = "/listByTeacherPage")
-    public Page<StudentTeacher> listByTeacherPage(
+    public Page<StudentProfessor> listByTeacherPage(
             @RequestParam(value = "page") Integer page,
             @RequestParam(value = "size") Integer size,
             @RequestParam(value = "order",required = false) String order,

@@ -7,6 +7,6 @@ import java.util.List;
 @Setter
 @Getter
 public class RetrieveProjectInfo {
-    TeacherDTO teacherDTO;
+    ProfessorDTO professorDTO;
     List<ProjectDTO> projectDTOS;
 }

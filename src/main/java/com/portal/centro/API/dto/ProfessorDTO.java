@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class TeacherDTO {
+public class ProfessorDTO {
     Long id;
     String name;
     String email;

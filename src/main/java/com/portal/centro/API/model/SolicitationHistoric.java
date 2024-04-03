@@ -22,7 +22,7 @@ public class SolicitationHistoric extends IModel {
     private Solicitation solicitation;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "created_by")
     private User createdBy;
 
     @Enumerated

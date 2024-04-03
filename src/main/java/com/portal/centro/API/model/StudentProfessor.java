@@ -1,19 +1,18 @@
 package com.portal.centro.API.model;
 
-import com.portal.centro.API.validations.user.UserUniqueConstraint;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.validator.cfg.context.Cascadable;
+import lombok.*;
 import java.time.LocalDate;
 
-@Data
+@Entity
+@Table(name = "tb_student_professor")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "student_teacher")
-public class StudentTeacher {
+@Builder
+public class StudentProfessor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,14 +25,12 @@ public class StudentTeacher {
 
     @NotNull
     @OneToOne
-    @JoinColumn(name = "teacher", referencedColumnName = "id")
-    private User teacher;
+    @JoinColumn(name = "professor", referencedColumnName = "id")
+    private User professor;
 
     @Column(name = "created_at")
     private LocalDate createdAt;
 
-    private Boolean aproved;
-
-
+    private Boolean approved;
 
 }
