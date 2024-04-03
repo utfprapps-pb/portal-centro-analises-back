@@ -21,6 +21,8 @@ public class SolicitationRequestDto {
     @Enumerated
     private SolicitationStatus status;
 
+    private boolean approved;
+
     @Size(max = 2048)
     private String observation;
 

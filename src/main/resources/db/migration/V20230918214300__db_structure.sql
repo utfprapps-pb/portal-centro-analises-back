@@ -174,6 +174,7 @@ CREATE TABLE public.tb_solicitation
     updated_at              timestamp      NULL,
     schedule_date           timestamp      NULL,
     observation             varchar(2048)  NULL,
+    paid                    bool           NULL,
     CONSTRAINT tb_solicitation_pkey PRIMARY KEY (id),
     CONSTRAINT fk_solicitation_user FOREIGN KEY (user_id) REFERENCES public.tb_user (id),
     CONSTRAINT fk_solicitation_professor FOREIGN KEY (professor_id) REFERENCES public.tb_user (id),

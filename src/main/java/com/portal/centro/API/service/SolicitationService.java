@@ -76,27 +76,53 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
      * Esse método deve ser utilizado ao atualizar a situação de uma solicitação
      */
     public Solicitation updateStatus(SolicitationRequestDto solicitationRequestDto) throws Exception {
+        // Recupera a solicitação do banco de dados
         Solicitation solicitation = this.findOneById(solicitationRequestDto.getId());
-        solicitation.setStatus(solicitationRequestDto.getStatus());
 
+        // Cria um novo registro no histórico
         SolicitationHistoric solicitationHistoric = new SolicitationHistoric();
         solicitationHistoric.setSolicitation(solicitation);
-        solicitationHistoric.setStatus(solicitationRequestDto.getStatus());
 
-        if (solicitation.getStatus() == SolicitationStatus.REFUSED) {
+        // Verifica se foi aprovado, se sim irá buscar a nova situação conforme as regras de negócio
+        if (solicitationRequestDto.isApproved()) {
+            solicitation.setStatus(getNewStatus(solicitation));
+        } else {
+            solicitation.setStatus(SolicitationStatus.REFUSED);
             solicitationHistoric.setObservation(solicitationRequestDto.getObservation());
         }
+        solicitationHistoric.setStatus(solicitation.getStatus());
 
-        if (SolicitationStatus.APPROVED.equals(solicitationRequestDto.getStatus())
+        // Quando aprovado a entrega da amostra o laboratório poderá colocar a data de agendamento da análise
+        if (SolicitationStatus.APPROVED.equals(solicitation.getStatus())
                 && solicitationRequestDto.getScheduleDate() != null) {
             solicitation.setScheduleDate(solicitationRequestDto.getScheduleDate());
         }
 
         solicitationHistoricService.save(solicitationHistoric);
-
         return super.save(solicitation);
     }
 
+    /**
+     * Retorna a nova situação caso a situação atual da solicitação tenha sido aprovada.
+     *
+     */
+    private SolicitationStatus getNewStatus(Solicitation solicitation) {
+        return switch (solicitation.getStatus()) {
+            case PENDING_ADVISOR -> SolicitationStatus.PENDING_LAB;
+            case PENDING_LAB -> SolicitationStatus.PENDING_SAMPLE;
+            case PENDING_SAMPLE -> SolicitationStatus.APPROVED;
+            case APPROVED -> {
+                if ((solicitation.getCreatedBy().getRole().equals(Type.ROLE_EXTERNAL)
+                  || solicitation.getCreatedBy().getRole().equals(Type.ROLE_PARTNER))
+                    && !solicitation.isPaid()) {
+                    yield SolicitationStatus.PENDING_PAYMENT;
+                } else {
+                    yield SolicitationStatus.FINISHED;
+                }
+            }
+            default -> throw new RuntimeException("Falha ao atualizar a situação da solicitação.");
+        };
+    }
 
     private boolean isEditing(Solicitation solicitation) {
         return (Objects.nonNull(solicitation.getId()) && solicitation.getId() > 0);

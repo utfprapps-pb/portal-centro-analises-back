@@ -102,4 +102,10 @@ public class Solicitation extends IModel {
 
     private String observation;
 
+    /**
+     * Caso seja usuário externo o laboratório deverá marcar como pago para
+     * liberar o relatório com o resultado da análise.
+     */
+    private boolean paid;
+
 }

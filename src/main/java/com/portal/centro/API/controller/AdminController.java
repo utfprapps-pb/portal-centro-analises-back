@@ -22,7 +22,7 @@ public class AdminController {
         this.userService = userService;
     }
 
-    @PostMapping("newuser")
+    @PostMapping("new-user")
     public ResponseEntity<?> addNewUserAdmin(@Valid @RequestBody User user) throws Exception {
         User loggedUser = userService.findSelfUser();
 
@@ -33,11 +33,11 @@ public class AdminController {
         return ResponseEntity.ok(userService.saveAdmin(user));
     }
 
-    //valida se o usuário é ativo ou inativo
+    // Valida se o usuário é ativo ou inativo
     //antes de deixar editar a role. Caso seja
     //ativo deixa editar e retorna o usuário
     //editado, caso contrario retornar uma
-    //mensagem "não é possivel editar um usuário
+    //mensagem "não é possível editar um usuário
     //inativo"
     @PostMapping("edit/role/{id}")
     public ResponseEntity<?> editRoleAdmin(@RequestBody @Valid String role, @PathVariable Long id) throws Exception {
