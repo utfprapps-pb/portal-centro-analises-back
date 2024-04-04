@@ -8,6 +8,7 @@ import com.portal.centro.API.model.SolicitationHistoric;
 import com.portal.centro.API.model.Solicitation;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.SolicitationRepository;
+import com.portal.centro.API.repository.StudentProfessorRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -22,12 +23,15 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
     private final UserService userService;
     private final SolicitationRepository solicitationRepository;
 
+    private final StudentProfessorRepository studentProfessorRepository;
+
     public SolicitationService(SolicitationRepository solicitationRepository, SolicitationHistoricService solicitationHistoricService,
-                               UserService userService) {
+                               UserService userService, StudentProfessorRepository studentProfessorRepository) {
         super(solicitationRepository);
         this.solicitationRepository = solicitationRepository;
         this.solicitationHistoricService = solicitationHistoricService;
         this.userService = userService;
+        this.studentProfessorRepository = studentProfessorRepository;
     }
 
     /**
@@ -61,6 +65,9 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
             if (loggedUser.getRole().equals(Type.ROLE_STUDENT)) {
                 solicitation.setStatus(SolicitationStatus.PENDING_ADVISOR);
                 solicitationHistoric.setStatus(SolicitationStatus.PENDING_ADVISOR);
+                // Seleciona o orientador do aluno no momento em que a solicitação foi realizada
+                solicitation.setProfessor(
+                        studentProfessorRepository.findProfessorByStudent(solicitation.getCreatedBy().getId()).get(0));
             } else {
                 solicitation.setStatus(SolicitationStatus.PENDING_LAB);
                 solicitationHistoric.setStatus(SolicitationStatus.PENDING_LAB);
@@ -104,7 +111,6 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
 
     /**
      * Retorna a nova situação caso a situação atual da solicitação tenha sido aprovada.
-     *
      */
     private SolicitationStatus getNewStatus(Solicitation solicitation) {
         return switch (solicitation.getStatus()) {
@@ -113,8 +119,8 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
             case PENDING_SAMPLE -> SolicitationStatus.APPROVED;
             case APPROVED -> {
                 if ((solicitation.getCreatedBy().getRole().equals(Type.ROLE_EXTERNAL)
-                  || solicitation.getCreatedBy().getRole().equals(Type.ROLE_PARTNER))
-                    && !solicitation.isPaid()) {
+                        || solicitation.getCreatedBy().getRole().equals(Type.ROLE_PARTNER))
+                        && !solicitation.isPaid()) {
                     yield SolicitationStatus.PENDING_PAYMENT;
                 } else {
                     yield SolicitationStatus.FINISHED;

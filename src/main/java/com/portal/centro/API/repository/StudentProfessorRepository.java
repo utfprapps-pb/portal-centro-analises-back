@@ -27,4 +27,8 @@ public interface StudentProfessorRepository extends GenericRepository<StudentPro
 
     Page<StudentProfessor> findAllByProfessorId(Long professorId, Pageable pageable);
 
+    @Query(value = "Select sp.professor From StudentProfessor as sp " +
+            "where sp.student.id=:studentId and sp.approved=true " +
+            "order by sp.createdAt desc")
+    List<User> findProfessorByStudent(Long studentId);
 }
