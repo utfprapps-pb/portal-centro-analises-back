@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("users")
+@RequestMapping("/users")
 public class UserController extends GenericController<User, Long> {
 
     private final EmailCodeService emailCodeService;
@@ -64,7 +64,7 @@ public class UserController extends GenericController<User, Long> {
         return ResponseEntity.ok(convertEntityToDto(userService.findSelfUser()));
     }
 
-    @GetMapping(path = "role/{role}")
+    @GetMapping(path = "/role/{role}")
     public ResponseEntity<List<UserDto>> findUsersByRole(@PathVariable("role") String role) {
         return ResponseEntity.ok(convertEntityListToDto(userService.findUsersByRole(role)));
     }
