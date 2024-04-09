@@ -28,6 +28,7 @@ public class UserDto {
     @Email
     private String email;
 
+    @Enumerated
     private StatusInactiveActive status;
 
     @Column(name = "created_at")

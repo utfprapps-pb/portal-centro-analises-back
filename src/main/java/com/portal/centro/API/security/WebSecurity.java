@@ -57,7 +57,6 @@ public class WebSecurity {
                 .requestMatchers(antMatcher("/error/**")).permitAll()
                 .requestMatchers(antMatcher("/errors/**")).permitAll()
                 .requestMatchers(antMatcher(HttpMethod.GET, "/email-confirm/**")).permitAll()
-                .requestMatchers(antMatcher(HttpMethod.POST, "/email-confirm/**")).permitAll()
                 .requestMatchers(antMatcher("/v3/**")).permitAll()
                 .requestMatchers(antMatcher("/swagger-ui/**")).permitAll()
                 .requestMatchers(antMatcher("/admin/**")).hasRole("ADMIN")

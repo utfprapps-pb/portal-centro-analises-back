@@ -157,7 +157,6 @@ public class UserController extends GenericController<User, Long> {
             this.emailCodeService.createCode(user);
             return ResponseEntity.ok(new ObjectReturn("OK"));
         }
-
         return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
