@@ -139,11 +139,13 @@ public class UserService extends GenericService<User, Long> {
 
     public DefaultResponse changePassword(ChangePasswordDTO changePasswordDTO) throws Exception {
         User user = findSelfUser();
-        if (!passwordEncoder.matches(changePasswordDTO.getOldPassword(), user.getPassword()))
-            return new DefaultResponse(HttpStatus.BAD_REQUEST.value(), "Senha atual inválida.");
+        if (!passwordEncoder.matches(changePasswordDTO.getOldPassword(), user.getPassword())) {
+            throw new GenericException("Senha atual inválida.");
+        } else {
+            updateUserNewPasswordByEmail(user, changePasswordDTO.getNewPassword());
+            return new DefaultResponse(HttpStatus.OK.value(), "Senha alterada com sucesso.");
+        }
 
-        updateUserNewPasswordByEmail(user, changePasswordDTO.getNewPassword());
-        return new DefaultResponse(HttpStatus.OK.value(), "Senha alterada com sucesso.");
     }
 
     private void updateUserNewPasswordByEmail(User user, String newPassword) throws Exception {
@@ -159,8 +161,8 @@ public class UserService extends GenericService<User, Long> {
         entity.setPassword(passwordEncoder.encode(entity.getPassword()));
     }
 
-    private void throwExceptionUserNotFound() {
-        throw new NotFoundException("Usuário não encontrado.");
+    private void throwExceptionUserNotFound() throws Exception {
+        throw new GenericException("Usuário não encontrado.");
     }
 
     public User findSelfUser() {
@@ -173,12 +175,12 @@ public class UserService extends GenericService<User, Long> {
         return this.userRepository.findByEmail(email);
     }
 
-    public List<User> findUsersByRole(@PathVariable("role") String role) {
+    public List<User> findUsersByRole(@PathVariable("role") String role) throws Exception {
         Type type;
         try {
             type = Type.valueOf(role);
         } catch (Exception e) {
-            throw new RuntimeException("Role informada não existe.");
+            throw new GenericException("Role informada não existe.");
         }
         return userRepository.findAllByRole(type);
     }

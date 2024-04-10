@@ -65,7 +65,7 @@ public class UserController extends GenericController<User, Long> {
     }
 
     @GetMapping(path = "/role/{role}")
-    public ResponseEntity<List<UserDto>> findUsersByRole(@PathVariable("role") String role) {
+    public ResponseEntity<List<UserDto>> findUsersByRole(@PathVariable("role") String role) throws Exception {
         return ResponseEntity.ok(convertEntityListToDto(userService.findUsersByRole(role)));
     }
 
