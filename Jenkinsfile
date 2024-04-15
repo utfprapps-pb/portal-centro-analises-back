@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        SERVER_PORT=8610
+        SERVER_PORT=8813
         POSTGRESQL_CRED = credentials('postgres-id')
         DATABASE_URL="jdbc:postgresql://postgresql:5432/ca_lab_v2"
         DATABASE_USERNAME="${POSTGRESQL_CRED_USR}"
