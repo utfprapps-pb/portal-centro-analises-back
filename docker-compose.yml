@@ -21,7 +21,7 @@ services:
       context: ./
       dockerfile: Dockerfile
     ports:
-      - "8810:8810"
+      - "8813:8810"
     environment:
       - SERVER_PORT=${SERVER_PORT}
       - DATABASE_URL=${DATABASE_URL}
