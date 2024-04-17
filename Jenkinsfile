@@ -9,7 +9,7 @@ pipeline {
 
         FRONT_BASE_URL="https://ca-dev-v2.app.pb.utfpr.edu.br"
         BACK_BASE_URL="https://ca-api-dev-v2.app.pb.utfpr.edu.br/api"
-
+        FRONT_PORT=""
         MINIO_CRED = credentials('ca-minio-id')
         MINIO_ACCESS_KEY = "${MINIO_CRED_USR}"
         MINIO_SECRET_KEY = "${MINIO_CRED_PSW}"
