@@ -9,6 +9,7 @@ import com.portal.centro.API.repository.EmailCodeRepository;
 import com.portal.centro.API.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDateTime;
 
@@ -20,6 +21,9 @@ public class EmailCodeService extends GenericService<EmailCode, Long> {
     private final EmailCodeRepository emailCodeRepository;
     private final UserRepository userRepository;
     private final EmailConfigService emailConfigService;
+
+    @Value("${ca.back.baseurl}")
+    private String backBaseURL;
 
     @Autowired
     public EmailCodeService(EmailCodeRepository emailCodeRepository, HashingService hashingService, UserRepository userRepository, EmailService emailService, ConfigFrontProvider configFrontProvider, EmailConfigService emailConfigService) {
@@ -49,7 +53,7 @@ public class EmailCodeService extends GenericService<EmailCode, Long> {
         emailDto.setEmailTo(user.getEmail());
         emailDto.setSubject("Confirmação de email - LAB CA");
         emailDto.setSubjectBody("Codigo para confirmação");
-        String link = configFrontProvider.getBaseurl() + configFrontProvider.getPort() + configFrontProvider.getEmailconfirm() + "/" + hashKey;
+        String link = backBaseURL + "/email-confirm/" + hashKey;
         emailDto.setContentBody("<p>Clique aqui para confirmar seu email: <a href=" + link + ">CONFIRMAR</a>.</p></br>Caso nao consiga clicar, copie e cole a URl abaixo no seu navegador: " + link);
 
         emailService.sendEmail(emailDto);
