@@ -35,7 +35,7 @@ services:
       - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME}
       - FRONT_BASEURL=${FRONT_BASE_URL}
       - FRONT_PORT=${FRONT_PORT}
-      - BACK_BASEURL=${BACK_BASE_URL}
+      - BACK_BASE_URL=${BACK_BASE_URL}
       - TZ=America/Sao_Paulo
     labels:
       # Traefik Config
