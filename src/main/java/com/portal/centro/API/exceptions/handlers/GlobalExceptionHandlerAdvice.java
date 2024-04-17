@@ -4,6 +4,7 @@ import com.portal.centro.API.exceptions.GenericException;
 import com.portal.centro.API.exceptions.NotFoundException;
 import com.portal.centro.API.exceptions.ValidationException;
 import com.portal.centro.API.model.ApiError;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -41,7 +42,7 @@ public class GlobalExceptionHandlerAdvice {
     private ApiError handlerValidationExceptionError(
             Exception exception,
             HttpServletRequest request) {
-        return new ApiError(HttpStatus.BAD_REQUEST.value(), exception.getMessage(), request.getServletPath());
+        return new ApiError(exception, request.getServletPath());
     }
 
     @ExceptionHandler({NotFoundException.class})
