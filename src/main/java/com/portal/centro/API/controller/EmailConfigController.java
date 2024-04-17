@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("email/config")
+@RequestMapping("/email/config")
 public class EmailConfigController extends GenericController<EmailConfig, Long> {
 
     final EmailConfigService emailConfigService;
