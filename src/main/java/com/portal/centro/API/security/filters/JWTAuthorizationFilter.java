@@ -1,10 +1,9 @@
 package com.portal.centro.API.security.filters;
 
+import cn.hutool.json.JSONObject;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.portal.centro.API.exceptions.GenericException;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.security.SecurityConstants;
 import com.portal.centro.API.security.auth.AuthService;
@@ -18,7 +17,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import java.io.IOException;
-import java.util.Date;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
@@ -39,12 +39,18 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             chain.doFilter(request, response);
             return;
         }
-//        DecodedJWT jwt = JWT.decode(request.getHeader(SecurityConstants.HEADER_STRING).replace(SecurityConstants.TOKEN_PREFIX, ""));
-//        if (jwt.getExpiresAt().before(new Date())) {
-//            throw new RuntimeException("Sessão expirada!");
-//        }
+        String headerUser = request.getHeader(SecurityConstants.HEADER_USER_STRING);
+        byte[] decoded = Base64.getDecoder().decode(headerUser);
+        String decodedStr = new String(decoded, StandardCharsets.ISO_8859_1);
+        JSONObject json = new JSONObject(decodedStr);
 
         UsernamePasswordAuthenticationToken authenticationToken = getAuthentication(request);
+
+        assert authenticationToken != null;
+        if (authenticationToken.getAuthorities().stream().noneMatch(it -> it.getAuthority().equals(json.get("role")))) {
+            throw new RuntimeException("mapped|GenericException|" + "Usuário inválido!");
+        }
+
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         chain.doFilter(request, response);
     }

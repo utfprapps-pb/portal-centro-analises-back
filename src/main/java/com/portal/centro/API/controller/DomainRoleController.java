@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/domain-role")
+@RequestMapping("/dominios")
 public class DomainRoleController extends GenericController<DomainRole, Long> {
 
     public DomainRoleController(DomainRoleService domainRoleService) {

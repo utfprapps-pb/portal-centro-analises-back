@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,12 +29,12 @@ public abstract class GenericController<T, ID extends Serializable> {
         return ResponseEntity.ok(genericService.save(requestBody));
     }
 
-    @PostMapping("{id}")
+    @PostMapping("/{id}")
     public ResponseEntity<T> findOneById(@PathVariable ID id) {
         return ResponseEntity.ok(genericService.findOneById(id));
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteById(@PathVariable ID id) throws Exception {
         return ResponseEntity.ok(genericService.deleteById(id));
     }

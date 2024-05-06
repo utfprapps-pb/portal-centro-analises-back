@@ -83,7 +83,7 @@ public class UserController extends GenericController<User, Long> {
     //chama a função que vai inativar ou deletar o usuário
     //dependendo dos vínculos dele com projetos
     @Override
-    public ResponseEntity<String> deleteById(@PathVariable Long id) throws Exception {
+    public ResponseEntity<ObjectReturn> deleteById(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(userService.editUserStatusToInactiveOrDelete(id));
     }
 

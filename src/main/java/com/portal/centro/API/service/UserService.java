@@ -7,12 +7,8 @@ import com.portal.centro.API.enums.StatusInactiveActive;
 import com.portal.centro.API.enums.TransactionType;
 import com.portal.centro.API.enums.Type;
 import com.portal.centro.API.exceptions.GenericException;
-import com.portal.centro.API.exceptions.NotFoundException;
 import com.portal.centro.API.generic.crud.GenericService;
-import com.portal.centro.API.model.RecoverPassword;
-import com.portal.centro.API.model.SendEmailCodeRecoverPassword;
-import com.portal.centro.API.model.User;
-import com.portal.centro.API.model.UserBalance;
+import com.portal.centro.API.model.*;
 import com.portal.centro.API.repository.ProjectRepository;
 import com.portal.centro.API.repository.UserRepository;
 import com.portal.centro.API.responses.DefaultResponse;
@@ -208,22 +204,22 @@ public class UserService extends GenericService<User, Long> {
      * professores ele não pode ser deletado, então procura
      * o tipo de usuário antes de inativa-lo ou deleta-lo
      * */
-    public String editUserStatusToInactiveOrDelete(Long id) throws Exception {
+    public ObjectReturn editUserStatusToInactiveOrDelete(Long id) throws Exception {
         User user = userRepository.findUserById(id);
 
         if (user.getRole().getContent().toString().equals("professor")) {
             user.setStatus(StatusInactiveActive.INACTIVE);
             super.save(user);
-            return "Usuário inativado com sucesso!";
+            return new ObjectReturn("Usuário inativado com sucesso!");
         } else {
             if (!projectRepository.findAllByStudentsContains(user).isEmpty()) {
                 user.setStatus(StatusInactiveActive.INACTIVE);
                 super.save(user);
-                return "Usuário inativado com sucesso!";
+                return new ObjectReturn("Usuário inativado com sucesso!");
             } else if (!projectRepository.findAllByUser(user).isEmpty()) {
                 user.setStatus(StatusInactiveActive.INACTIVE);
                 super.save(user);
-                return "Usuário inativado com sucesso!";
+                return new ObjectReturn("Usuário inativado com sucesso!");
             } else {
                 return super.deleteById(id);
             }
