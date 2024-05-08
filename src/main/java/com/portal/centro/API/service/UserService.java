@@ -65,6 +65,8 @@ public class UserService extends GenericService<User, Long> {
         requestBody.setPermissions(utilsService.getPermissionsByRole(role));
         requestBody.setRole(role);
         requestBody.setStatus(StatusInactiveActive.ACTIVE);
+        requestBody.setType(requestBody.getType());
+        requestBody.setCpfCnpj(requestBody.getCpfCnpj());
         this.validate(requestBody);
         User user = super.save(requestBody);
         this.emailCodeService.createCode(user);
@@ -76,6 +78,8 @@ public class UserService extends GenericService<User, Long> {
         encryptPassword(requestBody);
         requestBody.setPermissions(utilsService.getPermissionsByRole(requestBody.getRole()));
         requestBody.setStatus(StatusInactiveActive.ACTIVE);
+        requestBody.setType(requestBody.getType());
+        requestBody.setCpfCnpj(requestBody.getCpfCnpj());
         this.validate(requestBody);
         User user = super.save(requestBody);
         this.emailCodeService.createCode(user);

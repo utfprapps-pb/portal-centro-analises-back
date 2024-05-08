@@ -22,7 +22,7 @@
 -- INSERT INTO USERS (email, name, password, role, status) values ('partner@partner.com', 'Partner', '$2a$10$ze2T2cQAxRjql2kXEwzSZux4UMTlt/4bP.Ma/oTdekyNOqpWAUB9C', 4, 1);
 
 -- Insere domínio de teste para vincular o type PARTNER quando criar um usuário com esse domínio no e-mail
-INSERT INTO tb_domain_role (domain, role) VALUES('partner.com', 4);
+-- INSERT INTO tb_domain_role (domain, role) VALUES('partner.com', 4);
 
 -- INSERT INTO project (description, subject) VALUES ('PROJECT DESCRIPTION', 'PROJECT SUBJECT');
 --

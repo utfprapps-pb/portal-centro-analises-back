@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.portal.centro.API.enums.StatusInactiveActive;
 import com.portal.centro.API.enums.Type;
+import com.portal.centro.API.enums.UserType;
 import com.portal.centro.API.validations.user.UserUniqueConstraint;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -38,6 +39,9 @@ public class User implements UserDetails {
 
     @Enumerated
     private Type role;
+
+    @Enumerated()
+    private UserType type = UserType.PF;
 
     @NotNull(message = "Parameter name is required.")
     @Size(min = 4, max = 255)

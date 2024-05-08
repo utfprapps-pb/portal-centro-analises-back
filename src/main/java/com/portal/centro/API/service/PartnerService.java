@@ -14,11 +14,6 @@ public class PartnerService extends GenericService<Partner, Long> {
         super(partnerRepository);
     }
 
-    @Override
-    public Partner save(Partner requestBody) throws Exception {
-        return super.save(requestBody);
-    }
-
 }
 
 

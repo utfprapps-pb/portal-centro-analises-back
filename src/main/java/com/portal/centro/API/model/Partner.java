@@ -25,6 +25,7 @@ public class Partner {
     @Size(min = 4, max = 255)
     private String name;
 
+    @Column(nullable = false, unique = true, length = 20)
     private String cnpj;
 
     @NotNull
