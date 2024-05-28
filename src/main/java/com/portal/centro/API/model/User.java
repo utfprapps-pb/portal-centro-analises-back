@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.portal.centro.API.enums.StatusInactiveActive;
 import com.portal.centro.API.enums.Type;
 import com.portal.centro.API.enums.UserType;
+import com.portal.centro.API.generic.crud.GenericModel;
 import com.portal.centro.API.validations.user.UserUniqueConstraint;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -31,7 +32,7 @@ import java.util.List;
 })
 @UserUniqueConstraint
 @Builder
-public class User implements UserDetails {
+public class User implements GenericModel, UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,18 +41,18 @@ public class User implements UserDetails {
     @Enumerated
     private Type role;
 
-    @Enumerated()
+    @Enumerated
     private UserType type = UserType.PF;
 
-    @NotNull(message = "Parameter name is required.")
+    @Column(nullable = false)
     @Size(min = 4, max = 255)
     private String name;
 
-    @NotNull(message = "Parameter email is required.")
+    @Column(nullable = false)
     @Email
     private String email;
 
-    @NotNull(message = "Parameter password is required.")
+    @Column(nullable = false)
     @Size(min = 6, max = 254)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
@@ -63,10 +64,11 @@ public class User implements UserDetails {
 
     private BigDecimal balance;
 
+    @Size(min = 6, max = 254)
     @Column(name = "ra_siape")
     private String raSiape;
 
-    @Column(name = "cpf_cnpj")
+    @Column(name = "cpf_cnpj", unique = true, nullable = false)
     private String cpfCnpj;
 
     @ManyToOne

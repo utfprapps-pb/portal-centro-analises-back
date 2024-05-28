@@ -54,14 +54,42 @@ public class UtilsService {
     }
 
     public List<Permission> getPermissionsByRole(final Type role) {
-        List<Permission> permissionList = permissionRepository.findAll();
+        List<Permission> permissionList = new ArrayList<>();
+        Permission create = new Permission();
+        create.setAction(Action.CREATE);
+        create.setDescription("Criação");
 
-        if(Type.ROLE_STUDENT.equals(role)) {
-            return permissionList.stream().filter(permission -> permission.getAction().equals(Action.READ)).toList();
+        Permission read = new Permission();
+        read.setAction(Action.READ);
+        read.setDescription("Leitura");
+
+        Permission update = new Permission();
+        update.setAction(Action.UPDATE);
+        update.setDescription("Atualização");
+
+        Permission delete = new Permission();
+        delete.setAction(Action.DELETE);
+        delete.setDescription("Exclusão");
+
+        if(Type.ROLE_ADMIN.equals(role)) {
+            permissionList.add(create);
+            permissionList.add(read);
+            permissionList.add(update);
+            permissionList.add(delete);
+            return permissionList;
         } else if (Type.ROLE_PROFESSOR.equals(role)) {
+            permissionList.add(read);
+            return permissionList;
+        } else if(Type.ROLE_STUDENT.equals(role)) {
+            permissionList.add(read);
+            return permissionList;
+        } else if(Type.ROLE_PARTNER.equals(role)) {
+            permissionList.add(read);
             return permissionList;
         } else {
-            return permissionList.stream().filter(permission -> permission.getAction().equals(Action.CREATE) || permission.getAction().equals(Action.READ)).toList();
+            permissionList.add(create);
+            permissionList.add(read);
+            return permissionList;
         }
     }
 

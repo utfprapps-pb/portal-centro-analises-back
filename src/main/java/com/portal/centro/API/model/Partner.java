@@ -1,6 +1,7 @@
 package com.portal.centro.API.model;
 
 import com.portal.centro.API.enums.StatusInactiveActive;
+import com.portal.centro.API.generic.crud.GenericModel;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,7 +15,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Partner {
+public class Partner implements GenericModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -19,12 +19,6 @@ public interface UserRepository extends GenericRepository<User, Long> {
     User findByEmail(String email);
 
     List<User> findAllByRole(Type role);
-    Page<User> findAllByRole(Type role, PageRequest pageRequest);
-    Page<User> findAllByStatus(StatusInactiveActive status, PageRequest pageRequest);
-
-    List<User> findAllByStatus(StatusInactiveActive status);
-
-    User findUserById(Long id);
 
     @Query(
             value = "select " +

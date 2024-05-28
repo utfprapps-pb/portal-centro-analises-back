@@ -27,20 +27,4 @@ public class AuditController extends GenericController<SolicitationHistoric, Lon
         return ResponseEntity.ok(this.solicitationHistoricService.findHistoryById(id, newStatus));
     }
 
-    @Override
-    @GetMapping("page")
-    public ResponseEntity<Page<SolicitationHistoric>> search(
-            @RequestParam(value = "page") Integer page,
-            @RequestParam(value = "size") Integer size,
-            @RequestParam(value = "order",required = false) String order,
-            @RequestParam(value = "asc",required = false) Boolean asc
-    ) throws Exception {
-        PageRequest pageRequest = PageRequest.of(page, size);
-        if (order != null && asc != null) {
-            pageRequest = PageRequest.of(page, size,
-                    asc ? Sort.Direction.ASC : Sort.Direction.DESC, order);
-        }
-        return ResponseEntity.ok(solicitationHistoricService.page(pageRequest));
-    }
-
 }

@@ -1,5 +1,6 @@
 package com.portal.centro.API.model;
 
+import com.portal.centro.API.generic.crud.GenericModel;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmailCode {
+public class EmailCode implements GenericModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

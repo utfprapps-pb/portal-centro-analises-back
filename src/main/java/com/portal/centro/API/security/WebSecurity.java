@@ -54,6 +54,8 @@ public class WebSecurity {
         http.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(authenticationEntryPoint));
         http.authorizeHttpRequests((authorize) -> authorize
                 .requestMatchers(antMatcher(HttpMethod.POST,"/users/**")).permitAll()
+                .requestMatchers(antMatcher(HttpMethod.GET,"/open/**")).permitAll()
+
                 .requestMatchers(antMatcher("/error/**")).permitAll()
                 .requestMatchers(antMatcher("/errors/**")).permitAll()
                 .requestMatchers(antMatcher(HttpMethod.GET, "/email-confirm/**")).permitAll()
@@ -65,7 +67,7 @@ public class WebSecurity {
                 .requestMatchers(antMatcher(HttpMethod.PUT, "/equipments/**")).hasAnyRole("ADMIN")
                 .requestMatchers(antMatcher(HttpMethod.DELETE, "/equipments/**")).hasAnyRole("ADMIN")
 
-                .requestMatchers(antMatcher(HttpMethod.GET,"/partners/**")).hasAnyRole("ADMIN")
+                .requestMatchers(antMatcher(HttpMethod.GET,"/parceiros/**")).hasAnyRole("ADMIN")
 
                 .requestMatchers(antMatcher(HttpMethod.POST, "/solicitation/approve/**")).hasAnyRole("PROFESSOR")
                 .requestMatchers(antMatcher(HttpMethod.POST, "/solicitation/approvelab/**")).hasAnyRole("ADMIN")

@@ -15,9 +15,8 @@ import com.portal.centro.API.responses.DefaultResponse;
 import com.portal.centro.API.utils.DateTimeUtil;
 import com.portal.centro.API.utils.UtilsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,6 +27,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
+
+import static com.portal.centro.API.enums.Type.ROLE_ADMIN;
 
 @Service
 public class UserService extends GenericService<User, Long> {
@@ -70,29 +71,21 @@ public class UserService extends GenericService<User, Long> {
         this.validate(requestBody);
         User user = super.save(requestBody);
         this.emailCodeService.createCode(user);
-
         return user;
     }
 
-    public User saveAdmin(User requestBody) throws Exception {
-        encryptPassword(requestBody);
-        requestBody.setPermissions(utilsService.getPermissionsByRole(requestBody.getRole()));
-        requestBody.setStatus(StatusInactiveActive.ACTIVE);
-        requestBody.setType(requestBody.getType());
-        requestBody.setCpfCnpj(requestBody.getCpfCnpj());
-        this.validate(requestBody);
-        User user = super.save(requestBody);
-        this.emailCodeService.createCode(user);
-
-        return user;
-    }
-
-    public User editUserRole(Type role, Long id) throws Exception {
-        Optional<User> user = userRepository.findById(id);
-
-        user.get().setRole(role);
-
-        return super.save(user.get());
+    @Override
+    public User update(User requestBody) throws Exception {
+        User usuario = findOneById(requestBody.getId());
+        usuario.setStatus(requestBody.getStatus());
+        usuario.setType(requestBody.getType());
+        usuario.setCpfCnpj(requestBody.getCpfCnpj());
+        usuario.setRole(requestBody.getRole());
+        usuario.setPermissions(utilsService.getPermissionsByRole(usuario.getRole()));
+        usuario.setName(requestBody.getName());
+        usuario.setRaSiape(requestBody.getRaSiape());
+        this.validate(usuario);
+        return super.update(usuario);
     }
 
     private void validate(User user) throws Exception {
@@ -158,7 +151,9 @@ public class UserService extends GenericService<User, Long> {
     }
 
     private void encryptPassword(User entity) {
-        entity.setPassword(passwordEncoder.encode(entity.getPassword()));
+        if (entity.getPassword() != null) {
+            entity.setPassword(passwordEncoder.encode(entity.getPassword()));
+        }
     }
 
     private void throwExceptionUserNotFound() throws Exception {
@@ -202,60 +197,5 @@ public class UserService extends GenericService<User, Long> {
         return userBalance;
     }
 
-    /* Modifica o status de um usuário de ativo para inativo
-     * dos usuário que tem vinculo com projetos e exclui os
-     * usuários sem vinculos com projetos, para o caso dos
-     * professores ele não pode ser deletado, então procura
-     * o tipo de usuário antes de inativa-lo ou deleta-lo
-     * */
-    public ObjectReturn editUserStatusToInactiveOrDelete(Long id) throws Exception {
-        User user = userRepository.findUserById(id);
-
-        if (user.getRole().getContent().toString().equals("professor")) {
-            user.setStatus(StatusInactiveActive.INACTIVE);
-            super.save(user);
-            return new ObjectReturn("Usuário inativado com sucesso!");
-        } else {
-            if (!projectRepository.findAllByStudentsContains(user).isEmpty()) {
-                user.setStatus(StatusInactiveActive.INACTIVE);
-                super.save(user);
-                return new ObjectReturn("Usuário inativado com sucesso!");
-            } else if (!projectRepository.findAllByUser(user).isEmpty()) {
-                user.setStatus(StatusInactiveActive.INACTIVE);
-                super.save(user);
-                return new ObjectReturn("Usuário inativado com sucesso!");
-            } else {
-                return super.deleteById(id);
-            }
-        }
-    }
-
-    //modifica o status de um usuário de inativo para ativo
-    public User editUserStatusToActive(Long id) throws Exception {
-        Optional<User> user = userRepository.findById(id);
-
-        user.get().setStatus(StatusInactiveActive.ACTIVE);
-
-        return super.save(user.get());
-    }
-
-    //cria uma lista conforme o status escolhido na classe controller
-    public List<User> findAllUsersActivatedOrInactivated(StatusInactiveActive status) {
-        return userRepository.findAllByStatus(status);
-    }
-
-    public Page<User> findUsersByRolePaged(String role, PageRequest pageRequest) {
-        Type type;
-        try {
-            type = Type.valueOf(role);
-        } catch (Exception e) {
-            throw new RuntimeException("Role informada não existe.");
-        }
-        return userRepository.findAllByRole(type, pageRequest);
-    }
-
-    public Page<User> findUsersByStatusPaged(StatusInactiveActive status, PageRequest pageRequest) {
-        return userRepository.findAllByStatus(status, pageRequest);
-    }
 
 }

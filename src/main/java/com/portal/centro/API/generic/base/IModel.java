@@ -1,5 +1,6 @@
 package com.portal.centro.API.generic.base;
 
+import com.portal.centro.API.generic.crud.GenericModel;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -13,7 +14,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @MappedSuperclass
-public abstract class IModel implements Serializable {
+public abstract class IModel implements GenericModel, Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

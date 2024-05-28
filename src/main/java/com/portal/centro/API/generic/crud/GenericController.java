@@ -4,11 +4,14 @@ import com.google.common.base.Joiner;
 import com.portal.centro.API.enums.SearchOperation;
 import com.portal.centro.API.generic.specification.GenericSpecification;
 import com.portal.centro.API.generic.specification.GenericSpecificationsBuilder;
+import com.portal.centro.API.model.ObjectReturn;
+import com.portal.centro.API.model.User;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +19,9 @@ import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public abstract class GenericController<T, ID extends Serializable> {
+import static com.portal.centro.API.enums.Type.ROLE_ADMIN;
+
+public abstract class GenericController<T extends GenericModel, ID extends Serializable> {
 
     private final GenericService<T, ID> genericService;
 
@@ -27,6 +32,15 @@ public abstract class GenericController<T, ID extends Serializable> {
     @PostMapping("/save")
     public ResponseEntity<T> save(@RequestBody @Valid T requestBody) throws Exception {
         return ResponseEntity.ok(genericService.save(requestBody));
+    }
+
+    @PostMapping("/update")
+    public ResponseEntity<T> update(@Valid @RequestBody T requestBody) throws Exception {
+        return ResponseEntity.ok(genericService.update(requestBody));
+    }
+
+    public boolean allowUpdate() {
+        return true;
     }
 
     @PostMapping("/{id}")
@@ -42,38 +56,6 @@ public abstract class GenericController<T, ID extends Serializable> {
     @GetMapping
     public ResponseEntity<?> getAll() throws Exception {
         return ResponseEntity.ok(genericService.getAll());
-    }
-
-    @GetMapping("page")
-    public ResponseEntity<Page<T>> search(
-            @RequestParam(value = "page") Integer page,
-            @RequestParam(value = "size") Integer size,
-            @RequestParam(value = "order", required = false) String order,
-            @RequestParam(value = "asc", required = false) Boolean asc
-    ) throws Exception {
-        PageRequest pageRequest = PageRequest.of(page, size);
-        if (order != null && asc != null) {
-            pageRequest = PageRequest.of(page, size,
-                    asc ? Sort.Direction.ASC : Sort.Direction.DESC, order);
-        }
-        return ResponseEntity.ok(genericService.page(pageRequest));
-    }
-
-    @GetMapping("search")
-    public ResponseEntity<Page<T>> search(
-            @RequestParam(value = "page") Integer page,
-            @RequestParam(value = "size") Integer size,
-            @RequestParam(value = "order", required = false) String order,
-            @RequestParam(value = "asc", required = false) Boolean asc,
-            @RequestParam(value = "search", required = false) String search
-    ) throws Exception {
-        Specification<T> spec = resolveSpecification(search);
-        PageRequest pageRequest = PageRequest.of(page, size);
-        if (order != null && asc != null) {
-            pageRequest = PageRequest.of(page, size,
-                    asc ? Sort.Direction.ASC : Sort.Direction.DESC, order);
-        }
-        return ResponseEntity.ok(genericService.search(spec, pageRequest));
     }
 
     protected Specification<T> resolveSpecification(String searchParameters) {
