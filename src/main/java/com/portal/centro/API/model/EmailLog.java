@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Entity
-@Table(name = "tb_email_log")
+@Entity(name = "tb_email_log")
+@Table
 public class EmailLog implements Serializable {
 
     @Id

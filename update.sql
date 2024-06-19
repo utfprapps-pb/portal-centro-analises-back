@@ -1,193 +1,21 @@
 create sequence tb_email_log_seq start with 1 increment by 50;
-
-create table project_student (
-    project_id bigint not null,
-    user_id    bigint not null
-);
-
-create table tb_analysis (
-    id           bigserial not null,
-    equipment_id bigint,
-    description  varchar(255),
-    name         varchar(255),
-    primary key (id)
-);
-
-create table tb_domain_role (
-    id     bigserial not null,
-    role   smallint check (role between 0 and 4),
-    domain varchar(255),
-    primary key (id),
-    constraint unique_domain_role unique (domain)
-);
-
-create table tb_email_code (
-    id          bigserial not null,
-    user_id     bigint unique,
-    created_at  timestamp(6),
-    validate_at timestamp(6),
-    code        varchar(255),
-    primary key (id)
-);
-
-create table tb_email_config (
-    id       bigserial not null,
-    port     integer,
-    email    varchar(255),
-    host     varchar(255),
-    password varchar(255),
-    primary key (id)
-);
-
-create table tb_email_log (
-    id           bigint not null,
-    created_at   timestamp(6),
-    body         text,
-    email_from   varchar(255),
-    email_to     varchar(255),
-    owner_ref    varchar(255),
-    status_email varchar(255) check (status_email in ('PROCESSING', 'SENT', 'ERROR')),
-    subject      varchar(255),
-    primary key (id)
-);
-
-create table tb_equipment (
-    id                    bigserial not null,
-    status                smallint check (status between 0 and 1),
-    value_hour_external   numeric(38, 2),
-    value_hour_partner    numeric(38, 2),
-    value_hour_utfpr      numeric(38, 2),
-    value_sample_external numeric(38, 2),
-    value_sample_partner  numeric(38, 2),
-    value_sample_utfpr    numeric(38, 2),
-    model                 varchar(255),
-    name                  varchar(255),
-    short_name            varchar(255),
-    primary key (id)
-);
-
-create table tb_partner (
-    id     bigserial    not null,
-    status smallint check (status between 0 and 1),
-    cnpj   varchar(20) not null unique,
-    name   varchar(255),
-    primary key (id)
-);
-
-create table tb_permission (
-    id bigserial not null,
-    description varchar(50) not null,
-    action smallint check (action between 0 and 3),
-    user_id bigint,
-    primary key (id)
-);
-
-create table tb_project (
-    id          bigserial not null,
-    user_id     bigint,
-    description varchar(255),
-    subject     varchar(255),
-    primary key (id)
-);
-
-create table tb_solicitation (
-    id                      bigserial not null,
-    amount_hours            numeric(38, 2),
-    amount_samples          integer,
-    paid                    boolean   not null,
-    price                   numeric(38, 2),
-    status                  smallint check (status between 0 and 7),
-    total_price             numeric(38, 2),
-    analysis_id             bigint,
-    created_at              timestamp(6),
-    equipment_id            bigint unique,
-    professor_id            bigint,
-    project_id              bigint unique,
-    schedule_date           timestamp(6),
-    updated_at              timestamp(6),
-    user_id                 bigint,
-    user_updated_id         bigint,
-    methodology_description varchar(255),
-    observation             varchar(255),
-    other_project_nature    varchar(255),
-    project_nature          varchar(255) check (project_nature in
-                                                ('MASTERS_THESIS', 'DOCTORATE_DISSERTATION', 'UNDERGRADUATE_THESIS',
-                                                 'INTERNSHIP_PROJECT', 'SCIENTIFIC_INITIATION', 'EXTENSION_PROJECT',
-                                                 'RESEARCH_PROJECT', 'TEACHING_PROJECT', 'OTHER')),
-    form                    jsonb,
-    primary key (id)
-);
-
-create table tb_solicitation_attachments (
-    id                  bigserial not null,
-    technical_report_id bigint,
-    attachments         varchar(255) check (attachments in ('REPORT', 'TICKET', 'INVOICE', 'ATTACHMENT')),
-    content_type        varchar(255),
-    file_name           varchar(255),
-    url                 varchar(255),
-    primary key (id)
-);
-
-create table tb_solicitation_historic (
-    id              bigserial not null,
-    status          smallint check (status between 0 and 7),
-    created_at      timestamp(6),
-    created_by      bigint,
-    solicitation_id bigint,
-    observation     varchar(255),
-    primary key (id)
-);
-
-create table tb_student_professor (
-    id         bigserial not null,
-    approved   boolean,
-    created_at date,
-    professor  bigint unique,
-    student    bigint unique,
-    primary key (id)
-);
-
-create table tb_student_solicitation (
-    id            bigserial not null,
-    status        smallint check (status between 0 and 4),
-    creation_date timestamp(6),
-    finish_date   timestamp(6),
-    finished_by   bigint,
-    solicited_by  bigint,
-    solicited_to  bigint,
-    primary key (id)
-);
-
-create table tb_transaction (
-    id              bigserial not null,
-    total_value     numeric(38, 2),
-    created_at      timestamp(6),
-    created_by      bigint,
-    solicitation_id bigint,
-    updated_by      bigint,
-    user_id         bigint,
-    description     varchar(255),
-    primary key (id)
-);
-
-create table tb_user (
-    id             bigserial not null,
-    balance        numeric(38, 2),
-    email_verified boolean,
-    role           smallint check (role between 0 and 4),
-    status         smallint check (status between 0 and 1),
-    created_at     timestamp(6),
-    partner_id     bigint,
-    updated_at     timestamp(6),
-    cpf_cnpj       varchar(255),
-    email          varchar(255),
-    name           varchar(255),
-    password       varchar(255),
-    ra_siape       varchar(255),
-    primary key (id),
-    constraint set_unique_email unique (email)
-);
-
+create table project_student (project_id bigint not null, user_id bigint not null);
+create table tb_analysis (equipment_id bigint, id bigserial not null, description varchar(255), name varchar(255), primary key (id));
+create table tb_domain_role (role smallint check (role between 0 and 4), id bigserial not null, domain varchar(255), primary key (id), constraint unique_domain_role unique (domain));
+create table tb_email_code (created_at timestamp(6), id bigserial not null, user_id bigint unique, validate_at timestamp(6), code varchar(255), primary key (id));
+create table tb_email_config (port integer, id bigserial not null, email varchar(255), host varchar(255), password varchar(255), primary key (id));
+create table tb_email_log (created_at timestamp(6), id bigint not null, body text, email_from varchar(255), email_to varchar(255), owner_ref varchar(255), status_email varchar(255) check (status_email in ('PROCESSING','SENT','ERROR')), subject varchar(255), primary key (id));
+create table tb_equipment (status smallint check (status between 0 and 1), value_hour_external numeric(38,2), value_hour_partner numeric(38,2), value_hour_utfpr numeric(38,2), value_sample_external numeric(38,2), value_sample_partner numeric(38,2), value_sample_utfpr numeric(38,2), id bigserial not null, model varchar(255), name varchar(255), short_name varchar(255), primary key (id));
+create table tb_partner (status smallint check (status between 0 and 1), id bigserial not null, cnpj varchar(20) not null unique, name varchar(255), primary key (id));
+create table tb_permission (action smallint check (action between 0 and 3), id bigserial not null, user_id bigint, description varchar(50) not null, primary key (id));
+create table tb_project (id bigserial not null, user_id bigint, description varchar(255), subject varchar(255), primary key (id));
+create table tb_solicitation (amount_hours numeric(38,2), amount_samples integer, paid boolean not null, price numeric(38,2), status smallint check (status between 0 and 7), total_price numeric(38,2), analysis_id bigint, created_at timestamp(6), equipment_id bigint unique, id bigserial not null, professor_id bigint, project_id bigint unique, schedule_date timestamp(6), updated_at timestamp(6), user_id bigint, user_updated_id bigint, methodology_description varchar(255), observation varchar(255), other_project_nature varchar(255), project_nature varchar(255) check (project_nature in ('MASTERS_THESIS','DOCTORATE_DISSERTATION','UNDERGRADUATE_THESIS','INTERNSHIP_PROJECT','SCIENTIFIC_INITIATION','EXTENSION_PROJECT','RESEARCH_PROJECT','TEACHING_PROJECT','OTHER')), form jsonb, primary key (id));
+create table tb_solicitation_attachments (id bigserial not null, technical_report_id bigint, attachments varchar(255) check (attachments in ('REPORT','TICKET','INVOICE','ATTACHMENT')), content_type varchar(255), file_name varchar(255), url varchar(255), primary key (id));
+create table tb_solicitation_historic (status smallint check (status between 0 and 7), created_at timestamp(6), created_by bigint, id bigserial not null, solicitation_id bigint, observation varchar(255), primary key (id));
+create table tb_student_professor (approved smallint check (approved between 0 and 2), created_at date, id bigserial not null, professor bigint unique, student bigint unique, primary key (id));
+create table tb_student_solicitation (status smallint check (status between 0 and 4), creation_date timestamp(6), finish_date timestamp(6), finished_by bigint, id bigserial not null, solicited_by bigint, solicited_to bigint, primary key (id));
+create table tb_transaction (total_value numeric(38,2), created_at timestamp(6), created_by bigint, id bigserial not null, solicitation_id bigint, updated_by bigint, user_id bigint, description varchar(255), primary key (id));
+create table tb_user (balance numeric(38,2), email_verified boolean, role smallint check (role between 0 and 4), status smallint check (status between 0 and 1), type smallint check (type between 0 and 1), created_at timestamp(6), id bigserial not null, partner_id bigint, updated_at timestamp(6), cpf_cnpj varchar(255) not null unique, email varchar(255) not null, name varchar(255) not null, password varchar(255) not null, ra_siape varchar(255), primary key (id), constraint set_unique_email unique (email));
 alter table if exists project_student add constraint FKnv8q0novh3yhnbaq0tvq54jj4 foreign key (user_id) references tb_user;
 alter table if exists project_student add constraint FKrfndy6dlk9lmq59g8u3t735up foreign key (project_id) references tb_project;
 alter table if exists tb_analysis add constraint FK942vrnty41a31q2jcv4xvgdac foreign key (equipment_id) references tb_equipment;

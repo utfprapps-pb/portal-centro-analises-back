@@ -2,6 +2,8 @@ package com.portal.centro.API.controller;
 
 import com.portal.centro.API.dto.ChangePasswordDTO;
 import com.portal.centro.API.dto.UserDto;
+import com.portal.centro.API.dto.UserRawDto;
+import com.portal.centro.API.enums.Type;
 import com.portal.centro.API.exceptions.GenericException;
 import com.portal.centro.API.generic.crud.GenericController;
 import com.portal.centro.API.model.ObjectReturn;
@@ -38,19 +40,26 @@ public class UserController extends GenericController<User, Long> {
         DefaultResponse defaultResponse = userService.changePassword(changePasswordDTO);
         return ResponseEntity.status(defaultResponse.getHttpStatus()).body(defaultResponse);
     }
-
-    @GetMapping(path = "/find-self-user")
-    public ResponseEntity<UserDto> findSelfUser() {
-        return ResponseEntity.ok(convertEntityToDto(userService.findSelfUser()));
-    }
+//
+//    @GetMapping(path = "/find-self-user")
+//    public ResponseEntity<UserDto> findSelfUser() {
+//        return ResponseEntity.ok(convertEntityToDto(userService.findSelfUser()));
+//    }
 
     @GetMapping(path = "/role/{role}")
-    public ResponseEntity<List<UserDto>> findUsersByRole(@PathVariable("role") String role) throws Exception {
-        return ResponseEntity.ok(convertEntityListToDto(userService.findUsersByRole(role)));
+    public ResponseEntity<List<UserRawDto>> findUsersByRole(@PathVariable("role") String role) throws Exception {
+        return ResponseEntity.ok(convertEntityListToRawDto(userService.findUsersByRole(role)));
     }
 
     private UserDto convertEntityToDto(User user) {
         return modelMapper.map(user, UserDto.class);
+    }
+
+    private List<UserRawDto> convertEntityListToRawDto(List<User> users) {
+        List<UserRawDto> usersDto = new ArrayList<>();
+        for (User user : users)
+            usersDto.add(modelMapper.map(user, UserRawDto.class));
+        return usersDto;
     }
 
     private List<UserDto> convertEntityListToDto(List<User> users) {
@@ -66,9 +75,9 @@ public class UserController extends GenericController<User, Long> {
     }
 
     @Override
-    public ResponseEntity<User> update(User requestBody) throws Exception {
+    public ResponseEntity<User> update(@Valid @RequestBody User requestBody) throws Exception {
         User loggedUser = userService.findSelfUser();
-        if(loggedUser.getRole() != ROLE_ADMIN) {
+        if(loggedUser.getRole() != ROLE_ADMIN && !loggedUser.getId().equals(requestBody.getId())) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         return ResponseEntity.ok(userService.update(requestBody));

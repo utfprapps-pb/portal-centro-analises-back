@@ -49,19 +49,4 @@ public class SolicitationController extends GenericController<Solicitation, Long
         return ResponseEntity.ok(solicitationService.approveLab(id));
     }
 
-    @GetMapping("/pending-page")
-    public Page<Solicitation> getPendingPage(
-            @RequestParam(value = "page") Integer page,
-            @RequestParam(value = "size") Integer size,
-            @RequestParam(value = "order", required = false) String order,
-            @RequestParam(value = "asc", required = false) Boolean asc
-    ) {
-        PageRequest pageRequest = PageRequest.of(page, size);
-        if (order != null && asc != null) {
-            pageRequest = PageRequest.of(page, size,
-                    asc ? Sort.Direction.ASC : Sort.Direction.DESC, order);
-        }
-        return solicitationService.getPendingPage(pageRequest);
-    }
-
 }

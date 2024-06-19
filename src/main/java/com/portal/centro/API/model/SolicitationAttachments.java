@@ -5,8 +5,8 @@ import com.portal.centro.API.generic.base.IModel;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
-@Table(name = "tb_solicitation_attachments")
+@Entity(name = "tb_solicitation_attachments")
+@Table
 @Setter
 @Getter
 @AllArgsConstructor

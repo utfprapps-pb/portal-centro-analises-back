@@ -2,10 +2,12 @@ package com.portal.centro.API.service;
 
 import com.portal.centro.API.dto.SolicitationRequestDto;
 import com.portal.centro.API.enums.*;
+import com.portal.centro.API.exceptions.GenericException;
 import com.portal.centro.API.exceptions.ValidationException;
 import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.model.SolicitationHistoric;
 import com.portal.centro.API.model.Solicitation;
+import com.portal.centro.API.model.StudentProfessor;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.SolicitationRepository;
 import com.portal.centro.API.repository.StudentProfessorRepository;
@@ -66,8 +68,14 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
                 solicitation.setStatus(SolicitationStatus.PENDING_ADVISOR);
                 solicitationHistoric.setStatus(SolicitationStatus.PENDING_ADVISOR);
                 // Seleciona o orientador do aluno no momento em que a solicitação foi realizada
-                solicitation.setProfessor(
-                        studentProfessorRepository.findProfessorByStudent(solicitation.getCreatedBy().getId()).get(0));
+                List<StudentProfessor> professores = studentProfessorRepository.findAllByStudentAndApproved(loggedUser.getId(), StudentTeacherApproved.ACEITO);
+                if (professores.isEmpty()) {
+                    throw new GenericException("Você não possui um professor vinculado!");
+                } else if (professores.size() == 1) {
+                    solicitation.setProfessor(professores.get(0).getProfessor());
+                } else {
+                    throw new GenericException("É necessário selecionar o professor!");
+                }
             } else {
                 solicitation.setStatus(SolicitationStatus.PENDING_LAB);
                 solicitationHistoric.setStatus(SolicitationStatus.PENDING_LAB);

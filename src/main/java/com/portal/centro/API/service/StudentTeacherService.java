@@ -1,17 +1,17 @@
 package com.portal.centro.API.service;
 
+import com.portal.centro.API.enums.StudentTeacherApproved;
 import com.portal.centro.API.enums.Type;
-import com.portal.centro.API.exceptions.ValidationException;
+import com.portal.centro.API.exceptions.GenericException;
 import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.model.StudentProfessor;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.StudentProfessorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -30,40 +30,42 @@ public class StudentTeacherService extends GenericService<StudentProfessor, Long
 
     @Override
     public StudentProfessor save(StudentProfessor requestBody) throws Exception {
-
-        StudentProfessor studentProfessorDb = studentProfessorRepository.findByStudentIdAndApproved(requestBody.getStudent().getId(), true);
-        if (studentProfessorDb != null) {
-            throw new ValidationException("Este aluno já esta vinculado a um professor.");
+        if (requestBody.getId() == null) {
+            User self = userService.findSelfUser();
+            if (Type.ROLE_STUDENT.equals(self.getRole())) {
+                requestBody.setApproved(StudentTeacherApproved.PENDENTE);
+            } else {
+                requestBody.setApproved(StudentTeacherApproved.ACEITO);
+            }
+        }
+        List<StudentProfessor> allByStudentAndProfessor = studentProfessorRepository.findAllByStudentAndProfessor(requestBody.getStudent().getId(), requestBody.getProfessor().getId());
+        boolean pendenciaExistente = allByStudentAndProfessor.stream().anyMatch(it -> StudentTeacherApproved.PENDENTE.equals(it.getApproved()));
+        if (pendenciaExistente) {
+            throw new GenericException("Professor e Aluno já possuem um vínculo pendente de Aprovação/Recusa");
+        }
+        boolean vinculoJaAceito = allByStudentAndProfessor.stream().anyMatch(it -> StudentTeacherApproved.ACEITO.equals(it.getApproved()) && it.getProfessor().getId().equals(requestBody.getProfessor().getId()));
+        if (vinculoJaAceito) {
+            throw new GenericException("Professor e Aluno já possuem um vínculo Ativo!");
         }
 
         requestBody.setCreatedAt(LocalDate.now());
-
         return super.save(requestBody);
     }
 
-    public List<StudentProfessor> listByProfessor(Long professorId) {
-        return studentProfessorRepository.listByTeacherWhere(professorId);
+    public void updateBindStatus(Long id, boolean approved) {
+        studentProfessorRepository.updateApproved(id, approved ? StudentTeacherApproved.ACEITO : StudentTeacherApproved.RECUSADO);
     }
 
-    public List<User> listStudentsByTeacher(Long professorId) {
-        return studentProfessorRepository.listStudentsByProfessor(professorId, true);
-    }
-    public List<StudentProfessor> findByStudent(Long studentId) {
-        return studentProfessorRepository.findByStudentWhere(studentId);
-    }
-
-    public List<StudentProfessor> getAllByUser() {
+    public List<StudentProfessor> getAllPendantsByUser() {
         User user = userService.findSelfUser();
+        List<StudentProfessor> all = studentProfessorRepository.findAll();
 
-        if(user.getRole() == Type.ROLE_PROFESSOR) {
-            return studentProfessorRepository.listByTeacherWhere(user.getId());
-        } else {
-            return studentProfessorRepository.findByStudentWhere(user.getId());
-        }
-    }
-
-    public Page<StudentProfessor> listByTeacherPage(Long teacherId, PageRequest pageRequest) {
-        return studentProfessorRepository.findAllByProfessorId(teacherId, pageRequest);
+        return switch (user.getRole()) {
+            case ROLE_ADMIN -> all;
+            case ROLE_PROFESSOR -> all.stream().filter(it -> user.getId().equals(it.getProfessor().getId())).toList();
+            case ROLE_STUDENT -> all.stream().filter(it -> user.getId().equals(it.getStudent().getId())).toList();
+            case ROLE_PARTNER, ROLE_EXTERNAL -> new ArrayList<>();
+        };
     }
 
 }

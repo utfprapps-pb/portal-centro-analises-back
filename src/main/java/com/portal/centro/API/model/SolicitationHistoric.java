@@ -8,8 +8,8 @@ import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "tb_solicitation_historic")
+@Entity(name = "tb_solicitation_historic")
+@Table
 @Getter
 @Setter
 @NoArgsConstructor

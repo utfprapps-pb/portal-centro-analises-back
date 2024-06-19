@@ -1,10 +1,10 @@
 package com.portal.centro.API.repository;
 
+import com.portal.centro.API.enums.StudentTeacherApproved;
 import com.portal.centro.API.generic.crud.GenericRepository;
 import com.portal.centro.API.model.StudentProfessor;
-import com.portal.centro.API.model.User;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import jakarta.transaction.Transactional;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -13,22 +13,15 @@ import java.util.List;
 @Repository
 public interface StudentProfessorRepository extends GenericRepository<StudentProfessor, Long> {
 
-    @Query(nativeQuery = true, value = "Select * From tb_student_professor  where professor=:professorId")
-    List<StudentProfessor> listByTeacherWhere(Long professorId);
+    @Query(nativeQuery = true, value = "select * from tb_student_professor t where student=:studentId and professor=:professorId")
+    List<StudentProfessor> findAllByStudentAndProfessor(Long studentId, Long professorId);
 
-    @Query(value = "Select st.student From StudentProfessor as st " +
-            "where st.professor.id=:professorId and st.approved=:approvedStatus")
-    List<User> listStudentsByProfessor(Long professorId, Boolean approvedStatus);
+    @Query(nativeQuery = true, value = "select * from tb_student_professor t where student=:studentId and approved=:approved")
+    List<StudentProfessor> findAllByStudentAndApproved(Long studentId, StudentTeacherApproved approved);
 
-    @Query(nativeQuery = true, value = "Select * From tb_student_professor where student=:studentId")
-    List<StudentProfessor> findByStudentWhere(Long studentId);
+    @Modifying
+    @Transactional
+    @Query("update tb_student_professor set approved=:approved where id=:id")
+    void updateApproved(Long id, StudentTeacherApproved approved);
 
-    StudentProfessor findByStudentIdAndApproved(Long studentId, Boolean approved);
-
-    Page<StudentProfessor> findAllByProfessorId(Long professorId, Pageable pageable);
-
-    @Query(value = "Select sp.professor From StudentProfessor as sp " +
-            "where sp.student.id=:studentId and sp.approved=true " +
-            "order by sp.createdAt desc")
-    List<User> findProfessorByStudent(Long studentId);
 }

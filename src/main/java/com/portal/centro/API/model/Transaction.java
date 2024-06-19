@@ -13,8 +13,8 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 
-@Entity
-@Table(name = "tb_transaction")
+@Entity(name = "tb_transaction")
+@Table
 @Getter
 @Setter
 @NoArgsConstructor

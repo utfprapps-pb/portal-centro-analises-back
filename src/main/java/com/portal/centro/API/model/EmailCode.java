@@ -7,8 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "tb_email_code")
+@Entity(name = "tb_email_code")
+@Table
 @Getter
 @Setter
 @Builder

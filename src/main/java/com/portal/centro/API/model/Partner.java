@@ -8,8 +8,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-@Entity
-@Table(name = "tb_partner")
+@Entity(name = "tb_partner")
+@Table
 @Getter
 @Setter
 @Builder

@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 
-@Table(name = "tb_permission")
-@Entity
+@Table
+@Entity(name = "tb_permission")
 @Getter
 @Setter
 @AllArgsConstructor
