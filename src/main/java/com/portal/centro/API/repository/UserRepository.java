@@ -20,6 +20,9 @@ public interface UserRepository extends GenericRepository<User, Long> {
 
     List<User> findAllByRole(Type role);
 
+    List<User> findAllByEmailContainingIgnoreCase(String domain);
+
+
     @Query(
             value = "select " +
                     "ROW_NUMBER() OVER (ORDER BY role) AS id, " +
@@ -51,4 +54,5 @@ public interface UserRepository extends GenericRepository<User, Long> {
                     "group by u.status",
             nativeQuery = true)
     List<Tuple> findGraficoUsuarioSituacaoNative();
+
 }

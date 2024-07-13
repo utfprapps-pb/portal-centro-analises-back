@@ -167,11 +167,11 @@ public class UserService extends GenericService<User, Long> {
         return user;
     }
 
-    public User findByEmail(@PathVariable("email") String email) {
+    public User findByEmail(String email) {
         return this.userRepository.findByEmail(email);
     }
 
-    public List<User> findUsersByRole(@PathVariable("role") String role) throws Exception {
+    public List<User> findUsersByRole(String role) throws Exception {
         Type type;
         try {
             type = Type.valueOf(role);
@@ -179,6 +179,10 @@ public class UserService extends GenericService<User, Long> {
             throw new GenericException("Role informada não existe.");
         }
         return userRepository.findAllByRole(type);
+    }
+
+    public List<User> findUsersByDomain(String domain) throws Exception {
+        return userRepository.findAllByEmailContainingIgnoreCase(domain);
     }
 
     public UserBalance updateBalance(Long userId, TransactionType transactionType, BigDecimal value) throws Exception {

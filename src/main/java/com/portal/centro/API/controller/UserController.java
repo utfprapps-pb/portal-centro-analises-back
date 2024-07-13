@@ -40,15 +40,15 @@ public class UserController extends GenericController<User, Long> {
         DefaultResponse defaultResponse = userService.changePassword(changePasswordDTO);
         return ResponseEntity.status(defaultResponse.getHttpStatus()).body(defaultResponse);
     }
-//
-//    @GetMapping(path = "/find-self-user")
-//    public ResponseEntity<UserDto> findSelfUser() {
-//        return ResponseEntity.ok(convertEntityToDto(userService.findSelfUser()));
-//    }
 
     @GetMapping(path = "/role/{role}")
     public ResponseEntity<List<UserRawDto>> findUsersByRole(@PathVariable("role") String role) throws Exception {
         return ResponseEntity.ok(convertEntityListToRawDto(userService.findUsersByRole(role)));
+    }
+
+    @GetMapping(path = "/domain/{domain}")
+    public ResponseEntity<List<UserRawDto>> findUsersByDomain(@PathVariable("domain") String domain) throws Exception {
+        return ResponseEntity.ok(convertEntityListToRawDto(userService.findUsersByDomain(domain)));
     }
 
     private UserDto convertEntityToDto(User user) {
