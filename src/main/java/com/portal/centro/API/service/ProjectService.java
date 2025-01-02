@@ -1,8 +1,5 @@
 package com.portal.centro.API.service;
 
-import com.portal.centro.API.dto.ProjectDTO;
-import com.portal.centro.API.dto.RetrieveProjectInfo;
-import com.portal.centro.API.dto.ProfessorDTO;
 import com.portal.centro.API.enums.Type;
 import com.portal.centro.API.exceptions.ValidationException;
 import com.portal.centro.API.generic.crud.GenericService;
@@ -11,12 +8,14 @@ import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.ProjectRepository;
 import com.portal.centro.API.security.auth.AuthService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -46,32 +45,28 @@ public class ProjectService extends GenericService<Project, Long> {
         }
     }
 
-    public RetrieveProjectInfo getAllProjects() {
+    public List<Project> getAllProjects() {
         User user = userService.findSelfUser();
-        List<Project> projects = projectRepository.findAllByStudentsContains(user);
+        List<Project> projects;
 
-        RetrieveProjectInfo info = new RetrieveProjectInfo();
-        ProfessorDTO teacher = ProfessorDTO.builder().build();
+        if (!Objects.equals(user.getRole(), Type.ROLE_ADMIN)) {
+            projects = projectRepository.findAll();
+        } else {
+            projects = projectRepository.findAllByUserEqualsOrStudentsContains(user, user);
 
-        if (!projects.isEmpty()) {
-            teacher = ProfessorDTO.builder()
-                    .name(projects.get(0).getUser().getName())
-                    .id(projects.get(0).getUser().getId())
-                    .email(projects.get(0).getUser().getEmail())
-                    .build();
+            for (Project project : projects) {
+                if (ObjectUtils.isNotEmpty(project.getStudents())) {
+                    project.setStudents(
+                            project.getStudents()
+                                    .stream()
+                                    .filter(it -> it.getId().equals(user.getId()))
+                                    .toList()
+                    );
+                }
+            }
         }
 
-        List<ProjectDTO> output = projects.stream().map(projectObject -> ProjectDTO.builder()
-                .id(projectObject.getId())
-                .description(projectObject.getDescription())
-                .subject(projectObject.getSubject())
-                .build()
-        ).collect(Collectors.toList());
-
-        info.setProfessorDTO(teacher);
-        info.setProjectDTOS(output);
-
-        return info;
+        return projects;
     }
 
     /**
@@ -97,7 +92,7 @@ public class ProjectService extends GenericService<Project, Long> {
         User user = userService.findSelfUser();
         return switch (user.getRole()) {
             case ROLE_ADMIN -> super.page(pageRequest);
-            case ROLE_PROFESSOR -> projectRepository.findAllByUser(user, pageRequest);
+            case ROLE_PROFESSOR -> projectRepository.findAllByUserEqualsOrStudentsContains(user, user, pageRequest);
             default -> throw new ValidationException("Você não possui permissão para acessar este recurso.");
         };
     }

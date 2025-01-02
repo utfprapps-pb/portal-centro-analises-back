@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("solicitations")
+@RequestMapping("/solicitar")
 public class SolicitationController extends GenericController<Solicitation, Long> {
 
     private final SolicitationService solicitationService;

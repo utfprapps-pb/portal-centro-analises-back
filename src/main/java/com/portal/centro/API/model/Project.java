@@ -1,5 +1,6 @@
 package com.portal.centro.API.model;
 
+import com.portal.centro.API.enums.SolicitationProjectNature;
 import com.portal.centro.API.generic.base.IModel;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -36,4 +37,16 @@ public class Project extends IModel {
             inverseJoinColumns = @JoinColumn(
                     name = "user_id", referencedColumnName = "id"))
     private List<User> students;
+
+    @Enumerated(value = EnumType.STRING)
+    @NotNull(message = "Project nature must not be null")
+    @Column(name = "project_nature")
+    private SolicitationProjectNature projectNature;
+
+    /**
+     * Quando a solicitação vem de um projeto que não está no ENUM SolicitationProjectNature.
+     */
+    @Column(name = "other_project_nature")
+    private String otherProjectNature;
+
 }
