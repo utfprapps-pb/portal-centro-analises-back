@@ -1,5 +1,6 @@
 package com.portal.centro.API.model;
 
+import com.portal.centro.API.enums.SolicitationFormType;
 import com.portal.centro.API.enums.SolicitationProjectNature;
 import com.portal.centro.API.enums.SolicitationStatus;
 import com.portal.centro.API.generic.base.IModel;
@@ -61,6 +62,11 @@ public class Solicitation extends IModel {
     @Type(JsonType.class)
     @Column(name = "form", columnDefinition = "jsonb")
     private Object form;
+
+    @Enumerated(value = EnumType.STRING)
+    @NotNull(message = "Solicitation Type must not be null")
+    @Column(name = "solicitation_type")
+    private SolicitationFormType solicitationType;
 
     @Enumerated(value = EnumType.STRING)
     @NotNull(message = "Project nature must not be null")

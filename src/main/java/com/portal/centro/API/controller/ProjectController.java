@@ -23,14 +23,4 @@ public class ProjectController extends GenericController<Project, Long> {
         return ResponseEntity.ok(projectService.getAllProjects());
     }
 
-//    @PostMapping(value = "add/student/{id}")
-//    public ResponseEntity<Project> addUser(@PathVariable Long id, @Valid @RequestBody Project project) {
-//        return ResponseEntity.ok(projectService.linkUserToProject(id, project));
-//    }
-//
-//    @Override
-//    public ResponseEntity<Project> save(@RequestBody @Valid Project requestBody) throws Exception {
-//        return ResponseEntity.ok(projectService.save(requestBody));
-//    }
-
 }

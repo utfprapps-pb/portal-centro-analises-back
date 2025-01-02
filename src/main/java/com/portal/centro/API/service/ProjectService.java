@@ -13,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -33,40 +32,46 @@ public class ProjectService extends GenericService<Project, Long> {
         this.authService = authService;
     }
 
-    public Project linkUserToProject(Long studentId, Project linkTo) {
-        Project project = projectRepository.findById(linkTo.getId()).orElse(null);
-
-        if (project != null) {
-            User student = userService.findOneById(studentId);
-            project.getStudents().add(student);
-            return projectRepository.save(project);
-        } else {
-            return null;
-        }
-    }
-
     public List<Project> getAllProjects() {
         User user = userService.findSelfUser();
         List<Project> projects;
 
-        if (!Objects.equals(user.getRole(), Type.ROLE_ADMIN)) {
+        if (Objects.equals(user.getRole(), Type.ROLE_ADMIN)) {
             projects = projectRepository.findAll();
         } else {
             projects = projectRepository.findAllByUserEqualsOrStudentsContains(user, user);
+        }
 
-            for (Project project : projects) {
-                if (ObjectUtils.isNotEmpty(project.getStudents())) {
-                    project.setStudents(
-                            project.getStudents()
-                                    .stream()
-                                    .filter(it -> it.getId().equals(user.getId()))
-                                    .toList()
-                    );
+        for (Project project : projects) {
+            this.cleanUserInformations(project.getUser());
+            if (ObjectUtils.isNotEmpty(project.getStudents())) {
+                project.setStudents(
+                        project.getStudents()
+                                .stream()
+                                .filter(it -> it.getId().equals(user.getId()))
+                                .toList()
+                );
+                for (User student : project.getStudents()) {
+                    this.cleanUserInformations(student);
                 }
             }
         }
 
         return projects;
+    }
+
+    private void cleanUserInformations(User user) {
+        user.setType(null);
+        user.setPassword(null);
+        user.setStatus(null);
+        user.setEmailVerified(null);
+        user.setBalance(null);
+        user.setRaSiape(null);
+        user.setCpfCnpj(null);
+        user.setPartner(null);
+        user.setPermissions(null);
+        user.setCreatedAt(null);
+        user.setUpdatedAt(null);
     }
 
     /**
