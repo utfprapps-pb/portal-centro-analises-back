@@ -43,20 +43,14 @@ public class Solicitation extends IModel {
     @Enumerated
     private SolicitationStatus status;
 
-    @NotNull(message = "Equipment must not be null")
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "equipment_id")
     private Equipment equipment;
 
+    @ManyToOne
     @NotNull(message = "Project must not be null")
-    @OneToOne
     @JoinColumn(name = "project_id")
     private Project project;
-
-    @NotNull(message = "Description must not be null")
-    @NotBlank(message = "Description must not be empty")
-    @Column(name = "methodology_description")
-    private String methodologyDescription;
 
     @NotNull(message = "Form must not be null")
     @Type(JsonType.class)

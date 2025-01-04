@@ -11,10 +11,13 @@ import com.portal.centro.API.model.StudentProfessor;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.SolicitationRepository;
 import com.portal.centro.API.repository.StudentProfessorRepository;
+import io.hypersistence.utils.hibernate.type.array.LocalDateTimeArrayType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -46,6 +49,9 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
 
         if (isEditing(solicitation)) {
             validateSolicitationWhenEditing(solicitation);
+        } else {
+            solicitation.setCreatedAt(LocalDateTime.now());
+            solicitation.setPaid(false);
         }
 
         // Verifica se a Natureza do projeto é outra, se sim, verifica se o campo de outra natureza foi preenchido.
@@ -54,7 +60,7 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
             throw new ValidationException(
                     "O campo 'Outra natureza de projeto' deve ser preenchido quando a natureza do projeto for 'Outro'.");
         }
-        setProjectToNullIfEmpty(solicitation);
+//        setProjectToNullIfEmpty(solicitation);
         solicitation.setCreatedBy(loggedUser);
 
         // Cria o histório da solicitação
