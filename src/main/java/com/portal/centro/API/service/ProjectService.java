@@ -1,95 +1,104 @@
 package com.portal.centro.API.service;
 
-import com.portal.centro.API.dto.ProjectDTO;
-import com.portal.centro.API.dto.RetrieveProjectInfo;
-import com.portal.centro.API.dto.TeacherDTO;
+import com.portal.centro.API.enums.Type;
 import com.portal.centro.API.exceptions.ValidationException;
-import com.portal.centro.API.generic.crud.GenericRepository;
 import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.model.Project;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.ProjectRepository;
+import com.portal.centro.API.security.auth.AuthService;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Service
+@Slf4j
 public class ProjectService extends GenericService<Project, Long> {
 
     private final UserService userService;
     private final ProjectRepository projectRepository;
+    private final AuthService authService;
 
-    public ProjectService(GenericRepository<Project, Long> genericRepository , UserService userService, ProjectRepository projectRepository) {
+    public ProjectService(UserService userService, ProjectRepository projectRepository, AuthService authService) {
         super(projectRepository);
 
         this.projectRepository = projectRepository;
         this.userService = userService;
+        this.authService = authService;
     }
 
-    public ResponseEntity linkUserToProject(Long studentId, Project linkTo) {
-        Optional<Project> project = projectRepository.findById(linkTo.getId());
-
-        User student = userService.findOneById(studentId);
-        project.get().getStudents().add(student);
-
-        return ResponseEntity.ok(projectRepository.save(project.get()));
-    }
-
-    public ResponseEntity getAllProjects()  {
+    public List<Project> getAllProjects() {
         User user = userService.findSelfUser();
-        List<Project> projects = projectRepository.findAllByStudentsContains(user);
+        List<Project> projects;
 
-        RetrieveProjectInfo info = new RetrieveProjectInfo();
-        TeacherDTO teacher = TeacherDTO.builder().build();
-
-        if(!projects.isEmpty()) {
-            teacher = TeacherDTO.builder()
-                    .name(projects.get(0).getTeacher().getName())
-                    .id(projects.get(0).getTeacher().getId())
-                    .email(projects.get(0).getTeacher().getEmail())
-                    .build();
+        if (Objects.equals(user.getRole(), Type.ROLE_ADMIN)) {
+            projects = projectRepository.findAll();
+        } else {
+            projects = projectRepository.findAllByUserEqualsOrStudentsContains(user, user);
         }
 
-        List<ProjectDTO> output = projects.stream().map(projectObject -> ProjectDTO.builder()
-                .id(projectObject.getId())
-                .description(projectObject.getDescription())
-                .subject(projectObject.getSubject())
-                .build()
-        ).collect(Collectors.toList());
+        for (Project project : projects) {
+            this.cleanUserInformations(project.getUser());
+            if (ObjectUtils.isNotEmpty(project.getStudents())) {
+                project.setStudents(
+                        project.getStudents()
+                                .stream()
+                                .filter(it -> it.getId().equals(user.getId()))
+                                .toList()
+                );
+                for (User student : project.getStudents()) {
+                    this.cleanUserInformations(student);
+                }
+            }
+        }
 
-        info.setTeacherDTO(teacher);
-        info.setProjectDTOS(output);
-
-        return ResponseEntity.ok(info);
+        return projects;
     }
 
-    @Override
-    public Project save(Project requestBody) throws Exception {
-        Project project = new Project();
-        try{
-            project = projectRepository.save(requestBody);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+    private void cleanUserInformations(User user) {
+        user.setType(null);
+        user.setPassword(null);
+        user.setStatus(null);
+        user.setEmailVerified(null);
+        user.setBalance(null);
+        user.setRaSiape(null);
+        user.setCpfCnpj(null);
+        user.setPartner(null);
+        user.setPermissions(null);
+        user.setCreatedAt(null);
+        user.setUpdatedAt(null);
+    }
 
+    /**
+     * Irá setar o usuário apenas quando vindo de um professor.
+     * Quando cadastrado pelo Lab o usuário deverá vir na requisição.
+     */
+    @Override
+    public Project save(Project project) throws Exception {
+        User user = authService.findLoggedUser();
+        if (user.getRole().equals(Type.ROLE_PROFESSOR)) {
+            project.setUser(user);
+        }
+        try {
+            projectRepository.save(project);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
         return project;
     }
 
     @Override
     public Page<Project> page(PageRequest pageRequest) {
         User user = userService.findSelfUser();
-        switch (user.getRole()) {
-            case ROLE_ADMIN:
-                return super.page(pageRequest);
-            case ROLE_PROFESSOR:
-                return projectRepository.findAllByTeacher(user, pageRequest);
-            default:
-                throw new ValidationException("Você não possui permissão para acessar este recurso.");
-        }
+        return switch (user.getRole()) {
+            case ROLE_ADMIN -> super.page(pageRequest);
+            case ROLE_PROFESSOR -> projectRepository.findAllByUserEqualsOrStudentsContains(user, user, pageRequest);
+            default -> throw new ValidationException("Você não possui permissão para acessar este recurso.");
+        };
     }
 }

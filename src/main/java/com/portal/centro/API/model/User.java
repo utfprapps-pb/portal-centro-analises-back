@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.portal.centro.API.enums.StatusInactiveActive;
 import com.portal.centro.API.enums.Type;
+import com.portal.centro.API.enums.UserType;
+import com.portal.centro.API.generic.crud.GenericModel;
 import com.portal.centro.API.validations.user.UserUniqueConstraint;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -13,21 +15,24 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "users")
+@Entity(name = "tb_user")
 @Table(uniqueConstraints = {
-        @UniqueConstraint(name = "setuniqueemail", columnNames = "email")
+        @UniqueConstraint(name = "set_unique_email", columnNames = "email")
 })
 @UserUniqueConstraint
-public class User implements UserDetails {
+@Builder
+public class User implements GenericModel, UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,20 +41,43 @@ public class User implements UserDetails {
     @Enumerated
     private Type role;
 
-    @NotNull(message = "Parameter name is required.")
+    @Enumerated
+    private UserType type = UserType.PF;
+
+    @Column(nullable = false)
     @Size(min = 4, max = 255)
     private String name;
 
-    @NotNull(message = "Parameter email is required.")
+    @Column(nullable = false)
     @Email
     private String email;
 
-    @NotNull(message = "Parameter password is required.")
+    @Column(nullable = false)
     @Size(min = 6, max = 254)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     private StatusInactiveActive status;
+
+    @Column(name = "email_verified")
+    private Boolean emailVerified;
+
+    private BigDecimal balance;
+
+    @Size(min = 6, max = 254)
+    @Column(name = "ra_siape")
+    private String raSiape;
+
+    @Column(name = "cpf_cnpj", unique = true, nullable = false)
+    private String cpfCnpj;
+
+    @ManyToOne
+    @JoinColumn(name = "partner_id")
+    private Partner partner;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private List<Permission> permissions;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -57,34 +85,12 @@ public class User implements UserDetails {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "email_verified")
-    private Boolean emailVerified;
-
-    private BigDecimal balance;
-
-    private String ra;
-
-    private String siape;
-
-    private String cpf;
-
-    private String cnpj;
-
-    @ManyToOne
-    @JoinColumn(name = "partner_id")
-    private Partner partner;
-
     @Override
     @Transient
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
-//        List<GrantedAuthority> list = new ArrayList<>();
-//        list.addAll(this.permissions);
-//        return list;
-
         List<GrantedAuthority> authorities = new ArrayList<>();
-            authorities.add(new SimpleGrantedAuthority(role.name()));
-        // Você pode adicionar permissions aqui, se necessário
+        authorities.add(new SimpleGrantedAuthority(role.name()));
         return authorities;
     }
 
@@ -92,10 +98,6 @@ public class User implements UserDetails {
     public String getUsername() {
         return this.email;
     }
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
-    private List<Permission> permissions;
 
     @Override
     @Transient

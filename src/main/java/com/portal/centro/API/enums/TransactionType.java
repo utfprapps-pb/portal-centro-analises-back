@@ -1,17 +1,17 @@
 package com.portal.centro.API.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum TransactionType {
 
     DEPOSIT("+"),
     WITHDRAW("-");
 
-    private String content;
+    private final String content;
 
     TransactionType (String content) {
         this.content = content;
     }
 
-    public String getContent() {
-        return content;
-    }
 }

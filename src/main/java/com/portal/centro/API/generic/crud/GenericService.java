@@ -1,6 +1,8 @@
 package com.portal.centro.API.generic.crud;
 
 import com.portal.centro.API.exceptions.NotFoundException;
+import com.portal.centro.API.model.ObjectReturn;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
@@ -8,7 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class GenericService<T, ID> {
+public abstract class GenericService<T extends GenericModel, ID> {
 
     public final GenericRepository<T, ID> genericRepository;
 
@@ -17,12 +19,20 @@ public abstract class GenericService<T, ID> {
     }
 
     public T save(T requestBody) throws Exception {
-        return genericRepository.save(requestBody);
+        if (ObjectUtils.isNotEmpty(requestBody.getId())) {
+            return this.update(requestBody);
+        } else {
+            return genericRepository.saveAndFlush(requestBody);
+        }
     }
 
-    public String deleteById(ID id) {
+    public T update(T requestBody) throws Exception {
+        return genericRepository.saveAndFlush(requestBody);
+    }
+
+    public ObjectReturn deleteById(ID id) {
         genericRepository.deleteById(id);
-        return "Registro deletado com sucesso.";
+        return new ObjectReturn("Registro deletado com sucesso.");
     }
 
     public List<T> getAll() {

@@ -1,4 +1,5 @@
 package com.portal.centro.API.minio.util;
+
 import com.portal.centro.API.minio.config.MinioConfig;
 import io.minio.*;
 import io.minio.http.Method;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -17,7 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-//a classe **MinioUtil** é onde estão implementados os métodos de comunicação direto com a API do serviço **Minio**. Sendo o principal método o ***putObject()*** , responsável pelo upload do arquivo para o serviço de armazenamento.
+//A classe **MinioUtil** é onde estão implementados os métodos de comunicação direto com a API do serviço **Minio**. Sendo o principal método o ***putObject()*** , responsável pelo upload do arquivo para o serviço de armazenamento.
 
 @Component
 @RequiredArgsConstructor
@@ -43,13 +45,11 @@ public class MinioUtil {
         if (flag) {
             StatObjectResponse statObject = statObject(bucketName, objectName);
             if (statObject != null && statObject.size() > 0) {
-                InputStream stream =
-                        minioClient.getObject(
-                                GetObjectArgs.builder()
-                                        .bucket(bucketName)
-                                        .object(objectName)
-                                        .build());
-                return stream;
+                return minioClient.getObject(
+                        GetObjectArgs.builder()
+                                .bucket(bucketName)
+                                .object(objectName)
+                                .build());
             }
         }
         return null;
@@ -58,13 +58,10 @@ public class MinioUtil {
     // Check if bucket name exists
     @SneakyThrows
     public boolean bucketExists(String bucketName) {
-        boolean found =
-                minioClient.bucketExists(
-                        BucketExistsArgs.builder().
-                                bucket(bucketName).
-                                build());
-
-        return found;
+        return minioClient.bucketExists(
+                BucketExistsArgs.builder().
+                        bucket(bucketName).
+                        build());
     }
 
     // Create bucket name
@@ -125,11 +122,8 @@ public class MinioUtil {
             }
             //  Delete bucket when bucket is empty
             minioClient.removeBucket(RemoveBucketArgs.builder().bucket(bucketName).build());
-            flag = bucketExists(bucketName);
 
-            if (!flag) {
-                return true;
-            }
+            return !bucketExists(bucketName);
         }
         return false;
     }
@@ -185,30 +179,27 @@ public class MinioUtil {
     public StatObjectResponse statObject(String bucketName, String objectName) {
         boolean flag = bucketExists(bucketName);
         if (flag) {
-            StatObjectResponse stat =
-                    minioClient.statObject(
-                            StatObjectArgs.builder().bucket(bucketName).object(objectName).build());
-            return stat;
+            return minioClient.statObject(
+                    StatObjectArgs.builder().bucket(bucketName).object(objectName).build());
         }
         return null;
     }
 
-    // Get a file object as a stream from the specified bucket （ Breakpoint download )
+    // Get a file object as a stream from the specified bucket (Breakpoint download)
     @SneakyThrows
     public InputStream getObject(String bucketName, String objectName, long offset, Long length) {
         boolean flag = bucketExists(bucketName);
         if (flag) {
             StatObjectResponse statObject = statObject(bucketName, objectName);
             if (statObject != null && statObject.size() > 0) {
-                InputStream stream =
-                        minioClient.getObject(
-                                GetObjectArgs.builder()
-                                        .bucket(bucketName)
-                                        .object(objectName)
-                                        .offset(offset)
-                                        .length(length)
-                                        .build());
-                return stream;
+                return minioClient.getObject(
+                        GetObjectArgs.builder()
+                                .bucket(bucketName)
+                                .object(objectName)
+                                .offset(offset)
+                                .length(length)
+                                .build());
+
             }
         }
         return null;
@@ -220,15 +211,16 @@ public class MinioUtil {
         boolean flag = bucketExists(bucketName);
         if (flag) {
             List<DeleteObject> objects = new LinkedList<>();
-            for (int i = 0; i < objectNames.size(); i++) {
-                objects.add(new DeleteObject(objectNames.get(i)));
+            for (String objectName : objectNames) {
+                objects.add(new DeleteObject(objectName));
             }
             Iterable<Result<DeleteError>> results =
                     minioClient.removeObjects(
                             RemoveObjectsArgs.builder().bucket(bucketName).objects(objects).build());
 
             for (Result<DeleteError> result : results) {
-                DeleteError error = result.get();
+                result.get();
+                // DeleteError error = result.get();
                 return false;
             }
         }
@@ -247,9 +239,7 @@ public class MinioUtil {
                             .contentType(contentType)
                             .build());
             StatObjectResponse statObject = statObject(bucketName, objectName);
-            if (statObject != null && statObject.size() > 0) {
-                return true;
-            }
+            return statObject != null && statObject.size() > 0;
         }
         return false;
     }

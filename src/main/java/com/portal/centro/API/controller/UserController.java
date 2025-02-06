@@ -1,23 +1,18 @@
 package com.portal.centro.API.controller;
 
 import com.portal.centro.API.dto.ChangePasswordDTO;
-import com.portal.centro.API.dto.RecoverPasswordDTO;
-import com.portal.centro.API.dto.RequestCodeEmailDto;
 import com.portal.centro.API.dto.UserDto;
-import com.portal.centro.API.enums.StatusInactiveActive;
+import com.portal.centro.API.dto.UserRawDto;
+import com.portal.centro.API.enums.Type;
+import com.portal.centro.API.exceptions.GenericException;
 import com.portal.centro.API.generic.crud.GenericController;
 import com.portal.centro.API.model.ObjectReturn;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.responses.DefaultResponse;
-import com.portal.centro.API.service.EmailCodeService;
 import com.portal.centro.API.service.UserService;
 import jakarta.validation.Valid;
-import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,131 +20,66 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.portal.centro.API.enums.Type.ROLE_ADMIN;
+
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/usuarios")
 public class UserController extends GenericController<User, Long> {
 
-    private final EmailCodeService emailCodeService;
     private final UserService userService;
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
     @Autowired
-    public UserController(EmailCodeService emailCodeService, UserService userService, ModelMapper modelMapper) {
+    public UserController(UserService userService, ModelMapper modelMapper) {
         super(userService);
-        this.emailCodeService = emailCodeService;
         this.userService = userService;
         this.modelMapper = modelMapper;
     }
-
-    @PostMapping(path = "/send-code-recover-password/email/{email}")
-    public ResponseEntity sendEmailCodeRecoverPassword(@PathVariable("email") String email) throws Exception {
-        return ResponseEntity.ok(userService.sendEmailCodeRecoverPassword(email));
-    }
-
-    @PostMapping(path = "/recover-password")
-    public ResponseEntity recoverPassword(@RequestBody @Valid RecoverPasswordDTO recoverPasswordDTO) throws Exception {
-        DefaultResponse defaultResponse = userService.recoverPassword(recoverPasswordDTO);
-        return ResponseEntity.status(defaultResponse.getHttpStatus()).body(defaultResponse);
-    }
-
     @PostMapping(path = "/change-password")
-    public ResponseEntity changePassword(@RequestBody @Valid ChangePasswordDTO changePasswordDTO) throws Exception {
+    public ResponseEntity<DefaultResponse> changePassword(@RequestBody @Valid ChangePasswordDTO changePasswordDTO) throws Exception {
         DefaultResponse defaultResponse = userService.changePassword(changePasswordDTO);
         return ResponseEntity.status(defaultResponse.getHttpStatus()).body(defaultResponse);
     }
 
-    @GetMapping(path = "/findSelfUser")
-    public ResponseEntity<UserDto> findSelfUser() {
-        return ResponseEntity.ok(convertEntityToDto(userService.findSelfUser()));
+    @GetMapping(path = "/role/{role}")
+    public ResponseEntity<List<UserRawDto>> findUsersByRole(@PathVariable("role") String role) throws Exception {
+        return ResponseEntity.ok(convertEntityListToRawDto(userService.findUsersByRole(role)));
     }
 
-    @GetMapping(path = "role/{role}")
-    public ResponseEntity<List<UserDto>> findUsersByRole(@PathVariable("role") String role) {
-        return ResponseEntity.ok(convertEntityListToDto(userService.findUsersByRole(role)));
+    @GetMapping(path = "/domain/{domain}")
+    public ResponseEntity<List<UserRawDto>> findUsersByDomain(@PathVariable("domain") String domain) throws Exception {
+        return ResponseEntity.ok(convertEntityListToRawDto(userService.findUsersByDomain(domain)));
     }
 
     private UserDto convertEntityToDto(User user) {
         return modelMapper.map(user, UserDto.class);
     }
 
-    private List<UserDto> convertEntityListToDto(List<User> users) {
-        List<UserDto> userDtos = new ArrayList<>();
+    private List<UserRawDto> convertEntityListToRawDto(List<User> users) {
+        List<UserRawDto> usersDto = new ArrayList<>();
         for (User user : users)
-            userDtos.add(convertEntityToDto(user));
-        return userDtos;
+            usersDto.add(modelMapper.map(user, UserRawDto.class));
+        return usersDto;
     }
 
-    //chama a função que vai inativar ou deletar o usuário
-    //dependendo dos vinculos dele com projetos
+    private List<UserDto> convertEntityListToDto(List<User> users) {
+        List<UserDto> usersDto = new ArrayList<>();
+        for (User user : users)
+            usersDto.add(convertEntityToDto(user));
+        return usersDto;
+    }
+
     @Override
-    public ResponseEntity deleteById(@PathVariable Long id) throws Exception {
-        return ResponseEntity.ok(userService.editUserStatusToInactiveOrDelete(id));
+    public ResponseEntity<ObjectReturn> deleteById(@PathVariable Long id) throws Exception {
+        throw new GenericException("Não é possivel excluir este tipo de Registro!");
     }
 
-    //mostra lista que contem somente os usuários ativos
     @Override
-    public ResponseEntity getAll() throws Exception {
-        return ResponseEntity.ok(userService.findAllUsersActivatedOrInactivated(StatusInactiveActive.ACTIVE));
-    }
-
-    //mostra lista que contem somente os os usuários inativos
-    @GetMapping(path = "findInactive")
-    public ResponseEntity findAllInactive() throws Exception {
-        return ResponseEntity.ok(userService.findAllUsersActivatedOrInactivated(StatusInactiveActive.INACTIVE));
-    }
-
-    //torna um usuário inativo em ativo novamente
-    @PutMapping("activatedUser/{id}")
-    public ResponseEntity activeUserById(@PathVariable Long id) throws Exception {
-        return ResponseEntity.ok(userService.editUserStatusToActive(id));
-    }
-
-    @GetMapping("pagerole")
-    public Page<UserDto> pageUser(
-            @RequestParam(value = "page") Integer page,
-            @RequestParam(value = "size") Integer size,
-            @RequestParam(value = "order", required = false) String order,
-            @RequestParam(value = "asc", required = false) Boolean asc,
-            @RequestParam(value = "role", required = false) String role
-    ) throws Exception {
-        PageRequest pageRequest = PageRequest.of(page, size);
-        if (order != null && asc != null) {
-            pageRequest = PageRequest.of(page, size,
-                    asc ? Sort.Direction.ASC : Sort.Direction.DESC, order);
+    public ResponseEntity<User> update(@Valid @RequestBody User requestBody) throws Exception {
+        User loggedUser = userService.findSelfUser();
+        if(loggedUser.getRole() != ROLE_ADMIN && !loggedUser.getId().equals(requestBody.getId())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        Page<User> list = userService.findUsersByRolePaged(role, pageRequest);
-
-        return list.map(item -> convertEntityToDto(item));
+        return ResponseEntity.ok(userService.update(requestBody));
     }
-
-    @GetMapping("pagestatus")
-    public Page<UserDto> pageUser(
-            @RequestParam(value = "page") Integer page,
-            @RequestParam(value = "size") Integer size,
-            @RequestParam(value = "order", required = false) String order,
-            @RequestParam(value = "asc", required = false) Boolean asc,
-            @RequestParam(value = "active", required = false) Boolean active
-    ) throws Exception {
-        PageRequest pageRequest = PageRequest.of(page, size);
-        if (order != null && asc != null) {
-            pageRequest = PageRequest.of(page, size,
-                    asc ? Sort.Direction.ASC : Sort.Direction.DESC, order);
-        }
-        Page<User> list = userService.findUsersByStatusPaged(active ? StatusInactiveActive.ACTIVE : StatusInactiveActive.INACTIVE, pageRequest);
-
-        return list.map(item -> convertEntityToDto(item));
-    }
-
-    @PostMapping("/request_verification")
-    public ResponseEntity requestVerification(@NotNull @RequestBody RequestCodeEmailDto emailDto) throws Exception {
-        User user = userService.findByEmail(emailDto.getEmail());
-
-        if (user != null) {
-            this.emailCodeService.createCode(user);
-            return ResponseEntity.ok(new ObjectReturn("OK"));
-        }
-
-        return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
-    }
-
 }

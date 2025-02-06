@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TokenService implements Serializable {
-
     private static final Logger logger = LoggerFactory.getLogger(TokenService.class);
 
     public boolean validateJwtToken(String authToken) {

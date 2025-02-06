@@ -1,21 +1,22 @@
 package com.portal.centro.API.model;
 
+import com.portal.centro.API.enums.SolicitationProjectNature;
 import com.portal.centro.API.generic.base.IModel;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.util.List;
 
-@Data
+@Entity
+@Table(name = "tb_project")
+@Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "project")
+@Builder
 public class Project extends IModel {
-
 
     @NotNull()
     @Size(min = 4, max = 255)
@@ -26,8 +27,8 @@ public class Project extends IModel {
     private String subject;
 
     @ManyToOne
-    @JoinColumn(name = "teacher_id", updatable = false)
-    private User teacher;
+    @JoinColumn(name = "user_id", updatable = false)
+    private User user;
 
     @ManyToMany
     @JoinTable(name = "project_student",
@@ -36,4 +37,16 @@ public class Project extends IModel {
             inverseJoinColumns = @JoinColumn(
                     name = "user_id", referencedColumnName = "id"))
     private List<User> students;
+
+    @Enumerated(value = EnumType.STRING)
+    @NotNull(message = "Project nature must not be null")
+    @Column(name = "project_nature")
+    private SolicitationProjectNature projectNature;
+
+    /**
+     * Quando a solicitação vem de um projeto que não está no ENUM SolicitationProjectNature.
+     */
+    @Column(name = "other_project_nature")
+    private String otherProjectNature;
+
 }

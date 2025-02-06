@@ -17,7 +17,7 @@ public interface MinioService {
     //Check whether bucket already exists
     boolean bucketExists(String bucketName);
     // Create a bucket
-    void makeBucket(String bucketName);
+    boolean makeBucket(String bucketName);
     // List all bucket names
     List<String> listBucketName();
     //List all buckets
