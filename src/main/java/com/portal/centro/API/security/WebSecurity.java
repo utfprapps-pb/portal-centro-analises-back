@@ -55,6 +55,7 @@ public class WebSecurity {
         http.authorizeHttpRequests((authorize) -> authorize
                 .requestMatchers(antMatcher(HttpMethod.POST,"/users/**")).permitAll()
                 .requestMatchers(antMatcher(HttpMethod.GET,"/open/**")).permitAll()
+                .requestMatchers(antMatcher(HttpMethod.POST,"/open/**")).permitAll()
 
                 .requestMatchers(antMatcher("/error/**")).permitAll()
                 .requestMatchers(antMatcher("/errors/**")).permitAll()
