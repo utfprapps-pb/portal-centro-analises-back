@@ -54,6 +54,7 @@ public class EmailCodeService extends GenericService<EmailCode, Long> {
         emailDto.setSubject("Confirmação de email - LAB CA");
         emailDto.setSubjectBody("Codigo para confirmação");
         String link = backBaseURL + "/email-confirm/" + hashKey;
+
         emailDto.setContentBody("<p>Clique aqui para confirmar seu email: <a href=" + link + ">CONFIRMAR</a>.</p></br>Caso nao consiga clicar, copie e cole a URl abaixo no seu navegador: " + link);
 
         emailService.sendEmail(emailDto);
