@@ -15,8 +15,8 @@ networks:
 
 services:
   ca-api-dev-v2:
-    image: ca-api-dev-v2:${BUILD_NUMBER}
-    container_name: ca-api-dev-v2
+    image: ca-api-dev:${BUILD_NUMBER}
+    container_name: ca-api-dev
     build:
       context: ./
       dockerfile: Dockerfile
@@ -40,9 +40,9 @@ services:
     labels:
       # Traefik Config
       - "traefik.enable=true"
-      - "traefik.http.routers.ca-api-dev-v2.rule=Host(`ca-api-dev-v2.app.pb.utfpr.edu.br`)"
-      - "traefik.http.routers.ca-api-dev-v2.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.ca-api-dev-v2.entrypoints=websecure"
+      - "traefik.http.routers.ca-api-dev.rule=Host(`ca-api-dev.app.pb.utfpr.edu.br`)"
+      - "traefik.http.routers.ca-api-dev.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.ca-api-dev.entrypoints=websecure"
     restart: unless-stopped
     networks:
       - web
