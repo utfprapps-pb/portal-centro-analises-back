@@ -13,7 +13,7 @@ import java.util.Map;
 @Component
 public class HashingService {
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public String generateHashKey(String username) {
         LocalDate date = LocalDate.now();

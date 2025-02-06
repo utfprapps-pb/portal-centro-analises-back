@@ -1,7 +1,7 @@
 package com.portal.centro.API.service;
 
 import com.portal.centro.API.dto.EmailDto;
-import com.portal.centro.API.model.ConfigEmail;
+import com.portal.centro.API.model.EmailConfig;
 import com.portal.centro.API.utils.EmailMessageGenerator;
 import com.portal.centro.API.utils.UtilsService;
 import lombok.Data;
@@ -16,25 +16,25 @@ import org.springframework.stereotype.Service;
 public class EmailService {
 
     private final UtilsService utilsService;
-    private final ConfigEmailService configEmailService;
+    private final EmailConfigService emailConfigService;
     private final EmailMessageGenerator emailMessageGenerator;
 
-    public EmailService (UtilsService utils, ConfigEmailService configEmailService, EmailMessageGenerator emailMessageGenerator) {
+    public EmailService (UtilsService utils, EmailConfigService emailConfigService, EmailMessageGenerator emailMessageGenerator) {
         this.utilsService = utils;
-        this.configEmailService = configEmailService;
+        this.emailConfigService = emailConfigService;
         this.emailMessageGenerator = emailMessageGenerator;
     }
 
     public void sendEmail(EmailDto emailTo) throws Exception {
-        this.configEmailService.validateIfExistsEmailConfig();
+        this.emailConfigService.validateIfExistsEmailConfig();
         HtmlEmail htmlEmail = new HtmlEmail();
         try{
-            ConfigEmail configEmail = configEmailService.find();
-            htmlEmail.setHostName(configEmail.getSendHost());
-            htmlEmail.setSmtpPort(configEmail.getSendPort());
-            htmlEmail.setAuthenticator(new DefaultAuthenticator(configEmail.getEmailFrom(), configEmail.getPasswordEmailFrom()));
+            EmailConfig emailConfig = emailConfigService.find();
+            htmlEmail.setHostName(emailConfig.getHost());
+            htmlEmail.setSmtpPort(emailConfig.getPort());
+            htmlEmail.setAuthenticator(new DefaultAuthenticator(emailConfig.getEmail(), emailConfig.getPassword()));
             htmlEmail.setStartTLSEnabled(true);
-            htmlEmail.setFrom(configEmail.getEmailFrom());
+            htmlEmail.setFrom(emailConfig.getEmail());
             htmlEmail.addTo(emailTo.getEmailTo());
             htmlEmail.setSubject(emailTo.getSubject());
             htmlEmail.setHtmlMsg(emailMessageGenerator.generateHTML(emailTo.getSubjectBody(), emailTo.getContentBody(), ""));
@@ -44,7 +44,7 @@ public class EmailService {
             log.info("email enviado com sucesso!");
 
         } catch (Exception e) {
-            log.info("erro ao enviar email....");
+            log.error("Email Service -> sendEmail(): Erro ao enviar email:" + e.getMessage());
             e.printStackTrace();
         }
 

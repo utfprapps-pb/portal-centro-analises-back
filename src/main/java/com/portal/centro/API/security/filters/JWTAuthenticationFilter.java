@@ -17,6 +17,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
@@ -51,7 +52,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                         )
                 );
             }
-        } catch (BadCredentialsException | GenericException ge) {
+        } catch (UsernameNotFoundException | BadCredentialsException | GenericException ge) {
             throw new RuntimeException("mapped|GenericException|" + ge.getMessage());
         } catch (Exception e) {
             throw new RuntimeException(e);

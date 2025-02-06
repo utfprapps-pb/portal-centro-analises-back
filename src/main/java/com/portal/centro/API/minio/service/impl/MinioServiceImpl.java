@@ -6,6 +6,7 @@ import com.portal.centro.API.minio.service.MinioService;
 import com.portal.centro.API.minio.util.MinioUtil;
 import io.minio.messages.Bucket;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +19,7 @@ import java.util.UUID;
 //O principal método utilizado neste projeto é o ***putObject()***, que recebe o arquivo, o nome do *bucket* em que o arquivo será armazenado e o tipo do arquivo. E, utilizando os métodos da classe **MinioUtil** verifica se o *bucket* existe, caso não exista é criado e então o arquivo é enviado para o serviço do **Minio**.
 
 @Service
+@Slf4j
 public class MinioServiceImpl implements MinioService {
     private  final MinioUtil minioUtil;
     private  final MinioConfig minioProperties;
@@ -33,17 +35,24 @@ public class MinioServiceImpl implements MinioService {
         try {
             bucketName = StringUtils.isNotBlank(bucketName) ? bucketName : minioProperties.getBucketName();
             if (!this.bucketExists(bucketName)) {
-                this.makeBucket(bucketName);
+                if (!this.makeBucket(bucketName)) {
+                    log.error("Falha ao criar bucket.");
+                    throw new Exception("Falha ao criar bucket.");
+                }
             }
             String fileName = multipartFile.getOriginalFilename();
             Long fileSize = multipartFile.getSize();
-            String objectName = UUID.randomUUID().toString().replaceAll("-", "") + fileName.substring(fileName.lastIndexOf("."));
+            String objectName = "";
+            if (fileName != null) {
+                objectName = UUID.randomUUID().toString().replaceAll("-", "") + fileName.substring(fileName.lastIndexOf("."));
+            }
             LocalDateTime createdTime = LocalDateTime.now();
             minioUtil.putObject(bucketName, multipartFile, objectName,fileType);
             return FileResponse.builder().filename(objectName).fileSize(fileSize)
                     .contentType(fileType).createdTime(createdTime)
                     .build();
         } catch (Exception e) {
+            log.error("MinioServiceImpl -> putObject: " + e.getMessage());
             return  null;
         }
     }
@@ -58,8 +67,8 @@ public class MinioServiceImpl implements MinioService {
         return minioUtil.bucketExists(bucketName);
     }
     @Override
-    public void makeBucket(String bucketName) {
-        minioUtil.makeBucket(bucketName);
+    public boolean makeBucket(String bucketName) {
+        return minioUtil.makeBucket(bucketName);
     }
     @Override
     public List<String> listBucketName() {

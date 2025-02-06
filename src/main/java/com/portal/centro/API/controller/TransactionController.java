@@ -41,14 +41,15 @@ public class TransactionController extends GenericController<Transaction, Long> 
             throw new ValidationException("Não é possível atualizar uma transação, somente inseri-las.");
         }
         requestBody.setCreatedAt(LocalDateTime.now());
-        requestBody.setCreatedBy(selfUser);
-        UserBalance userBalance = userService.updateBalance(
-                requestBody.getUser().getId(),
-                requestBody.getType(),
-                requestBody.getValue()
-        );
-        requestBody.setOldBalance(userBalance.getOld());
-        requestBody.setCurrentBalance(userBalance.getCurrent());
+        requestBody.setUser(selfUser);
+        // TODO AJUSTAR CALCULO DO SALDO
+//        UserBalance userBalance = userService.updateBalance(
+//                requestBody.getUser().getId(),
+//                requestBody.getType(),
+//                requestBody.getValue()
+//        );
+//        requestBody.setOldBalance(userBalance.getOld());
+//        requestBody.setCurrentBalance(userBalance.getCurrent());
         return ResponseEntity.ok(transactionService.save(requestBody));
     }
 

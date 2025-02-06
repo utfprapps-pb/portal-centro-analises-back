@@ -1,17 +1,17 @@
 package com.portal.centro.API.enums;
 
-public enum TypeUser {
-    UTFPR("utfpr"),
-    PATNER("patner"),
-    PF_PJ("pf_pj");
+import lombok.Getter;
 
-    private String content;
+@Getter
+public enum TypeUser {
+    UTFPR("UTFPR"),
+    PARTNER("Parceiro"),
+    EXTERNAL("Externo");
+
+    private final String content;
 
     TypeUser (String content) {
         this.content = content;
     }
 
-    public String getContent() {
-        return content;
-    }
 }

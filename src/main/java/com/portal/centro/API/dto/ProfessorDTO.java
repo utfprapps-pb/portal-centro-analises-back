@@ -4,15 +4,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter
 @Setter
 @Builder
-@Getter
-public class ProjectDTO {
-
-    private String description;
-
-    private String subject;
-
-    private Long id;
-
+public class ProfessorDTO {
+    Long id;
+    String name;
+    String email;
 }

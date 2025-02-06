@@ -1,15 +1,15 @@
 pipeline {
     agent any
     environment {
-        SERVER_PORT=8810
+        SERVER_PORT=8813
         POSTGRESQL_CRED = credentials('postgres-id')
         DATABASE_URL="jdbc:postgresql://postgresql:5432/ca_lab"
         DATABASE_USERNAME="${POSTGRESQL_CRED_USR}"
         DATABASE_PASSWORD="${POSTGRESQL_CRED_PSW}"
 
-        FRONT_BASEURL="https://ca-dev.app.pb.utfpr.edu.br"
+        FRONT_BASE_URL="https://ca-dev.app.pb.utfpr.edu.br"
+        BACK_BASE_URL="https://ca-api-dev.app.pb.utfpr.edu.br/api"
         FRONT_PORT=""
-
         MINIO_CRED = credentials('ca-minio-id')
         MINIO_ACCESS_KEY = "${MINIO_CRED_USR}"
         MINIO_SECRET_KEY = "${MINIO_CRED_PSW}"

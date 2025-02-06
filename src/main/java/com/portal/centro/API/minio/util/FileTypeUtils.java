@@ -1,9 +1,11 @@
 package com.portal.centro.API.minio.util;
 import cn.hutool.core.io.FileTypeUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 
+@Slf4j
 public  class FileTypeUtils {
     private final static String IMAGE_TYPE = "image/";
     private final static String AUDIO_TYPE = "audio/";
@@ -42,13 +44,15 @@ public  class FileTypeUtils {
             if (type.equalsIgnoreCase("doc") || type.equalsIgnoreCase("docx")
                     || type.equalsIgnoreCase("ppt") || type.equalsIgnoreCase("pptx")
                     || type.equalsIgnoreCase("xls") || type.equalsIgnoreCase("xlsx")
-                    || type.equalsIgnoreCase("zip") || type.equalsIgnoreCase("jar") || type.equalsIgnoreCase("pdf")) {
+                    || type.equalsIgnoreCase("zip") || type.equalsIgnoreCase("jar")
+                    || type.equalsIgnoreCase("pdf")) {
                 return APPLICATION_TYPE + type;
             }
             if (type.equalsIgnoreCase("txt")) {
                 return TXT_TYPE + type;
             }
         } catch (IOException e) {
+            log.error("FileTypeUtils -> getFileType: " + e.getMessage());
         }
         return null;
     }

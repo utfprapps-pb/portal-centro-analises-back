@@ -28,8 +28,7 @@ public class AuthService implements UserDetailsService {
 
     public User findLoggedUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = userRepository.findByEmail(principal.toString());
-        return user;
+        return userRepository.findByEmail(principal.toString());
     }
 
 }

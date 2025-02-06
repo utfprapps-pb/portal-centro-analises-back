@@ -9,7 +9,6 @@ import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.model.StudentSolicitation;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.StudentSolicitationRepository;
-import jakarta.persistence.EntityManager;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -24,7 +23,7 @@ public class StudentSolicitationService extends GenericService<StudentSolicitati
     private final ModelMapper modelMapper;
     private static final String MESSAGE_VALIDATION_APPROVE_ADVISOR_AND_LAB = "Apenas o orientador e o laboratório podem aprovar ou recusar a solicitação.";
 
-    public StudentSolicitationService(StudentSolicitationRepository studentSolicitationRepository, UserService userService, ModelMapper modelMapper, EntityManager entityManager) {
+    public StudentSolicitationService(StudentSolicitationRepository studentSolicitationRepository, UserService userService, ModelMapper modelMapper) {
         super(studentSolicitationRepository);
         this.studentSolicitationRepository = studentSolicitationRepository;
         this.userService = userService;
@@ -38,7 +37,7 @@ public class StudentSolicitationService extends GenericService<StudentSolicitati
     }
 
     private void setDefaultValuesWhenSave(StudentSolicitation requestBody) {
-        if (Objects.isNull(requestBody.getId()) || Objects.equals(requestBody.getId(), 0)) {
+        if (Objects.isNull(requestBody.getId()) || Objects.equals(requestBody.getId(), 0L)) {
             requestBody.setCreationDate(LocalDateTime.now());
             requestBody.setStatus(StudentSolicitationStatus.PENDING);
         }
@@ -48,8 +47,8 @@ public class StudentSolicitationService extends GenericService<StudentSolicitati
         User user = userService.findOneById(studentSolicitationDTO.getSolicitatedTo().getId());
         studentSolicitationDTO.setSolicitatedTo(user);
         StudentSolicitation studentSolicitation = modelMapper.map(studentSolicitationDTO, StudentSolicitation.class);
-        studentSolicitation.setSolicitatedBy(userService.findSelfUser());
-        validateLoggedUserIsSoliciting(studentSolicitation.getSolicitatedBy());
+        studentSolicitation.setSolicitedBy(userService.findSelfUser());
+        validateLoggedUserIsSoliciting(studentSolicitation.getSolicitedBy());
         studentSolicitation.setCreationDate(LocalDateTime.now());
         studentSolicitation.setStatus(StudentSolicitationStatus.PENDING);
         return save(studentSolicitation);
@@ -66,7 +65,7 @@ public class StudentSolicitationService extends GenericService<StudentSolicitati
         setDefaultValuesWhenApprovingOrRefusing(studentSolicitation, true);
         validateWhenApprovingOrRefusing(
                 studentSolicitation.getFinishedBy(),
-                studentSolicitation.getSolicitatedTo(),
+                studentSolicitation.getSolicitedTo(),
                 currentStudentSolicitationStatus
         );
         return save(studentSolicitation);
@@ -108,7 +107,7 @@ public class StudentSolicitationService extends GenericService<StudentSolicitati
         setDefaultValuesWhenApprovingOrRefusing(studentSolicitation, false);
         validateWhenApprovingOrRefusing(
                 studentSolicitation.getFinishedBy(),
-                studentSolicitation.getSolicitatedTo(),
+                studentSolicitation.getSolicitedTo(),
                 currentStudentSolicitationStatus
         );
         return save(studentSolicitation);

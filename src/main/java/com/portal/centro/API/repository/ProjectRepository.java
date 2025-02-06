@@ -12,10 +12,12 @@ import java.util.List;
 @Repository
 public interface ProjectRepository extends GenericRepository<Project, Long> {
 
-    List<Project> findAllByStudentsContains(User user);
+    List<Project> findAllByUserEqualsOrStudentsContains(User user, User student);
 
-    List<Project> findAllByTeacher(User teacher);
+    Page<Project> findAllByUserEqualsOrStudentsContains(User user, User student, PageRequest pageRequest);
 
-    Page<Project> findAllByTeacher(User teacher, PageRequest pageRequest);
+    List<Project> findAllByUser(User user);
+
+    Page<Project> findAllByUser(User user, PageRequest pageRequest);
 
 }

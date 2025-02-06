@@ -5,51 +5,49 @@ import com.portal.centro.API.enums.TransactionType;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.portal.centro.API.generic.base.IModel;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
 
-@Entity
-@Table(name = "transaction")
-@Data
+@Entity(name = "tb_transaction")
+@Table
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Transaction {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@Builder
+public class Transaction extends IModel {
 
     @NotNull(message = "Parameter value is required.")
-    private BigDecimal value;
+    @Column(name = "total_value")
+    private BigDecimal totalValue;
 
+    @CreatedDate
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @CreatedBy
     @ManyToOne
-    @JoinColumn(name = "create_by")
-    private User createdBy;
+    @JoinColumn(name = "created_by")
+    private User created_by;
+
+    @LastModifiedBy
+    @ManyToOne
+    @JoinColumn(name = "updated_by")
+    private User updatedBy;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     @NotNull(message = "Parameter user is required.")
     private User user;
 
-    @Column(name = "old_balance")
-    private BigDecimal oldBalance;
-
-    @Column(name = "current_balance")
-    private BigDecimal currentBalance;
-
     @ManyToOne
-    @JoinColumn(name = "solicitation")
+    @JoinColumn(name = "solicitation_id")
     private Solicitation solicitation;
-
-    @NotNull(message = "Parameter type is required.")
-    @Enumerated
-    private TransactionType type;
 
     @Column(name = "description")
     private String description;

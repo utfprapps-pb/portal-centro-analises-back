@@ -7,21 +7,16 @@ import com.portal.centro.API.enums.StatusInactiveActive;
 import com.portal.centro.API.enums.TransactionType;
 import com.portal.centro.API.enums.Type;
 import com.portal.centro.API.exceptions.GenericException;
-import com.portal.centro.API.exceptions.NotFoundException;
 import com.portal.centro.API.generic.crud.GenericService;
-import com.portal.centro.API.model.RecoverPassword;
-import com.portal.centro.API.model.SendEmailCodeRecoverPassword;
-import com.portal.centro.API.model.User;
-import com.portal.centro.API.model.UserBalance;
+import com.portal.centro.API.model.*;
 import com.portal.centro.API.repository.ProjectRepository;
 import com.portal.centro.API.repository.UserRepository;
 import com.portal.centro.API.responses.DefaultResponse;
 import com.portal.centro.API.utils.DateTimeUtil;
 import com.portal.centro.API.utils.UtilsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,6 +27,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.RecursiveTask;
+
+import static com.portal.centro.API.enums.Type.ROLE_ADMIN;
 
 @Service
 public class UserService extends GenericService<User, Long> {
@@ -69,30 +67,26 @@ public class UserService extends GenericService<User, Long> {
         requestBody.setPermissions(utilsService.getPermissionsByRole(role));
         requestBody.setRole(role);
         requestBody.setStatus(StatusInactiveActive.ACTIVE);
+        requestBody.setType(requestBody.getType());
+        requestBody.setCpfCnpj(requestBody.getCpfCnpj());
         this.validate(requestBody);
         User user = super.save(requestBody);
         this.emailCodeService.createCode(user);
-
         return user;
     }
 
-    public User saveAdmin(User requestBody) throws Exception {
-        encryptPassword(requestBody);
-        requestBody.setPermissions(utilsService.getPermissionsByRole(requestBody.getRole()));
-        requestBody.setStatus(StatusInactiveActive.ACTIVE);
-        this.validate(requestBody);
-        User user = super.save(requestBody);
-        this.emailCodeService.createCode(user);
-
-        return user;
-    }
-
-    public User editUserRole(Type role, Long id) throws Exception {
-        Optional<User> user = userRepository.findById(id);
-
-        user.get().setRole(role);
-
-        return super.save(user.get());
+    @Override
+    public User update(User requestBody) throws Exception {
+        User usuario = findOneById(requestBody.getId());
+        usuario.setStatus(requestBody.getStatus());
+        usuario.setType(requestBody.getType());
+        usuario.setCpfCnpj(requestBody.getCpfCnpj());
+        usuario.setRole(requestBody.getRole());
+        usuario.setPermissions(utilsService.getPermissionsByRole(usuario.getRole()));
+        usuario.setName(requestBody.getName());
+        usuario.setRaSiape(requestBody.getRaSiape());
+        this.validate(usuario);
+        return super.update(usuario);
     }
 
     private void validate(User user) throws Exception {
@@ -139,11 +133,13 @@ public class UserService extends GenericService<User, Long> {
 
     public DefaultResponse changePassword(ChangePasswordDTO changePasswordDTO) throws Exception {
         User user = findSelfUser();
-        if (!passwordEncoder.matches(changePasswordDTO.getOldPassword(), user.getPassword()))
-            return new DefaultResponse(HttpStatus.BAD_REQUEST.value(), "Senha atual inválida.");
+        if (!passwordEncoder.matches(changePasswordDTO.getOldPassword(), user.getPassword())) {
+            throw new GenericException("Senha atual inválida.");
+        } else {
+            updateUserNewPasswordByEmail(user, changePasswordDTO.getNewPassword());
+            return new DefaultResponse(HttpStatus.OK.value(), "Senha alterada com sucesso.");
+        }
 
-        updateUserNewPasswordByEmail(user, changePasswordDTO.getNewPassword());
-        return new DefaultResponse(HttpStatus.OK.value(), "Senha alterada com sucesso.");
     }
 
     private void updateUserNewPasswordByEmail(User user, String newPassword) throws Exception {
@@ -156,11 +152,13 @@ public class UserService extends GenericService<User, Long> {
     }
 
     private void encryptPassword(User entity) {
-        entity.setPassword(passwordEncoder.encode(entity.getPassword()));
+        if (entity.getPassword() != null) {
+            entity.setPassword(passwordEncoder.encode(entity.getPassword()));
+        }
     }
 
-    private void throwExceptionUserNotFound() {
-        throw new NotFoundException("Usuário não encontrado.");
+    private void throwExceptionUserNotFound() throws Exception {
+        throw new GenericException("Usuário não encontrado.");
     }
 
     public User findSelfUser() {
@@ -169,18 +167,22 @@ public class UserService extends GenericService<User, Long> {
         return user;
     }
 
-    public User findByEmail(@PathVariable("email") String email) {
+    public User findByEmail(String email) {
         return this.userRepository.findByEmail(email);
     }
 
-    public List<User> findUsersByRole(@PathVariable("role") String role) {
+    public List<User> findUsersByRole(String role) throws Exception {
         Type type;
         try {
             type = Type.valueOf(role);
         } catch (Exception e) {
-            throw new RuntimeException("Role informada não existe.");
+            throw new GenericException("Role informada não existe.");
         }
         return userRepository.findAllByRole(type);
+    }
+
+    public List<User> findUsersByDomain(String domain) throws Exception {
+        return userRepository.findAllByEmailContainingIgnoreCase(domain);
     }
 
     public UserBalance updateBalance(Long userId, TransactionType transactionType, BigDecimal value) throws Exception {
@@ -200,60 +202,5 @@ public class UserService extends GenericService<User, Long> {
         return userBalance;
     }
 
-    /* Modifica o status de um usuário de ativo para inativo
-     * dos usuário que tem vinculo com projetos e exclui os
-     * usuários sem vinculos com projetos, para o caso dos
-     * professores ele não pode ser deletado, então procura
-     * o tipo de usuário antes de inativa-lo ou deleta-lo
-     * */
-    public String editUserStatusToInactiveOrDelete(Long id) throws Exception {
-        User user = userRepository.findUserById(id);
-
-        if (user.getRole().getContent().toString().equals("professor")) {
-            user.setStatus(StatusInactiveActive.INACTIVE);
-            super.save(user);
-            return "Usuário inativado com sucesso!";
-        } else {
-            if (!projectRepository.findAllByStudentsContains(user).isEmpty()) {
-                user.setStatus(StatusInactiveActive.INACTIVE);
-                super.save(user);
-                return "Usuário inativado com sucesso!";
-            } else if (!projectRepository.findAllByTeacher(user).isEmpty()) {
-                user.setStatus(StatusInactiveActive.INACTIVE);
-                super.save(user);
-                return "Usuário inativado com sucesso!";
-            } else {
-                return super.deleteById(id);
-            }
-        }
-    }
-
-    //modifica o status de um usuário de inativo para ativo
-    public User editUserStatusToActive(Long id) throws Exception {
-        Optional<User> user = userRepository.findById(id);
-
-        user.get().setStatus(StatusInactiveActive.ACTIVE);
-
-        return super.save(user.get());
-    }
-
-    //cria uma lista conforme o status escolhido na classe controller
-    public List<User> findAllUsersActivatedOrInactivated(StatusInactiveActive status) {
-        return userRepository.findAllByStatus(status);
-    }
-
-    public Page<User> findUsersByRolePaged(String role, PageRequest pageRequest) {
-        Type type;
-        try {
-            type = Type.valueOf(role);
-        } catch (Exception e) {
-            throw new RuntimeException("Role informada não existe.");
-        }
-        return userRepository.findAllByRole(type, pageRequest);
-    }
-
-    public Page<User> findUsersByStatusPaged(StatusInactiveActive status, PageRequest pageRequest) {
-        return userRepository.findAllByStatus(status, pageRequest);
-    }
 
 }

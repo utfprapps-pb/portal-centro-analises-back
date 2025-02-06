@@ -1,10 +1,12 @@
 package com.portal.centro.API.security.filters;
 
+import cn.hutool.json.JSONObject;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.portal.centro.API.model.User;
 import com.portal.centro.API.security.SecurityConstants;
 import com.portal.centro.API.security.auth.AuthService;
-import com.portal.centro.API.model.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,7 +15,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
@@ -34,15 +39,23 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             chain.doFilter(request, response);
             return;
         }
+        String headerUser = request.getHeader(SecurityConstants.HEADER_USER_STRING);
+        byte[] decoded = Base64.getDecoder().decode(headerUser);
+        String decodedStr = new String(decoded, StandardCharsets.ISO_8859_1);
+        JSONObject json = new JSONObject(decodedStr);
 
-        UsernamePasswordAuthenticationToken authenticationToken =
-                getAuthentication(request);
+        UsernamePasswordAuthenticationToken authenticationToken = getAuthentication(request);
+
+        assert authenticationToken != null;
+        if (authenticationToken.getAuthorities().stream().noneMatch(it -> it.getAuthority().equals(json.get("role")))) {
+            throw new RuntimeException("mapped|GenericException|" + "Usuário inválido!");
+        }
+
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         chain.doFilter(request, response);
     }
 
-    private UsernamePasswordAuthenticationToken
-                getAuthentication(HttpServletRequest request) {
+    private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) throws TokenExpiredException {
         String token = request.getHeader(SecurityConstants.HEADER_STRING);
         if (token != null) {
             String username =
@@ -53,7 +66,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             if (username != null) {
                 User user = (User) authService.loadUserByUsername(username);
                 return new UsernamePasswordAuthenticationToken(username, null,
-                                    user.getAuthorities());
+                        user.getAuthorities());
             }
         }
         return null;
