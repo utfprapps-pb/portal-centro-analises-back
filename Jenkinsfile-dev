@@ -7,7 +7,7 @@ pipeline {
         DATABASE_USERNAME="${POSTGRESQL_CRED_USR}"
         DATABASE_PASSWORD="${POSTGRESQL_CRED_PSW}"
 
-        SPRING.FLYWAY.ENABLED=true
+        SPRING_FLYWAY_ENABLED=true
 
         FRONT_BASEURL="https://ca-dev.app.pb.utfpr.edu.br"
         FRONT_PORT=""
