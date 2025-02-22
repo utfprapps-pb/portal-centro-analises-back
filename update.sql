@@ -1,5 +1,5 @@
 create sequence tb_email_log_seq start with 1 increment by 50;
-create table project_student (project_id bigint not null, user_id bigint not null);
+create table tb_project_student (project_id bigint not null, user_id bigint not null);
 create table tb_analysis (equipment_id bigint, id bigserial not null, description varchar(255), name varchar(255), primary key (id));
 create table tb_domain_role (role smallint check (role between 0 and 4), id bigserial not null, domain varchar(255), primary key (id), constraint unique_domain_role unique (domain));
 create table tb_email_code (created_at timestamp(6), id bigserial not null, user_id bigint unique, validate_at timestamp(6), code varchar(255), primary key (id));
@@ -16,8 +16,8 @@ create table tb_student_professor (approved smallint check (approved between 0 a
 create table tb_student_solicitation (status smallint check (status between 0 and 4), creation_date timestamp(6), finish_date timestamp(6), finished_by bigint, id bigserial not null, solicited_by bigint, solicited_to bigint, primary key (id));
 create table tb_transaction (total_value numeric(38,2), created_at timestamp(6), created_by bigint, id bigserial not null, solicitation_id bigint, updated_by bigint, user_id bigint, description varchar(255), primary key (id));
 create table tb_user (balance numeric(38,2), email_verified boolean, role smallint check (role between 0 and 4), status smallint check (status between 0 and 1), type smallint check (type between 0 and 1), created_at timestamp(6), id bigserial not null, partner_id bigint, updated_at timestamp(6), cpf_cnpj varchar(255) not null unique, email varchar(255) not null, name varchar(255) not null, password varchar(255) not null, ra_siape varchar(255), primary key (id), constraint set_unique_email unique (email));
-alter table if exists project_student add constraint FKnv8q0novh3yhnbaq0tvq54jj4 foreign key (user_id) references tb_user;
-alter table if exists project_student add constraint FKrfndy6dlk9lmq59g8u3t735up foreign key (project_id) references tb_project;
+alter table if exists tb_project_student add constraint FKnv8q0novh3yhnbaq0tvq54jj4 foreign key (user_id) references tb_user;
+alter table if exists tb_project_student add constraint FKrfndy6dlk9lmq59g8u3t735up foreign key (project_id) references tb_project;
 alter table if exists tb_analysis add constraint FK942vrnty41a31q2jcv4xvgdac foreign key (equipment_id) references tb_equipment;
 alter table if exists tb_email_code add constraint FKk5qogn023wep95dh3yww10uws foreign key (user_id) references tb_user;
 alter table if exists tb_permission add constraint FKcdbrluhn9jgyn5de6fwr4fpv9 foreign key (user_id) references tb_user;

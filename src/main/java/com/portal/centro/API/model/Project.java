@@ -31,7 +31,7 @@ public class Project extends IModel {
     private User user;
 
     @ManyToMany
-    @JoinTable(name = "project_student",
+    @JoinTable(name = "tb_project_student",
             joinColumns = @JoinColumn(
                     name = "project_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(
