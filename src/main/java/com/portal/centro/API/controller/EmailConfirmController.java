@@ -26,6 +26,7 @@ public class EmailConfirmController {
     @GetMapping("/{code}")
     public RedirectView confirmEmail(@PathVariable("code") String hash) throws Exception {
         RedirectView redirectView = new RedirectView();
+
         redirectView.setUrl(configFrontProvider.getBaseurl() +
                 (configFrontProvider.getPort() != null ? configFrontProvider.getPort() : "") +
                 "/#/entrar?success=" + this.emailCodeService.confirmEmail(hash));

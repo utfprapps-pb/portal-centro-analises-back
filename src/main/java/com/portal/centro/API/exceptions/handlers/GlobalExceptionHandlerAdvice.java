@@ -54,7 +54,7 @@ public class GlobalExceptionHandlerAdvice {
     private ApiError handlerNotFoundExceptionError(
             Exception exception,
             HttpServletRequest request) {
-        return new ApiError(HttpStatus.NOT_FOUND.value(), exception.getMessage(), request.getServletPath());
+        return new ApiError(exception, request.getServletPath());
     }
 
     @ExceptionHandler({Exception.class})
