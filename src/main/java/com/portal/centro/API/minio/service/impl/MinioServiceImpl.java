@@ -1,12 +1,14 @@
 package com.portal.centro.API.minio.service.impl;
 
 import com.portal.centro.API.minio.config.MinioConfig;
-import com.portal.centro.API.minio.payload.FileResponse;
 import com.portal.centro.API.minio.service.MinioService;
 import com.portal.centro.API.minio.util.MinioUtil;
+import com.portal.centro.API.model.Attachment;
+import io.minio.ObjectWriteResponse;
 import io.minio.messages.Bucket;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,8 +23,8 @@ import java.util.UUID;
 @Service
 @Slf4j
 public class MinioServiceImpl implements MinioService {
-    private  final MinioUtil minioUtil;
-    private  final MinioConfig minioProperties;
+    private final MinioUtil minioUtil;
+    private final MinioConfig minioProperties;
 
     public MinioServiceImpl(MinioUtil minioUtil, MinioConfig minioProperties) {
         this.minioUtil = minioUtil;
@@ -31,7 +33,7 @@ public class MinioServiceImpl implements MinioService {
 
     @SneakyThrows
     @Override
-    public FileResponse putObject(MultipartFile multipartFile, String bucketName, String fileType) {
+    public Attachment putObject(MultipartFile multipartFile, String bucketName, String subfolder) {
         try {
             bucketName = StringUtils.isNotBlank(bucketName) ? bucketName : minioProperties.getBucketName();
             if (!this.bucketExists(bucketName)) {
@@ -42,58 +44,71 @@ public class MinioServiceImpl implements MinioService {
             }
             String fileName = multipartFile.getOriginalFilename();
             Long fileSize = multipartFile.getSize();
-            String objectName = "";
-            if (fileName != null) {
-                objectName = UUID.randomUUID().toString().replaceAll("-", "") + fileName.substring(fileName.lastIndexOf("."));
+            String fileHash = UUID.randomUUID().toString().replaceAll("-", "") + fileName.substring(fileName.lastIndexOf("."));
+            if (ObjectUtils.isNotEmpty(subfolder)) {
+                fileHash = subfolder + "/" + fileHash;
             }
-            LocalDateTime createdTime = LocalDateTime.now();
-            minioUtil.putObject(bucketName, multipartFile, objectName,fileType);
-            return FileResponse.builder().filename(objectName).fileSize(fileSize)
-                    .contentType(fileType).createdTime(createdTime)
+            ObjectWriteResponse objectWriteResponse = minioUtil.putObject(bucketName, multipartFile, fileHash, multipartFile.getContentType());
+            return Attachment.builder()
+                    .fileName(multipartFile.getOriginalFilename())
+                    .fileHash(fileHash)
+                    .contentType(multipartFile.getContentType())
+                    .bucket(objectWriteResponse.bucket())
+                    .fileSize(fileSize)
+                    .url(getObjectUrl(bucketName, fileHash))
+                    .createdAt(LocalDateTime.now())
                     .build();
         } catch (Exception e) {
             log.error("MinioServiceImpl -> putObject: " + e.getMessage());
-            return  null;
+            return null;
         }
     }
 
     @Override
     public InputStream downloadObject(String bucketName, String objectName) {
-        return minioUtil.getObject(bucketName,objectName);
+        return minioUtil.getObject(bucketName, objectName);
     }
 
     @Override
     public boolean bucketExists(String bucketName) {
         return minioUtil.bucketExists(bucketName);
     }
+
     @Override
     public boolean makeBucket(String bucketName) {
         return minioUtil.makeBucket(bucketName);
     }
+
     @Override
     public List<String> listBucketName() {
         return minioUtil.listBucketNames();
     }
+
     @Override
     public List<Bucket> listBuckets() {
         return minioUtil.listBuckets();
     }
+
     @Override
     public boolean removeBucket(String bucketName) {
         return minioUtil.removeBucket(bucketName);
     }
+
     @Override
     public List<String> listObjectNames(String bucketName) {
         return minioUtil.listObjectNames(bucketName);
     }
+
     @Override
     public boolean removeObject(String bucketName, String objectName) {
         return minioUtil.removeObject(bucketName, objectName);
     }
+
     @Override
     public boolean removeListObject(String bucketName, List<String> objectNameList) {
-        return minioUtil.removeObject(bucketName,objectNameList);
+        return minioUtil.removeObject(bucketName, objectNameList);
     }
+
     @Override
     public String getObjectUrl(String bucketName, String objectName) {
         return minioUtil.getObjectUrl(bucketName, objectName);

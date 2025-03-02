@@ -29,9 +29,9 @@ public class MinioUtil {
 
     // Upload Files
     @SneakyThrows
-    public void putObject(String bucketName, MultipartFile multipartFile, String filename, String fileType) {
+    public ObjectWriteResponse putObject(String bucketName, MultipartFile multipartFile, String filename, String fileType) {
         InputStream inputStream = new ByteArrayInputStream(multipartFile.getBytes());
-        minioClient.putObject(
+        return minioClient.putObject(
                 PutObjectArgs.builder().bucket(bucketName).object(filename).stream(
                                 inputStream, -1, minioConfig.getFileSize())
                         .contentType(fileType)
