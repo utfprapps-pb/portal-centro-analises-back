@@ -5,19 +5,20 @@ import com.portal.centro.API.enums.*;
 import com.portal.centro.API.exceptions.GenericException;
 import com.portal.centro.API.exceptions.ValidationException;
 import com.portal.centro.API.generic.crud.GenericService;
-import com.portal.centro.API.model.SolicitationHistoric;
-import com.portal.centro.API.model.Solicitation;
-import com.portal.centro.API.model.StudentProfessor;
-import com.portal.centro.API.model.User;
+import com.portal.centro.API.minio.service.impl.MinioServiceImpl;
+import com.portal.centro.API.model.*;
 import com.portal.centro.API.repository.SolicitationRepository;
 import com.portal.centro.API.repository.StudentProfessorRepository;
-import io.hypersistence.utils.hibernate.type.array.LocalDateTimeArrayType;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
+import org.apache.commons.lang3.ObjectUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,22 +28,29 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
     private final SolicitationHistoricService solicitationHistoricService;
     private final UserService userService;
     private final SolicitationRepository solicitationRepository;
-
     private final StudentProfessorRepository studentProfessorRepository;
+    private final MinioServiceImpl minioService;
+    private final ModelMapper modelMapper;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public SolicitationService(SolicitationRepository solicitationRepository, SolicitationHistoricService solicitationHistoricService,
-                               UserService userService, StudentProfessorRepository studentProfessorRepository) {
+                               UserService userService, StudentProfessorRepository studentProfessorRepository, ModelMapper modelMapper,
+                               MinioServiceImpl minioService) {
         super(solicitationRepository);
         this.solicitationRepository = solicitationRepository;
         this.solicitationHistoricService = solicitationHistoricService;
         this.userService = userService;
         this.studentProfessorRepository = studentProfessorRepository;
+        this.modelMapper = modelMapper;
+        this.minioService = minioService;
     }
 
     /**
      * Esse método deve ser utilizado ao salvar um novo registro de solicitação ou ao alterar uma solicitação
      * que está na situação REFUSED. Para atualizar a situação da solicitação, utilizar o método updateStatus()
      */
+    @Transactional
     @Override
     public Solicitation save(Solicitation solicitation) throws Exception {
         User loggedUser = userService.findSelfUser();
@@ -87,10 +95,71 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
                 solicitationHistoric.setStatus(SolicitationStatus.PENDING_LAB);
             }
         }
-        super.save(solicitation);
+
+        salvarAnexosMEV(solicitation);
+        genericRepository.saveAndFlush(solicitation);
         solicitationHistoricService.save(solicitationHistoric);
 
         return solicitation;
+    }
+
+    @Transactional(value = Transactional.TxType.REQUIRES_NEW)
+    public void salvarAnexosMEV(Solicitation solicitation) {
+        // Verifica se a solicitação é do tipo MEV
+        if (SolicitationFormType.MEV.getContent().equals(solicitation.getSolicitationType().getContent())) {
+            // Supondo que o formulário da solicitação contenha uma amostra registrada "amostras"
+            LinkedHashMap form = (LinkedHashMap) solicitation.getForm();
+            List<LinkedHashMap> amostras = (List<LinkedHashMap>) form.get("amostras");
+
+            if (amostras != null && !amostras.isEmpty()) {
+                for (LinkedHashMap node : amostras) {
+                    // Obtém a lista de anexos (modeloMicroscopia) de cada amostra
+                    List<LinkedHashMap> modeloMicroscopia = (List<LinkedHashMap>) node.get("modeloMicroscopia");
+
+                    if (modeloMicroscopia != null && !modeloMicroscopia.isEmpty()) {
+                        List<Attachment> attachmentsPersistidos = new ArrayList<>();
+
+                        // Persistindo cada anexo para que o ID seja gerado
+                        for (LinkedHashMap attachmentHash : modeloMicroscopia) {
+                            Attachment attachment = modelMapper.map(attachmentHash, Attachment.class);
+                            entityManager.persist(attachment);
+                            attachmentsPersistidos.add(attachment);
+                        }
+                        // Atualiza o node da amostra para usar os anexos já persistidos (com ID)
+                        node.put("modeloMicroscopia", attachmentsPersistidos);
+                    }
+                }
+            }
+        }
+    }
+
+    @Transactional
+    @Override
+    public ObjectReturn deleteById(Long id) {
+        Solicitation solicitation = this.findOneById(id);
+        if (ObjectUtils.isNotEmpty(solicitation)) {
+            this.excluirAnexosMEV(solicitation);
+        }
+        return super.deleteById(id);
+    }
+
+    @Transactional
+    public void excluirAnexosMEV(Solicitation solicitation) {
+        if (SolicitationFormType.MEV.getContent().equals(solicitation.getSolicitationType().getContent())) {
+            LinkedHashMap form = (LinkedHashMap) solicitation.getForm();
+            List<LinkedHashMap> amostras = (List<LinkedHashMap>) form.get("amostras");
+            if (amostras != null && !amostras.isEmpty()) {
+                for (LinkedHashMap node : amostras) {
+                    List<LinkedHashMap> modeloMicroscopia = (List<LinkedHashMap>) node.get("modeloMicroscopia");
+                    if (modeloMicroscopia != null && !modeloMicroscopia.isEmpty()) {
+                        for (LinkedHashMap attachmentHash : modeloMicroscopia) {
+                            Attachment attachment = modelMapper.map(attachmentHash, Attachment.class);
+                            entityManager.remove(attachment);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -206,17 +275,6 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         } else {
             throw new RuntimeException("Registro não encontrado");
         }
-    }
-
-    public Page<Solicitation> getPendingPage(PageRequest pageRequest) {
-        User user = userService.findSelfUser();
-
-        return switch (user.getRole()) {
-            case ROLE_PROFESSOR ->
-                    solicitationRepository.findAllByProject_UserAndStatus(user, SolicitationStatus.PENDING_ADVISOR, pageRequest);
-            case ROLE_ADMIN -> solicitationRepository.findAllByStatus(SolicitationStatus.PENDING_LAB, pageRequest);
-            default -> throw new ValidationException("Você não possui permissão para acessar este recurso.");
-        };
     }
 
 }
