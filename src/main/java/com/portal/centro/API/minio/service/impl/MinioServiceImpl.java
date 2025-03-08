@@ -5,6 +5,7 @@ import com.portal.centro.API.minio.service.MinioService;
 import com.portal.centro.API.minio.util.MinioUtil;
 import com.portal.centro.API.model.Attachment;
 import io.minio.ObjectWriteResponse;
+import io.minio.StatObjectResponse;
 import io.minio.messages.Bucket;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,7 @@ public class MinioServiceImpl implements MinioService {
 
     @SneakyThrows
     @Override
-    public Attachment putObject(MultipartFile multipartFile, String bucketName, String subfolder) {
+    public Attachment putObject(MultipartFile multipartFile, String bucketName) {
         try {
             bucketName = StringUtils.isNotBlank(bucketName) ? bucketName : minioProperties.getBucketName();
             if (!this.bucketExists(bucketName)) {
@@ -45,9 +46,6 @@ public class MinioServiceImpl implements MinioService {
             String fileName = multipartFile.getOriginalFilename();
             Long fileSize = multipartFile.getSize();
             String fileHash = UUID.randomUUID().toString().replaceAll("-", "") + fileName.substring(fileName.lastIndexOf("."));
-            if (ObjectUtils.isNotEmpty(subfolder)) {
-                fileHash = subfolder + "/" + fileHash;
-            }
             ObjectWriteResponse objectWriteResponse = minioUtil.putObject(bucketName, multipartFile, fileHash, multipartFile.getContentType());
             return Attachment.builder()
                     .fileName(multipartFile.getOriginalFilename())

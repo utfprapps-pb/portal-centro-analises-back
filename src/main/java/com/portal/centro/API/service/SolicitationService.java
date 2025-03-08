@@ -5,8 +5,8 @@ import com.portal.centro.API.enums.*;
 import com.portal.centro.API.exceptions.GenericException;
 import com.portal.centro.API.exceptions.ValidationException;
 import com.portal.centro.API.generic.crud.GenericService;
-import com.portal.centro.API.minio.service.impl.MinioServiceImpl;
 import com.portal.centro.API.model.*;
+import com.portal.centro.API.repository.SolicitationAttachmentsRepository;
 import com.portal.centro.API.repository.SolicitationRepository;
 import com.portal.centro.API.repository.StudentProfessorRepository;
 import jakarta.persistence.EntityManager;
@@ -17,10 +17,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class SolicitationService extends GenericService<Solicitation, Long> {
@@ -29,21 +26,22 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
     private final UserService userService;
     private final SolicitationRepository solicitationRepository;
     private final StudentProfessorRepository studentProfessorRepository;
-    private final MinioServiceImpl minioService;
     private final ModelMapper modelMapper;
+    private final SolicitationAttachmentsRepository solicitationAttachmentRepository;
+
     @PersistenceContext
     private EntityManager entityManager;
 
     public SolicitationService(SolicitationRepository solicitationRepository, SolicitationHistoricService solicitationHistoricService,
                                UserService userService, StudentProfessorRepository studentProfessorRepository, ModelMapper modelMapper,
-                               MinioServiceImpl minioService) {
+                               SolicitationAttachmentsRepository solicitationAttachmentRepository) {
         super(solicitationRepository);
         this.solicitationRepository = solicitationRepository;
         this.solicitationHistoricService = solicitationHistoricService;
         this.userService = userService;
         this.studentProfessorRepository = studentProfessorRepository;
         this.modelMapper = modelMapper;
-        this.minioService = minioService;
+        this.solicitationAttachmentRepository = solicitationAttachmentRepository;
     }
 
     /**
@@ -107,6 +105,7 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
     public void salvarAnexosMEV(Solicitation solicitation) {
         // Verifica se a solicitação é do tipo MEV
         if (SolicitationFormType.MEV.getContent().equals(solicitation.getSolicitationType().getContent())) {
+            List<SolicitationAttachments> vinculos = new ArrayList<>();
             // Supondo que o formulário da solicitação contenha uma amostra registrada "amostras"
             LinkedHashMap form = (LinkedHashMap) solicitation.getForm();
             List<LinkedHashMap> amostras = (List<LinkedHashMap>) form.get("amostras");
@@ -122,12 +121,25 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
                         // Persistindo cada anexo para que o ID seja gerado
                         for (LinkedHashMap attachmentHash : modeloMicroscopia) {
                             Attachment attachment = modelMapper.map(attachmentHash, Attachment.class);
+                            attachment.setCreatedAt(LocalDateTime.now());
                             entityManager.persist(attachment);
+
+                            SolicitationAttachments vinculo = new SolicitationAttachments();
+                            vinculo.setAttachment(attachment);
+                            vinculo.setSolicitation(solicitation);
+                            vinculos.add(vinculo);
+                            entityManager.persist(vinculo);
+
                             attachmentsPersistidos.add(attachment);
                         }
                         // Atualiza o node da amostra para usar os anexos já persistidos (com ID)
                         node.put("modeloMicroscopia", attachmentsPersistidos);
                     }
+                }
+            }
+            if (!vinculos.isEmpty()) {
+                for (SolicitationAttachments vinculo : vinculos) {
+//                    entityManager.persist(vinculo);
                 }
             }
         }
@@ -154,6 +166,10 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
                     if (modeloMicroscopia != null && !modeloMicroscopia.isEmpty()) {
                         for (LinkedHashMap attachmentHash : modeloMicroscopia) {
                             Attachment attachment = modelMapper.map(attachmentHash, Attachment.class);
+                            SolicitationAttachments bind = solicitationAttachmentRepository.findByAttachment_Id(attachment.getId());
+                            if (ObjectUtils.isNotEmpty(bind)) {
+                                entityManager.remove(bind);
+                            }
                             entityManager.remove(attachment);
                         }
                     }

@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface MinioService {
     // Upload files in the bucket
-    Attachment putObject(MultipartFile multipartFile, String bucketName, String subfolder);
+    Attachment putObject(MultipartFile multipartFile, String bucketName);
 
     // Download file from bucket
     InputStream downloadObject(String bucketName, String objectName);

@@ -22,8 +22,7 @@ public class MinioController {
 
     @PostMapping(path = "/upload")
     public ResponseEntity upload(@RequestPart("file") MultipartFile file,
-                                 @RequestParam("bucket") String bucket,
-                                 @RequestParam(value = "subfolder", required = false) String subfolder) {
+                                 @RequestParam("bucket") String bucket) {
         if (bucket.length() < 3) {
             StringBuilder newBucket = new StringBuilder();
             for (int i = bucket.length(); i < 3; i++) {
@@ -31,7 +30,7 @@ public class MinioController {
             }
             bucket = newBucket + bucket;
         }
-        return ResponseEntity.ok(minioService.putObject(file, bucket, subfolder));
+        return ResponseEntity.ok(minioService.putObject(file, bucket));
     }
 
 }
