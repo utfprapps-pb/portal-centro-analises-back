@@ -8,6 +8,7 @@ import com.portal.centro.API.model.TermsOfUse;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.SolicitationHistoricRepository;
 import com.portal.centro.API.repository.TermsOfUseRepository;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -20,10 +21,12 @@ import java.util.List;
 public class TermsOfUseService extends GenericService<TermsOfUse, Long> {
 
     private final TermsOfUseRepository termsOfUseRepository;
+    private final UserService userService;
 
     public TermsOfUseService(TermsOfUseRepository termsOfUseRepository, UserService userService) {
         super(termsOfUseRepository);
         this.termsOfUseRepository = termsOfUseRepository;
+        this.userService = userService;
     }
 
 }

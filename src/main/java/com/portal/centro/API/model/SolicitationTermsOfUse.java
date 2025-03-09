@@ -20,11 +20,13 @@ public class SolicitationTermsOfUse extends IModel {
     @ManyToOne
     @JoinColumn(name = "termsofuse_id")
     @JsonIgnore
-    private TermsOfUse terms;
+    private TermsOfUse termofuse;
 
     @ManyToOne
     @JoinColumn(name = "solicitation_id")
     @JsonIgnore
     private Solicitation solicitation;
+
+    private boolean approved;
 
 }

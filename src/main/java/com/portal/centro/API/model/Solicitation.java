@@ -9,7 +9,10 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.Type;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -23,9 +26,23 @@ import java.util.List;
 @Entity(name = "tb_solicitation")
 public class Solicitation extends IModel {
 
+    @CreatedBy
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User createdBy;
+
+    @CreatedDate
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @LastModifiedBy
+    @ManyToOne
+    @JoinColumn(name = "user_updated_id")
+    private User updatedBy;
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     /**
      * Quando criado por um aluno vai o professor orientador dele no momento da criação da solicitação
@@ -33,11 +50,6 @@ public class Solicitation extends IModel {
     @ManyToOne
     @JoinColumn(name = "responsavel_id")
     private User responsavel;
-
-    @LastModifiedBy
-    @ManyToOne
-    @JoinColumn(name = "user_updated_id")
-    private User updatedBy;
 
     @Enumerated
     @Column(name = "status", updatable = false)
@@ -75,12 +87,6 @@ public class Solicitation extends IModel {
 
     @Column(name = "schedule_date")
     private LocalDateTime scheduleDate;
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
 
     private BigDecimal price;
 
