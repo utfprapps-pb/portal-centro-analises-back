@@ -66,7 +66,6 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
             throw new ValidationException(
                     "O campo 'Outra natureza de projeto' deve ser preenchido quando a natureza do projeto for 'Outro'.");
         }
-//        setProjectToNullIfEmpty(solicitation);
         solicitation.setCreatedBy(loggedUser);
 
         // Cria o histório da solicitação
@@ -79,15 +78,6 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
             if (loggedUser.getRole().equals(Type.ROLE_STUDENT)) {
                 solicitation.setStatus(SolicitationStatus.PENDING_ADVISOR);
                 solicitationHistoric.setStatus(SolicitationStatus.PENDING_ADVISOR);
-                // Seleciona o orientador do aluno no momento em que a solicitação foi realizada
-                List<StudentProfessor> professores = studentProfessorRepository.findAllByStudentAndApproved(loggedUser.getId(), StudentTeacherApproved.ACEITO);
-                if (professores.isEmpty()) {
-                    throw new GenericException("Você não possui um professor vinculado!");
-                } else if (professores.size() == 1) {
-                    solicitation.setProfessor(professores.get(0).getProfessor());
-                } else {
-                    throw new GenericException("É necessário selecionar o professor!");
-                }
             } else {
                 solicitation.setStatus(SolicitationStatus.PENDING_LAB);
                 solicitationHistoric.setStatus(SolicitationStatus.PENDING_LAB);

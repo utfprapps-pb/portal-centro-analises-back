@@ -1,25 +1,18 @@
 package com.portal.centro.API.model;
 
-import com.portal.centro.API.configuration.ApplicationContextProvider;
 import com.portal.centro.API.enums.SolicitationFormType;
 import com.portal.centro.API.enums.SolicitationProjectNature;
 import com.portal.centro.API.enums.SolicitationStatus;
 import com.portal.centro.API.generic.base.IModel;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.apache.commons.lang3.ObjectUtils;
 import org.hibernate.annotations.Type;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.annotation.LastModifiedBy;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 @Getter
@@ -38,8 +31,8 @@ public class Solicitation extends IModel {
      * Quando criado por um aluno vai o professor orientador dele no momento da criação da solicitação
      */
     @ManyToOne
-    @JoinColumn(name = "professor_id")
-    private User professor;
+    @JoinColumn(name = "responsavel_id")
+    private User responsavel;
 
     @LastModifiedBy
     @ManyToOne
@@ -47,6 +40,7 @@ public class Solicitation extends IModel {
     private User updatedBy;
 
     @Enumerated
+    @Column(name = "status", updatable = false)
     private SolicitationStatus status;
 
     @ManyToOne
@@ -99,12 +93,12 @@ public class Solicitation extends IModel {
     private BigDecimal totalPrice;
 
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "technical_report_id")
+    @JoinColumn(name = "solicitation_id")
     private List<SolicitationAttachments> solicitationAttachments; //adicionar coluna nova no banco
 
-    @ManyToOne
-    @JoinColumn(name = "analysis_id")
-    private Analysis analysis;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "solicitation_id")
+    private List<SolicitationTermsOfUse> termsOfUses;
 
     private String observation;
 

@@ -18,6 +18,8 @@ public interface SolicitationHistoricRepository extends GenericRepository<Solici
     Page<SolicitationHistoric> findAllBySolicitation_CreatedBy(User user, PageRequest pageRequest);
     List<SolicitationHistoric> findAllBySolicitation_CreatedByAndSolicitationIdAndStatusIsNotOrderByCreatedAtDesc(User user, Long id, SolicitationStatus newStatus);
 
+    List<SolicitationHistoric> findAllBySolicitation_CreatedByOrSolicitation_Responsavel(User user, User responsavel);
+
     List<SolicitationHistoric> findAllBySolicitation_CreatedByOrSolicitation_Project_User(User user, User teacher);
     Page<SolicitationHistoric> findAllBySolicitation_CreatedByOrSolicitation_Project_User(User user, User teacher, PageRequest pageRequest);
     List<SolicitationHistoric> findAllBySolicitation_Project_UserAndSolicitationIdAndStatusIsNotOrderByCreatedAtDesc(User teacher, Long id, SolicitationStatus newStatus);

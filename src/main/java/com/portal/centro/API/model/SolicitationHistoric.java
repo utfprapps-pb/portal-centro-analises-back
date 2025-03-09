@@ -21,19 +21,21 @@ public class SolicitationHistoric extends IModel {
     @JoinColumn(name = "solicitation_id")
     private Solicitation solicitation;
 
+    @Enumerated
+    private SolicitationStatus status;
+
     @ManyToOne
     @JoinColumn(name = "created_by")
     private User createdBy;
 
-    @Enumerated
-    private SolicitationStatus status;
-
     @CreatedDate
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Column(name = "observation")
     private String observation;
+
 }
 
 

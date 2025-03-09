@@ -1,7 +1,6 @@
 package com.portal.centro.API.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.portal.centro.API.generic.base.IModel;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -9,19 +8,19 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.*;
 
-@Entity(name = "tb_solicitation_attachments")
+@Entity(name = "tb_solicitation_termsofuse")
 @Table
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SolicitationAttachments extends IModel {
+public class SolicitationTermsOfUse extends IModel {
 
     @ManyToOne
-    @JoinColumn(name = "attachment_id")
+    @JoinColumn(name = "termsofuse_id")
     @JsonIgnore
-    private Attachment attachment;
+    private TermsOfUse terms;
 
     @ManyToOne
     @JoinColumn(name = "solicitation_id")

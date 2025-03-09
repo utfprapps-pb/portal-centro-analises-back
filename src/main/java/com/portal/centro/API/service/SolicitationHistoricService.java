@@ -32,10 +32,8 @@ public class SolicitationHistoricService extends GenericService<SolicitationHist
         switch (user.getRole()) {
             case ROLE_ADMIN:
                 return super.getAll();
-            case ROLE_PROFESSOR:
-                return solicitationHistoricRepository.findAllBySolicitation_CreatedByOrSolicitation_Project_User(user, user);
             default:
-                return solicitationHistoricRepository.findAllBySolicitation_CreatedBy(user);
+                return solicitationHistoricRepository.findAllBySolicitation_CreatedByOrSolicitation_Responsavel(user, user);
         }
     }
 

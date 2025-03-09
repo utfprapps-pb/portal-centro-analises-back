@@ -28,7 +28,7 @@ public class MinIoCleaner {
 
     // O cron "0 0 0 * * ?" indica que a tarefa será executada todos os dias à meia-noite.
 //    @Scheduled(cron = "0 0 0 * * ?")
-    @Scheduled(cron = "0 24 22 * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     public void limparAnexos() {
         List<Attachment> attachmentsBanco = attachmentService.getAll();
 

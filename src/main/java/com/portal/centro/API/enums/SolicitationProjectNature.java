@@ -9,6 +9,7 @@ public enum SolicitationProjectNature {
   EXTENSION_PROJECT("Projeto de Extensão"),
   RESEARCH_PROJECT("Projeto de Pesquisa"),
   TEACHING_PROJECT("Projeto de Ensino"),
+  PERSONAL_PROJECT("Projeto de Pessoal"),
   OTHER("Outro");
 
   private String content;
