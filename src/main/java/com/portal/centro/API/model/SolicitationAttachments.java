@@ -20,12 +20,11 @@ public class SolicitationAttachments extends IModel {
 
     @ManyToOne
     @JoinColumn(name = "attachment_id")
-    @JsonIgnore
     private Attachment attachment;
 
     @ManyToOne
     @JoinColumn(name = "solicitation_id")
-    @JsonIgnore
+    @JsonIgnoreProperties(value = "solicitationAttachments", allowSetters = true)
     private Solicitation solicitation;
 
 }
