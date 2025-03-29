@@ -15,17 +15,7 @@ public class DashboardController {
     public DashboardController(DashboardService dashboardService) {
         this.dashboardService = dashboardService;
     }
-
-    @GetMapping(path = "/solicitacao")
-    public ResponseEntity getGraficoSolicitacao() throws Exception {
-        return ResponseEntity.ok(dashboardService.getGraficoSolicitacao());
-    }
-
-    @GetMapping(path = "/solicitacaoequipamento")
-    public ResponseEntity getGraficoSolicitacaoEquipamento() throws Exception {
-        return ResponseEntity.ok(dashboardService.getGraficoEquipamentoSolicitacao());
-    }
-
+    
     @GetMapping(path = "/usuariotipo")
     public ResponseEntity getGraficoUsuarioTipo() throws Exception {
         return ResponseEntity.ok(dashboardService.getGraficoUsuarioRole());

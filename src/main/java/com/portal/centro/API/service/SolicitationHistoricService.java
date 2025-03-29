@@ -1,18 +1,16 @@
 package com.portal.centro.API.service;
 
 import com.portal.centro.API.enums.SolicitationStatus;
-import com.portal.centro.API.exceptions.ValidationException;
+import com.portal.centro.API.enums.Type;
+import com.portal.centro.API.exceptions.GenericException;
 import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.model.SolicitationHistoric;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.SolicitationHistoricRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class SolicitationHistoricService extends GenericService<SolicitationHistoric, Long> {
@@ -37,46 +35,21 @@ public class SolicitationHistoricService extends GenericService<SolicitationHist
         }
     }
 
-    @Override
-    public SolicitationHistoric save(SolicitationHistoric solicitationHistoric) {
-        solicitationHistoric.setCreatedAt(LocalDateTime.now());
-        solicitationHistoric.setCreatedBy(userService.findSelfUser());
-
-        return solicitationHistoricRepository.save(solicitationHistoric);
+    public List<SolicitationHistoric> findHistoryBySolicitationId(Long id) {
+        return solicitationHistoricRepository.findAllBySolicitationId(id);
     }
 
-    public List<SolicitationHistoric> findHistoryById(Long id, SolicitationStatus status) {
-        User user = userService.findSelfUser();
-
-        switch (user.getRole()) {
-            case ROLE_STUDENT:
-            case ROLE_EXTERNAL:
-            case ROLE_PARTNER:
-                return solicitationHistoricRepository.findAllBySolicitation_CreatedByAndSolicitationIdAndStatusIsNotOrderByCreatedAtDesc(user, id, status);
-            case ROLE_PROFESSOR:
-                return solicitationHistoricRepository.findAllBySolicitation_Project_UserAndSolicitationIdAndStatusIsNotOrderByCreatedAtDesc(user, id, status);
-            case ROLE_ADMIN:
-                return solicitationHistoricRepository.findAllBySolicitationIdAndStatusIsNotOrderByCreatedAtDesc(id, status);
-            default:
-                return new ArrayList<>();
+    public void verificaStatusValido(SolicitationHistoric historico) throws Exception {
+        User selfUser = userService.findSelfUser();
+        if (!Objects.equals(selfUser.getRole(), Type.ROLE_ADMIN)) {
+            List<SolicitationStatus> statusPermitidos = List.of(
+                    SolicitationStatus.AWAITING_RESPONSIBLE_CONFIRMATION,
+                    SolicitationStatus.AWAITING_LAB_CONFIRMATION,
+                    SolicitationStatus.AWAITING_CORRECTION,
+                    SolicitationStatus.REJECTED);
+            if (!statusPermitidos.contains(historico.getStatus())) {
+                throw new GenericException("Você não pode fazer isso!");
+            }
         }
     }
-
-    public Page<SolicitationHistoric> page(PageRequest pageRequest) {
-        User user = userService.findSelfUser();
-
-        switch (user.getRole()) {
-            case ROLE_STUDENT:
-            case ROLE_EXTERNAL:
-            case ROLE_PARTNER:
-                return solicitationHistoricRepository.findAllDistinctByOrderByUserCreatedAtDescCreatedByUser(user.getId(), pageRequest);
-            case ROLE_PROFESSOR:
-                return solicitationHistoricRepository.findAllDistinctByOrderByUserCreatedAtDescCreatedByUserOrTeacherInProject(user.getId(), pageRequest);
-            case ROLE_ADMIN:
-                return solicitationHistoricRepository.findAllDistinctByOrderByUserCreatedAtDesc(pageRequest);
-            default:
-                throw new ValidationException("Você não possui permissão para acessar este recurso.");
-        }
-    }
-
 }

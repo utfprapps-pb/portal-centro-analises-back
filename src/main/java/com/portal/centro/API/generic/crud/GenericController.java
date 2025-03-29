@@ -39,10 +39,6 @@ public abstract class GenericController<T extends GenericModel, ID extends Seria
         return ResponseEntity.ok(genericService.update(requestBody));
     }
 
-    public boolean allowUpdate() {
-        return true;
-    }
-
     @PostMapping("/{id}")
     public ResponseEntity<T> findOneById(@PathVariable ID id) {
         return ResponseEntity.ok(genericService.findOneById(id));
@@ -56,16 +52,6 @@ public abstract class GenericController<T extends GenericModel, ID extends Seria
     @GetMapping
     public ResponseEntity<?> getAll() throws Exception {
         return ResponseEntity.ok(genericService.getAll());
-    }
-
-    protected Specification<T> resolveSpecification(String searchParameters) {
-        GenericSpecificationsBuilder<T> specBuilder = new GenericSpecificationsBuilder<>();
-        Pattern pattern = Pattern.compile("(\\p{Punct}?)(\\w+?)(" + Joiner.on("|").join(SearchOperation.SIMPLE_OPERATION_SET) + ")(\\p{Punct}?)(\\w+?)(\\p{Punct}?),");
-        Matcher matcher = pattern.matcher(searchParameters + ",");
-        while (matcher.find()) {
-            specBuilder.with(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(5), matcher.group(4), matcher.group(6));
-        }
-        return specBuilder.build(GenericSpecification<T>::new);
     }
 
 }

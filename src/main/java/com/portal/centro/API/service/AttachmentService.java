@@ -19,7 +19,7 @@ public class AttachmentService extends GenericService<Attachment, Long> {
     }
 
     @Override
-    public ObjectReturn deleteById(Long id) {
+    public ObjectReturn deleteById(Long id) throws Exception {
         Attachment attachment = findOneById(id);
         ObjectReturn result = super.deleteById(id);
         this.minioService.removeObject(attachment.getBucket(), attachment.getFileHash());

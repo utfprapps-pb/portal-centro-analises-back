@@ -44,13 +44,12 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             if (user.getEmailVerified() == null || !user.getEmailVerified()) {
                 throw new GenericException("E-mail do usuário não foi validado!");
             } else {
-                return authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(
-                                credentials.getEmail(),
-                                credentials.getPassword(),
-                                user.getAuthorities()
-                        )
+                UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                        credentials.getEmail(),
+                        credentials.getPassword(),
+                        user.getAuthorities()
                 );
+                return authenticationManager.authenticate(token);
             }
         } catch (UsernameNotFoundException | BadCredentialsException | GenericException ge) {
             throw new RuntimeException("mapped|GenericException|" + ge.getMessage());

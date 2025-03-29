@@ -2,28 +2,23 @@ package com.portal.centro.API.minio.service;
 
 import com.portal.centro.API.minio.service.impl.MinioServiceImpl;
 import com.portal.centro.API.model.Attachment;
-import com.portal.centro.API.repository.SolicitationAttachmentsRepository;
 import com.portal.centro.API.service.AttachmentService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class MinIoCleaner {
 
     private final MinioServiceImpl minioService;
 
-    private final SolicitationAttachmentsRepository solicitationAttachmentsRepository;
     private final AttachmentService attachmentService;
 
-    public MinIoCleaner(MinioServiceImpl minioService, AttachmentService attachmentService, SolicitationAttachmentsRepository solicitationAttachmentsRepository) {
+    public MinIoCleaner(MinioServiceImpl minioService, AttachmentService attachmentService) {
         this.minioService = minioService;
         this.attachmentService = attachmentService;
-        this.solicitationAttachmentsRepository = solicitationAttachmentsRepository;
     }
 
     // O cron "0 0 0 * * ?" indica que a tarefa será executada todos os dias à meia-noite.

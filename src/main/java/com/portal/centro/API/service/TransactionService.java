@@ -39,17 +39,4 @@ public class TransactionService  extends GenericService<Transaction, Long> {
         return transactionRepository.findAllByUser_IdOrderByCreatedAtDesc(selfUser.getId());
     }
 
-    @Override
-    public Page<Transaction> page(PageRequest pageRequest) {
-        User user = userService.findSelfUser();
-
-        switch (user.getRole()) {
-            case ROLE_ADMIN:
-                return super.page(pageRequest);
-            case ROLE_PROFESSOR:
-                return transactionRepository.findAllByUser_IdOrderByCreatedAtDesc(user.getId(), pageRequest);
-            default:
-                throw new ValidationException("Você não possui permissão para acessar este recurso.");
-        }
-    }
 }

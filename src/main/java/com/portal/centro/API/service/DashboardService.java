@@ -28,16 +28,6 @@ public class DashboardService {
         this.equipmentRepository = equipmentRepository;
     }
 
-    public GraficoDTO getGraficoSolicitacao(){
-        List<Tuple> dados = solicitationRepository.findGraficoSolicitacoesNative();
-        return processaDados(dados, "Solicitações");
-    }
-
-    public GraficoDTO getGraficoEquipamentoSolicitacao(){
-        List<Tuple> dados = solicitationRepository.findGraficoEquipamentoSolicitacaoNative();
-        return processaDados(dados, "Equipamentos em solicitações");
-    }
-
     public GraficoDTO getGraficoUsuarioSituacao(){
         List<Tuple> dados = userRepository.findGraficoUsuarioSituacaoNative();
         return processaDados(dados, "Situações de usuários");

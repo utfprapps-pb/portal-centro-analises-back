@@ -18,35 +18,8 @@ import java.util.List;
 @RequestMapping("/solicitar")
 public class SolicitationController extends GenericController<Solicitation, Long> {
 
-    private final SolicitationService solicitationService;
-
-    public SolicitationController(GenericService<Solicitation, Long> genericService,
-                                  SolicitationService solicitationService) {
-        super(genericService);
-        this.solicitationService = solicitationService;
-    }
-
-    /**
-     * Atualiza a situação da solicitação
-     */
-    @PostMapping("/status")
-    public ResponseEntity<Solicitation> alterStatus(@RequestBody @Valid SolicitationRequestDto solicitationRequestDto) throws Exception {
-        return ResponseEntity.ok(this.solicitationService.updateStatus(solicitationRequestDto));
-    }
-
-    @GetMapping("/pending")
-    public ResponseEntity<List<Solicitation>> getPending() {
-        return ResponseEntity.ok(solicitationService.getPending());
-    }
-
-    @PostMapping("/approve/{id}")
-    public ResponseEntity<Solicitation> aproveProfessorSolicitation(@PathVariable Long id) {
-        return ResponseEntity.ok(solicitationService.approveProfessor(id));
-    }
-
-    @PostMapping("/approve-lab/{id}")
-    public ResponseEntity<Solicitation> aproveLabSolicitation(@PathVariable Long id) {
-        return ResponseEntity.ok(solicitationService.approveLab(id));
+    public SolicitationController(SolicitationService solicitationService) {
+        super(solicitationService);
     }
 
 }

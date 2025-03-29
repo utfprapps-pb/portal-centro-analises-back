@@ -27,7 +27,6 @@ public class EmailConfigService extends GenericService<EmailConfig, Long> {
     }
 
     public EmailConfig find() throws Exception {
-        this.validateIfExistsEmailConfig();
         List<EmailConfig> emailConfigList = emailConfigRepository.findAll();
         return emailConfigList.get(0);
     }

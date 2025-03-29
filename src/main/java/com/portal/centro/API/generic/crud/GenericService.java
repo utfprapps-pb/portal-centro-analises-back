@@ -22,15 +22,17 @@ public abstract class GenericService<T extends GenericModel, ID> {
         if (ObjectUtils.isNotEmpty(requestBody.getId())) {
             return this.update(requestBody);
         } else {
-            return genericRepository.saveAndFlush(requestBody);
+            genericRepository.saveAndFlush(requestBody);
+            return findOneById((ID) requestBody.getId());
         }
     }
 
     public T update(T requestBody) throws Exception {
-        return genericRepository.saveAndFlush(requestBody);
+        genericRepository.saveAndFlush(requestBody);
+        return findOneById((ID) requestBody.getId());
     }
 
-    public ObjectReturn deleteById(ID id) {
+    public ObjectReturn deleteById(ID id) throws Exception {
         genericRepository.deleteById(id);
         return new ObjectReturn("Registro deletado com sucesso.");
     }
@@ -39,19 +41,12 @@ public abstract class GenericService<T extends GenericModel, ID> {
         return genericRepository.findAll();
     }
 
-    public Page<T> page(PageRequest pageRequest) {
-        return genericRepository.findAll(pageRequest);
-    }
-
-    public Page<T> search(Specification specification, PageRequest pageRequest) {
-        return genericRepository.findAll(specification, pageRequest);
-    }
 
     public T findOneById(ID id) {
         Optional<T> optional = genericRepository.findById(id);
-        if (optional.isPresent())
+        if (optional.isPresent()) {
             return optional.get();
-
+        }
         throw new NotFoundException("Nenhum registro encontrado.");
     }
 
