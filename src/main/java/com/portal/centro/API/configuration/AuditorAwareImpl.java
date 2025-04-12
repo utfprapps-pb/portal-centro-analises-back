@@ -5,6 +5,7 @@ import com.portal.centro.API.security.AuthenticationToken;
 import com.portal.centro.API.security.AuthenticationTokenDetails;
 import com.portal.centro.API.service.UserService;
 import org.springframework.data.domain.AuditorAware;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
@@ -19,11 +20,18 @@ public class AuditorAwareImpl implements AuditorAware<User> {
 
     @Override
     public Optional<User> getCurrentAuditor() {
-        AuthenticationToken token = (AuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        AuthenticationTokenDetails details = (AuthenticationTokenDetails) token.getDetails();
-        return Optional.of(User.builder()
-                .id(details.getId())
-                .build());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        try {
+            AuthenticationToken token = (AuthenticationToken) authentication;
+            AuthenticationTokenDetails details = (AuthenticationTokenDetails) token.getDetails();
+            return Optional.of(User.builder()
+                    .id(details.getId())
+                    .build());
+        } catch (ClassCastException e) {
+            return Optional.empty();
+        }
+
+
     }
 
 }

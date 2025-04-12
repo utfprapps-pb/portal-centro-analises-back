@@ -1,6 +1,5 @@
 package com.portal.centro.API.security;
 
-import com.portal.centro.API.security.auth.AuthService;
 import com.portal.centro.API.security.filters.JWTAuthenticationFilter;
 import com.portal.centro.API.security.filters.JWTAuthorizationFilter;
 import lombok.SneakyThrows;
@@ -44,7 +43,7 @@ public class WebSecurity {
         AuthenticationManagerBuilder authenticationManagerBuilder =
                 http.getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder.userDetailsService(authService)
-                .passwordEncoder( passwordEncoder() );
+                .passwordEncoder(passwordEncoder());
         AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
 
         http.csrf(AbstractHttpConfigurer::disable);
@@ -53,36 +52,51 @@ public class WebSecurity {
 
         http.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(authenticationEntryPoint));
         http.authorizeHttpRequests((authorize) -> authorize
-                .requestMatchers(antMatcher(HttpMethod.POST,"/users/**")).permitAll()
-                .requestMatchers(antMatcher(HttpMethod.GET,"/open/**")).permitAll()
-                .requestMatchers(antMatcher(HttpMethod.POST,"/open/**")).permitAll()
+                .requestMatchers(antMatcher("/ws/**")).permitAll()
 
-                .requestMatchers(antMatcher("/error/**")).permitAll()
-                .requestMatchers(antMatcher("/errors/**")).permitAll()
                 .requestMatchers(antMatcher(HttpMethod.GET, "/email-confirm/**")).permitAll()
-                .requestMatchers(antMatcher("/v3/**")).permitAll()
-                .requestMatchers(antMatcher("/swagger-ui/**")).permitAll()
-                .requestMatchers(antMatcher("/admin/**")).hasRole("ADMIN")
+                .requestMatchers(antMatcher("/open/**")).permitAll()
 
-                .requestMatchers(antMatcher(HttpMethod.POST, "/equipments/**")).hasAnyRole("ADMIN")
-                .requestMatchers(antMatcher(HttpMethod.PUT, "/equipments/**")).hasAnyRole("ADMIN")
-                .requestMatchers(antMatcher(HttpMethod.DELETE, "/equipments/**")).hasAnyRole("ADMIN")
+                .requestMatchers(antMatcher("/usuarios/**")).authenticated()
 
-                .requestMatchers(antMatcher(HttpMethod.GET,"/parceiros/**")).hasAnyRole("ADMIN")
+                .requestMatchers(antMatcher(HttpMethod.GET, "/termos-de-uso")).authenticated()
+                .requestMatchers(antMatcher("/termos-de-uso/**")).hasRole("ADMIN")
 
-                .requestMatchers(antMatcher(HttpMethod.POST, "/solicitation/approve/**")).hasAnyRole("PROFESSOR")
-                .requestMatchers(antMatcher(HttpMethod.POST, "/solicitation/approvelab/**")).hasAnyRole("ADMIN")
-                .requestMatchers(antMatcher(HttpMethod.GET, "/solicitation/pendingpage")).hasAnyRole("ADMIN", "PROFESSOR")
-                .requestMatchers(antMatcher(HttpMethod.GET, "/solicitation/pending")).hasAnyRole("ADMIN", "PROFESSOR")
+                .requestMatchers(
+                        antMatcher("/vinculos"),
+                        antMatcher("/vinculos/**")
+                ).authenticated()
 
-                .requestMatchers(antMatcher(HttpMethod.POST, "/transaction")).hasAnyRole("ADMIN")
+                .requestMatchers(antMatcher("/solicitar/save")).authenticated()
+                .requestMatchers(antMatcher("/solicitar/**")).denyAll()
 
-                .requestMatchers(antMatcher(HttpMethod.DELETE, "/users")).hasAnyRole("ADMIN")
-                .requestMatchers(antMatcher(HttpMethod.GET, "/users/pagestatus")).hasAnyRole("ADMIN")
-                .requestMatchers(antMatcher(HttpMethod.GET, "/users")).hasAnyRole("ADMIN", "PROFESSOR")
-                .requestMatchers(antMatcher(HttpMethod.GET, "/users/findInactive")).hasAnyRole("ADMIN")
-                .requestMatchers(antMatcher(HttpMethod.PUT, "/users/activatedUser/**")).hasAnyRole("ADMIN")
-                .anyRequest().authenticated()
+                .requestMatchers(
+                        antMatcher("/solicitacoes/atualizar-status"),
+                        antMatcher("/solicitacoes/salvar/solicitacao-amostra-analise"),
+                        antMatcher("/solicitacoes/salvar/solicitacao-amostra-finalizar")
+                ).hasRole("ADMIN")
+                .requestMatchers(
+                        antMatcher("/solicitacoes"),
+                        antMatcher("/solicitacoes/**")
+                ).authenticated()
+
+                .requestMatchers(
+                        antMatcher("/projetos"),
+                        antMatcher("/projetos/**")
+                ).authenticated()
+
+                .requestMatchers(antMatcher("/parceiros/**")).hasRole("ADMIN")
+                .requestMatchers(antMatcher("/minio/**")).authenticated()
+
+                .requestMatchers(antMatcher("/equipamentos")).authenticated()
+                .requestMatchers(antMatcher("/equipamentos/**")).hasRole("ADMIN")
+
+                .requestMatchers(antMatcher("/email-config/**")).hasRole("ADMIN")
+                .requestMatchers(antMatcher("/dominios/**")).hasRole("ADMIN")
+
+                        .requestMatchers(antMatcher("/email/config/**")).hasRole("ADMIN")
+
+                .anyRequest().denyAll()
         );
         http.authenticationManager(authenticationManager)
                 .addFilter(new JWTAuthenticationFilter(authenticationManager, authService))
@@ -98,7 +112,7 @@ public class WebSecurity {
     }
 
     @Bean
-    CorsConfigurationSource corsConfigurationSource(){
+    CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of("*"));
@@ -106,7 +120,7 @@ public class WebSecurity {
 //                configuration..setAllowedOrigins(List.of("http://localhost:5173"));
 //                configuration..setAllowedOrigins(List.of("https://ca-dev.app.pb.utfpr.edu.br"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "TRACE", "CONNECT"));
-        configuration.setAllowedHeaders(List.of("Authorization","x-xsrf-token",
+        configuration.setAllowedHeaders(List.of("Authorization", "x-xsrf-token",
                 "Access-Control-Allow-Headers", "Origin",
                 "Accept", "X-Requested-With", "Content-Type",
                 "Access-Control-Request-Method", "Credentials",

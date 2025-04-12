@@ -4,11 +4,10 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.portal.centro.API.dto.UserLoginDTO;
-import com.portal.centro.API.exceptions.GenericException;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.security.AuthenticationResponse;
 import com.portal.centro.API.security.SecurityConstants;
-import com.portal.centro.API.security.auth.AuthService;
+import com.portal.centro.API.security.AuthService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -42,7 +41,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             User user = (User) authService.loadUserByUsername(credentials.getEmail());
 
             if (user.getEmailVerified() == null || !user.getEmailVerified()) {
-                throw new GenericException("E-mail do usuário não foi validado!");
+                throw new RuntimeException("mapped|GenericException|E-mail do usuário não foi validado!");
             } else {
                 UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
                         credentials.getEmail(),
@@ -51,8 +50,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 );
                 return authenticationManager.authenticate(token);
             }
-        } catch (UsernameNotFoundException | BadCredentialsException | GenericException ge) {
-            throw new RuntimeException("mapped|GenericException|" + ge.getMessage());
+        } catch (UsernameNotFoundException | BadCredentialsException e) {
+            throw new RuntimeException("mapped|GenericException|" + e.getMessage());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

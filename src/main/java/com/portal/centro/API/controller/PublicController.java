@@ -2,6 +2,7 @@ package com.portal.centro.API.controller;
 
 import com.portal.centro.API.dto.RecoverPasswordDTO;
 import com.portal.centro.API.dto.RequestCodeEmailDto;
+import com.portal.centro.API.exceptions.GenericException;
 import com.portal.centro.API.model.ObjectReturn;
 import com.portal.centro.API.model.SendEmailCodeRecoverPassword;
 import com.portal.centro.API.model.User;
@@ -43,16 +44,16 @@ public class PublicController {
     }
 
     @PostMapping("/request-verification")
-    public ResponseEntity<?> requestVerification(@NotNull @RequestBody RequestCodeEmailDto emailDto) throws Exception {
+    public ResponseEntity requestVerification(@RequestBody RequestCodeEmailDto emailDto) throws Exception {
         User user = userService.findByEmail(emailDto.getEmail());
         if (user != null) {
             this.emailCodeService.createCode(user);
             return ResponseEntity.ok(new ObjectReturn("OK"));
         }
-        return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+        throw new GenericException("E-mail não encontrado");
     }
 
-    @PostMapping(path = "/recover-password")
+    @PostMapping("/recover-password")
     public ResponseEntity<DefaultResponse> recoverPassword(@RequestBody @Valid RecoverPasswordDTO recoverPasswordDTO) throws Exception {
         DefaultResponse defaultResponse = userService.recoverPassword(recoverPasswordDTO);
         return ResponseEntity.status(defaultResponse.getHttpStatus()).body(defaultResponse);

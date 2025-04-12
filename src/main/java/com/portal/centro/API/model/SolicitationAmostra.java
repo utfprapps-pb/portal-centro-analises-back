@@ -6,6 +6,7 @@ import com.portal.centro.API.enums.EnumBoolean;
 import com.portal.centro.API.generic.base.IModel;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Immutable;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -21,8 +22,12 @@ public class SolicitationAmostra extends IModel {
 
     @ManyToOne
     @JoinColumn(name = "form_id")
-    @JsonIgnoreProperties(value = "amostras", allowSetters = true)
+    @JsonIgnoreProperties(value = "amostras")
     private SolicitationForm form;
+
+    @Immutable
+    @Column(name = "index")
+    private Integer index;
 
     @Column(name = "identification")
     private String identification;
@@ -32,6 +37,13 @@ public class SolicitationAmostra extends IModel {
 
     @Column(name = "leituras")
     private Long leituras;
+
+    @Column(name = "concluida")
+    private Boolean concluida;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "amostra_id")
+    private List<SolicitationAmostraAnalise> analises = new ArrayList<>();
 
     @Column(name = "composicao")
     private String composicao;

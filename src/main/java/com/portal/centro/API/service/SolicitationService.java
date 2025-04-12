@@ -2,18 +2,21 @@ package com.portal.centro.API.service;
 
 import com.portal.centro.API.enums.SolicitationProjectNature;
 import com.portal.centro.API.enums.SolicitationStatus;
+import com.portal.centro.API.enums.Type;
 import com.portal.centro.API.exceptions.GenericException;
 import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.model.*;
+import com.portal.centro.API.repository.SolicitationAmostraAnaliseRepository;
+import com.portal.centro.API.repository.SolicitationAmostraRepository;
 import com.portal.centro.API.repository.SolicitationRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.ObjectUtils;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class SolicitationService extends GenericService<Solicitation, Long> {
@@ -21,16 +24,23 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
     private final SolicitationHistoricService solicitationHistoricService;
     private final UserService userService;
     private final SolicitationRepository solicitationRepository;
+    private final SolicitationAmostraRepository solicitationAmostraRepository;
+    private final SolicitationAmostraAnaliseRepository solicitationAmostraAnaliseRepository;
+    private final WebsocketService websocketService;
 
     @PersistenceContext
     private EntityManager entityManager;
 
     public SolicitationService(SolicitationRepository solicitationRepository, SolicitationHistoricService solicitationHistoricService,
-                               UserService userService) {
+                               UserService userService, SolicitationAmostraAnaliseRepository solicitationAmostraAnaliseRepository,
+                               SolicitationAmostraRepository solicitationAmostraRepository, WebsocketService websocketService) {
         super(solicitationRepository);
         this.solicitationRepository = solicitationRepository;
         this.solicitationHistoricService = solicitationHistoricService;
         this.userService = userService;
+        this.solicitationAmostraAnaliseRepository = solicitationAmostraAnaliseRepository;
+        this.solicitationAmostraRepository = solicitationAmostraRepository;
+        this.websocketService = websocketService;
     }
 
     @Override
@@ -53,6 +63,7 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         solicitationHistoricService.save(solicitationHistoric);
         solicitation.setStatus(solicitationHistoric.getStatus());
 
+        this.websocketService.atualizarSolicitacao(solicitation);
         return solicitation;
     }
 
@@ -92,7 +103,9 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
 
         SolicitationForm form = solicitation.getForm();
         if (ObjectUtils.isNotEmpty(form)) {
+            form.setSolicitation(solicitation);
             entityManager.persist(form);
+            solicitation.setForm(form);
 
             if (ObjectUtils.isNotEmpty(form.getAmostras())) {
                 for (SolicitationAmostra amostra : form.getAmostras()) {
@@ -109,90 +122,20 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
                     entityManager.persist(amostra);
                 }
             }
+            entityManager.persist(solicitation);
+            genericRepository.saveAndFlush(solicitation);
+        } else {
+            genericRepository.saveAndFlush(solicitation);
+
         }
 
-//        salvarAnexosMEV(solicitation);
-        genericRepository.saveAndFlush(solicitation);
         solicitationHistoricService.save(solicitationHistoric);
-    }
-
-    @Transactional(value = Transactional.TxType.REQUIRES_NEW)
-    public void salvarAnexosMEV(Solicitation solicitation) {
-        // Verifica se a solicitação é do tipo MEV
-//        if (SolicitationFormType.MEV.getContent().equals(solicitation.getSolicitationType().getContent())) {
-//            List<SolicitationAmostraAttachment> vinculos = new ArrayList<>();
-//            // Supondo que o formulário da solicitação contenha uma amostra registrada "amostras"
-//            LinkedHashMap form = (LinkedHashMap) solicitation.getForm();
-//            List<LinkedHashMap> amostras = (List<LinkedHashMap>) form.get("amostras");
-//
-//            if (amostras != null && !amostras.isEmpty()) {
-//                for (LinkedHashMap node : amostras) {
-//                    // Obtém a lista de anexos (modeloMicroscopia) de cada amostra
-//                    List<LinkedHashMap> modeloMicroscopia = (List<LinkedHashMap>) node.get("modeloMicroscopia");
-//
-//                    if (modeloMicroscopia != null && !modeloMicroscopia.isEmpty()) {
-//                        List<Attachment> attachmentsPersistidos = new ArrayList<>();
-//
-//                        // Persistindo cada anexo para que o ID seja gerado
-//                        for (LinkedHashMap attachmentHash : modeloMicroscopia) {
-//                            Attachment attachment = modelMapper.map(attachmentHash, Attachment.class);
-//                            attachment.setUrl(null);
-//                            attachment.setCreatedAt(LocalDateTime.now());
-//                            entityManager.persist(attachment);
-//
-//                            SolicitationAmostraAttachment vinculo = new SolicitationAmostraAttachment();
-//                            vinculo.setAttachment(attachment);
-//                            vinculos.add(vinculo);
-//                            entityManager.persist(vinculo);
-//
-//                            attachmentsPersistidos.add(attachment);
-//                        }
-//                        // Atualiza o node da amostra para usar os anexos já persistidos (com ID)
-//                        node.put("modeloMicroscopia", attachmentsPersistidos);
-//                    }
-//                }
-//            }
-//        }
     }
 
     @Transactional
     @Override
     public ObjectReturn deleteById(Long id) throws Exception {
         throw new GenericException("Não é possível excluir solicitações.");
-//        Solicitation solicitation = this.findOneById(id);
-//        // Se não ta Aguardando Confirmação do Responsavel ou Aguardando Confirmação do Lab. Ainda pode Excluir
-//        if (!(SolicitationStatus.AWAITING_RESPONSIBLE_CONFIRMATION.equals(solicitation.getStatus()) ||
-//                SolicitationStatus.AWAITING_LAB_CONFIRMATION.equals(solicitation.getStatus()))) {
-//            throw new GenericException("Solicitações não podem ser excluidas após entrada no laboratório!");
-//        }
-//
-//        if (ObjectUtils.isNotEmpty(solicitation)) {
-//            this.excluirAnexosMEV(solicitation);
-//        }
-//        return super.deleteById(id);
-    }
-
-    @Transactional
-    public void excluirAnexosMEV(Solicitation solicitation) {
-//        if (SolicitationFormType.MEV.getContent().equals(solicitation.getSolicitationType().getContent())) {
-//            LinkedHashMap form = (LinkedHashMap) solicitation.getForm();
-//            List<LinkedHashMap> amostras = (List<LinkedHashMap>) form.get("amostras");
-//            if (amostras != null && !amostras.isEmpty()) {
-//                for (LinkedHashMap node : amostras) {
-//                    List<LinkedHashMap> modeloMicroscopia = (List<LinkedHashMap>) node.get("modeloMicroscopia");
-//                    if (modeloMicroscopia != null && !modeloMicroscopia.isEmpty()) {
-//                        for (LinkedHashMap attachmentHash : modeloMicroscopia) {
-//                            Attachment attachment = modelMapper.map(attachmentHash, Attachment.class);
-//                            SolicitationAmostraAttachment bind = solicitationAttachmentRepository.findByAttachment_Id(attachment.getId());
-//                            if (ObjectUtils.isNotEmpty(bind)) {
-//                                entityManager.remove(bind);
-//                            }
-//                            entityManager.remove(attachment);
-//                        }
-//                    }
-//                }
-//            }
-//        }
     }
 
     @Override
@@ -204,5 +147,32 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
             default:
                 return solicitationRepository.findAllByCreatedByOrResponsavel(user, user);
         }
+    }
+
+    public Long salvarAnalise(SolicitationAmostra amostra) throws Exception {
+        User user = userService.findSelfUser();
+        if (!Objects.equals(user.getRole(), Type.ROLE_ADMIN)) {
+            throw new GenericException("Você não pode fazer isso!");
+        }
+        try {
+            solicitationAmostraRepository.saveAndFlush(amostra);
+            return amostra.getForm().getSolicitation().getId();
+        } catch (Exception e) {
+            String message = e.getMessage();
+            final String genericException = "GenericException{";
+            if (message.contains(genericException)) {
+                message = message.substring(message.indexOf(genericException) + genericException.length());
+                message = message.substring(0, message.indexOf("}"));
+                throw new GenericException(message);
+            }
+
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public Long atualizarConclusao(SolicitationAmostra amostra) throws Exception {
+        amostra.setConcluida(!amostra.getConcluida());
+        return this.salvarAnalise(amostra);
     }
 }

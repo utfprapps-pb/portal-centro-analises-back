@@ -41,7 +41,6 @@ public class Solicitation extends IModelCrud {
     @ManyToOne
     @NotNull(message = "Form must not be null")
     @JoinColumn(name = "form_id", updatable = false)
-    @JsonIgnoreProperties(value = "solicitation", allowSetters = true)
     private SolicitationForm form;
 
     @Enumerated(value = EnumType.STRING)

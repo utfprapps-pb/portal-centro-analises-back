@@ -62,8 +62,6 @@ public class User implements GenericModel, UserDetails {
     @Column(name = "email_verified")
     private Boolean emailVerified;
 
-    private BigDecimal balance;
-
     @Size(min = 6, max = 254)
     @Column(name = "ra_siape")
     private String raSiape;

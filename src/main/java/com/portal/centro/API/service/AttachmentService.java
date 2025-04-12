@@ -5,6 +5,7 @@ import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.minio.service.impl.MinioServiceImpl;
 import com.portal.centro.API.model.Attachment;
 import com.portal.centro.API.model.ObjectReturn;
+import com.portal.centro.API.repository.AttachmentRepository;
 import io.minio.StatObjectResponse;
 import org.springframework.stereotype.Service;
 
@@ -13,8 +14,8 @@ public class AttachmentService extends GenericService<Attachment, Long> {
 
     private final MinioServiceImpl minioService;
 
-    public AttachmentService(GenericRepository<Attachment, Long> genericRepository, MinioServiceImpl minioService) {
-        super(genericRepository);
+    public AttachmentService(AttachmentRepository attachmentRepository, MinioServiceImpl minioService) {
+        super(attachmentRepository);
         this.minioService = minioService;
     }
 

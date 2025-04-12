@@ -1,9 +1,11 @@
 package com.portal.centro.API.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.portal.centro.API.enums.*;
 import com.portal.centro.API.generic.base.IModel;
 import com.portal.centro.API.generic.base.IModelCrud;
+import com.portal.centro.API.generic.serialization.OnlyIdSerializer;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,10 +21,10 @@ import java.util.List;
 @Entity(name = "tb_solicitation_form")
 public class SolicitationForm extends IModel {
 
-//    @ManyToOne
-//    @JoinColumn(name = "solicitation_id")
-//    @JsonIgnoreProperties(value = "form", allowSetters = true)
-//    private SolicitationForm solicitation;
+    @ManyToOne
+    @JoinColumn(name = "solicitation_id")
+    @JsonIgnoreProperties(value = "form", allowSetters = true)
+    private Solicitation solicitation;
 
     @Enumerated
     @Column(name = "retirada")
@@ -33,7 +35,7 @@ public class SolicitationForm extends IModel {
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "form_id")
-    @JsonIgnoreProperties(value = "form", allowSetters = true)
+    @OrderColumn(name = "index")
     private List<SolicitationAmostra> amostras = new ArrayList<>();
 
     // AA

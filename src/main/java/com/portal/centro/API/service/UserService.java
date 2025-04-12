@@ -186,22 +186,4 @@ public class UserService extends GenericService<User, Long> {
         return userRepository.findAllByEmailContainingIgnoreCase(domain);
     }
 
-    public UserBalance updateBalance(Long userId, TransactionType transactionType, BigDecimal value) throws Exception {
-        User user = findOneById(userId);
-        if (Objects.isNull(user))
-            throwExceptionUserNotFound();
-        BigDecimal balance = Objects.nonNull(user.getBalance()) ? user.getBalance() : BigDecimal.ZERO;
-        UserBalance userBalance = new UserBalance();
-        userBalance.setOld(balance);
-        switch (transactionType) {
-            case DEPOSIT -> balance = balance.add(value);
-            case WITHDRAW -> balance = balance.subtract(value);
-        }
-        userBalance.setCurrent(balance);
-        user.setBalance(balance);
-        userRepository.save(user);
-        return userBalance;
-    }
-
-
 }
