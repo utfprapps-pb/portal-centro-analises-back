@@ -6,6 +6,8 @@ import com.portal.centro.API.exceptions.ValidationException;
 import com.portal.centro.API.model.ApiError;
 import jakarta.servlet.http.HttpServletRequest;
 import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -15,13 +17,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @RestControllerAdvice
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class GlobalExceptionHandlerAdvice {
 
     @ExceptionHandler({MethodArgumentNotValidException.class})
@@ -92,10 +94,11 @@ public class GlobalExceptionHandlerAdvice {
                     value = matcher.group(2);
                 }
                 if (key != null && value != null) {
-                    final String[] everUppercaseKey = new String[]{"cpf", "cnpj"};
-                    final String auxKey = key;
-                    if (Arrays.stream(everUppercaseKey).anyMatch(it -> it.equalsIgnoreCase(auxKey))) {
-                        key = key.toUpperCase();
+                    switch (key.toLowerCase()) {
+                        case "cpf_cnpj" -> key = "CPF/CNPJ";
+                        case "cpf" -> key = "CPF";
+                        case "cnpj" -> key = "CNPJ";
+                        default -> key = "GlobalExceptionHandlerAdvice: 99 - KEY NAO MAPEADA";
                     }
                     GenericException aux = new GenericException(key + " já utilizado(a) por outro registro!");
                     return new ApiError(aux, request.getServletPath());

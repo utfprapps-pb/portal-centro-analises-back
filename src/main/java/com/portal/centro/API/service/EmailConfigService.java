@@ -7,7 +7,7 @@ import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.model.EmailConfig;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.EmailConfigRepository;
-import com.portal.centro.API.security.auth.AuthService;
+import com.portal.centro.API.security.AuthService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -27,7 +27,6 @@ public class EmailConfigService extends GenericService<EmailConfig, Long> {
     }
 
     public EmailConfig find() throws Exception {
-        this.validateIfExistsEmailConfig();
         List<EmailConfig> emailConfigList = emailConfigRepository.findAll();
         return emailConfigList.get(0);
     }

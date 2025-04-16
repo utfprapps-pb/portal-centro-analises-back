@@ -14,6 +14,7 @@ import com.portal.centro.API.repository.UserRepository;
 import com.portal.centro.API.responses.DefaultResponse;
 import com.portal.centro.API.utils.DateTimeUtil;
 import com.portal.centro.API.utils.UtilsService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -184,23 +185,5 @@ public class UserService extends GenericService<User, Long> {
     public List<User> findUsersByDomain(String domain) throws Exception {
         return userRepository.findAllByEmailContainingIgnoreCase(domain);
     }
-
-    public UserBalance updateBalance(Long userId, TransactionType transactionType, BigDecimal value) throws Exception {
-        User user = findOneById(userId);
-        if (Objects.isNull(user))
-            throwExceptionUserNotFound();
-        BigDecimal balance = Objects.nonNull(user.getBalance()) ? user.getBalance() : BigDecimal.ZERO;
-        UserBalance userBalance = new UserBalance();
-        userBalance.setOld(balance);
-        switch (transactionType) {
-            case DEPOSIT -> balance = balance.add(value);
-            case WITHDRAW -> balance = balance.subtract(value);
-        }
-        userBalance.setCurrent(balance);
-        user.setBalance(balance);
-        userRepository.save(user);
-        return userBalance;
-    }
-
 
 }

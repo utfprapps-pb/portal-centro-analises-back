@@ -51,21 +51,10 @@ public class UserController extends GenericController<User, Long> {
         return ResponseEntity.ok(convertEntityListToRawDto(userService.findUsersByDomain(domain)));
     }
 
-    private UserDto convertEntityToDto(User user) {
-        return modelMapper.map(user, UserDto.class);
-    }
-
     private List<UserRawDto> convertEntityListToRawDto(List<User> users) {
         List<UserRawDto> usersDto = new ArrayList<>();
         for (User user : users)
             usersDto.add(modelMapper.map(user, UserRawDto.class));
-        return usersDto;
-    }
-
-    private List<UserDto> convertEntityListToDto(List<User> users) {
-        List<UserDto> usersDto = new ArrayList<>();
-        for (User user : users)
-            usersDto.add(convertEntityToDto(user));
         return usersDto;
     }
 

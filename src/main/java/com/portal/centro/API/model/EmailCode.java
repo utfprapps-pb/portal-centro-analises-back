@@ -30,7 +30,7 @@ public class EmailCode implements GenericModel {
     @Column(name = "validate_at")
     private LocalDateTime validateAt;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 

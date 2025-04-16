@@ -139,8 +139,6 @@ public class MinioUtil {
                 Item item = result.get();
                 listObjectNames.add(item.objectName());
             }
-        } else {
-            listObjectNames.add("Bucket does not exist");
         }
         return listObjectNames;
     }

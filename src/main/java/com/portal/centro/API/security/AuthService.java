@@ -1,4 +1,4 @@
-package com.portal.centro.API.security.auth;
+package com.portal.centro.API.security;
 
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.UserRepository;

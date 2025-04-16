@@ -3,10 +3,7 @@ package com.portal.centro.API.model;
 import com.portal.centro.API.configuration.ApplicationContextProvider;
 import com.portal.centro.API.generic.base.IModel;
 import com.portal.centro.API.minio.service.impl.MinioServiceImpl;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.PreRemove;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -32,9 +29,6 @@ public class Attachment extends IModel {
     @Column(name = "file_size")
     private Long fileSize;
 
-    @Column(name = "url", columnDefinition = "text")
-    private String url;
-
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -43,5 +37,8 @@ public class Attachment extends IModel {
 
     @Column(name = "index")
     private Long index;
+
+    @Transient
+    private String url;
 
 }

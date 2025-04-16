@@ -1,25 +1,19 @@
 package com.portal.centro.API.model;
 
-import com.portal.centro.API.configuration.ApplicationContextProvider;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.portal.centro.API.enums.SolicitationFormType;
 import com.portal.centro.API.enums.SolicitationProjectNature;
 import com.portal.centro.API.enums.SolicitationStatus;
-import com.portal.centro.API.generic.base.IModel;
+import com.portal.centro.API.generic.base.IModelCrud;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.apache.commons.lang3.ObjectUtils;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Type;
-import org.modelmapper.ModelMapper;
-import org.springframework.data.annotation.LastModifiedBy;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 @Getter
@@ -28,90 +22,71 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Entity(name = "tb_solicitation")
-public class Solicitation extends IModel {
+public class Solicitation extends IModelCrud {
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User createdBy;
+    @JoinColumn(name = "responsavel_id", updatable = false)
+    private User responsavel;
 
-    /**
-     * Quando criado por um aluno vai o professor orientador dele no momento da criação da solicitação
-     */
-    @ManyToOne
-    @JoinColumn(name = "professor_id")
-    private User professor;
-
-    @LastModifiedBy
-    @ManyToOne
-    @JoinColumn(name = "user_updated_id")
-    private User updatedBy;
-
+    @Immutable
     @Enumerated
+    @Column(name = "status")
     private SolicitationStatus status;
 
     @ManyToOne
-    @JoinColumn(name = "equipment_id")
-    private Equipment equipment;
-
-    @ManyToOne
     @NotNull(message = "Project must not be null")
-    @JoinColumn(name = "project_id")
+    @JoinColumn(name = "project_id", updatable = false)
     private Project project;
 
+    @ManyToOne
     @NotNull(message = "Form must not be null")
-    @Type(JsonType.class)
-    @Column(name = "form", columnDefinition = "jsonb")
-    private Object form;
+    @JoinColumn(name = "form_id", updatable = false)
+    private SolicitationForm form;
 
     @Enumerated(value = EnumType.STRING)
     @NotNull(message = "Solicitation Type must not be null")
-    @Column(name = "solicitation_type")
+    @Column(name = "solicitation_type", updatable = false)
     private SolicitationFormType solicitationType;
 
     @Enumerated(value = EnumType.STRING)
     @NotNull(message = "Project nature must not be null")
-    @Column(name = "project_nature")
+    @Column(name = "project_nature", updatable = false)
     private SolicitationProjectNature projectNature;
 
     /**
      * Quando a solicitação vem de um projeto que não está no ENUM SolicitationProjectNature.
      */
-    @Column(name = "other_project_nature")
+    @Column(name = "other_project_nature", updatable = false)
     private String otherProjectNature;
 
     @Column(name = "schedule_date")
     private LocalDateTime scheduleDate;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private Integer amountSamples;
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+//    @OneToMany(cascade = CascadeType.ALL)
+//    @JoinColumn(name = "solicitation_id")
+//    @JsonIgnoreProperties(value = "solicitation", allowSetters = true)
+//    private List<SolicitationAttachments> solicitationAttachments; //adicionar coluna nova no banco
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "solicitation_id")
+    private List<SolicitationTermsOfUse> termsOfUses;
+
+    private String observation;
 
     private BigDecimal price;
 
     private BigDecimal amountHours;
 
-    @NotNull(message = "Parameter amountSamples is required.")
-    private Integer amountSamples;
-
     @Column(name = "total_price")
     private BigDecimal totalPrice;
-
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "technical_report_id")
-    private List<SolicitationAttachments> solicitationAttachments; //adicionar coluna nova no banco
-
-    @ManyToOne
-    @JoinColumn(name = "analysis_id")
-    private Analysis analysis;
-
-    private String observation;
 
     /**
      * Caso seja usuário externo o laboratório deverá marcar como pago para
      * liberar o relatório com o resultado da análise.
      */
+    @Column(updatable = false)
     private boolean paid;
 
 }

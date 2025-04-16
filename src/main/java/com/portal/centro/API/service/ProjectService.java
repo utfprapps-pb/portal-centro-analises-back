@@ -1,16 +1,13 @@
 package com.portal.centro.API.service;
 
 import com.portal.centro.API.enums.Type;
-import com.portal.centro.API.exceptions.ValidationException;
 import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.model.Project;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.ProjectRepository;
-import com.portal.centro.API.security.auth.AuthService;
+import com.portal.centro.API.security.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,6 +27,11 @@ public class ProjectService extends GenericService<Project, Long> {
         this.projectRepository = projectRepository;
         this.userService = userService;
         this.authService = authService;
+    }
+
+    @Override
+    public List<Project> getAll() {
+        return getAllProjects();
     }
 
     public List<Project> getAllProjects() {
@@ -65,7 +67,6 @@ public class ProjectService extends GenericService<Project, Long> {
         user.setPassword(null);
         user.setStatus(null);
         user.setEmailVerified(null);
-        user.setBalance(null);
         user.setRaSiape(null);
         user.setCpfCnpj(null);
         user.setPartner(null);
@@ -92,13 +93,4 @@ public class ProjectService extends GenericService<Project, Long> {
         return project;
     }
 
-    @Override
-    public Page<Project> page(PageRequest pageRequest) {
-        User user = userService.findSelfUser();
-        return switch (user.getRole()) {
-            case ROLE_ADMIN -> super.page(pageRequest);
-            case ROLE_PROFESSOR -> projectRepository.findAllByUserEqualsOrStudentsContains(user, user, pageRequest);
-            default -> throw new ValidationException("Você não possui permissão para acessar este recurso.");
-        };
-    }
 }

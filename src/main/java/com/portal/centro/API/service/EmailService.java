@@ -1,6 +1,7 @@
 package com.portal.centro.API.service;
 
 import com.portal.centro.API.dto.EmailDto;
+import com.portal.centro.API.exceptions.GenericException;
 import com.portal.centro.API.model.EmailConfig;
 import com.portal.centro.API.utils.EmailMessageGenerator;
 import com.portal.centro.API.utils.UtilsService;
@@ -42,10 +43,10 @@ public class EmailService {
             log.info("enviando email....");
             htmlEmail.send();
             log.info("email enviado com sucesso!");
-
         } catch (Exception e) {
             log.error("Email Service -> sendEmail(): Erro ao enviar email:" + e.getMessage());
             e.printStackTrace();
+            throw new GenericException("Erro ao enviar email");
         }
 
     }
