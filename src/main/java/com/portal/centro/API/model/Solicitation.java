@@ -71,6 +71,7 @@ public class Solicitation extends IModelCrud {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "solicitation_id")
+    @JsonIgnoreProperties(value = "solicitation", allowSetters = true)
     private List<SolicitationTermsOfUse> termsOfUses;
 
     private String observation;
