@@ -55,6 +55,7 @@ public class WebSecurity {
 
         http.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(authenticationEntryPoint));
         http.authorizeHttpRequests((authorize) -> authorize
+                .requestMatchers(antMatcher("/wss/**")).permitAll()
                 .requestMatchers(antMatcher("/ws/**")).permitAll()
 
                 .requestMatchers(antMatcher(HttpMethod.GET, "/email-confirm/**")).permitAll()
@@ -99,7 +100,7 @@ public class WebSecurity {
 
                         .requestMatchers(antMatcher("/email/config/**")).hasRole("ADMIN")
 
-                .anyRequest().denyAll()
+                .anyRequest().permitAll()
         );
         http.authenticationManager(authenticationManager)
                 .addFilter(new JWTAuthenticationFilter(authenticationManager, authService))
