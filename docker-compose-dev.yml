@@ -44,6 +44,7 @@ services:
       - "traefik.http.routers.ca-api-dev.rule=Host(`ca-api-dev.app.pb.utfpr.edu.br`)"
       - "traefik.http.routers.ca-api-dev.tls.certresolver=letsencrypt"
       - "traefik.http.routers.ca-api-dev.entrypoints=websecure"
+      - "traefik.http.services.app.loadbalancer.server.port=8810"
     restart: unless-stopped
     networks:
       - web
