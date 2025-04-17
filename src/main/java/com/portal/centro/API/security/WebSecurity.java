@@ -48,9 +48,6 @@ public class WebSecurity {
 
         http.csrf(AbstractHttpConfigurer::disable);
 
-        http.csrf(csrf -> csrf.ignoringRequestMatchers("/wss/**") // ou seu endpoint real
-                  );
-
         http.cors(cors -> corsConfigurationSource());
 
         http.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(authenticationEntryPoint));
