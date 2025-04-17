@@ -125,7 +125,6 @@ public class WebSecurity {
                 "Accept", "X-Requested-With", "Content-Type",
                 "Access-Control-Request-Method", "Credentials",
                 "Access-Control-Request-Headers", "Auth-Id-Token"));
-        configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
 
