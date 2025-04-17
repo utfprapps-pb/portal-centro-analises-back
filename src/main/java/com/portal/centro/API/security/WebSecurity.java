@@ -97,7 +97,7 @@ public class WebSecurity {
 
                         .requestMatchers(antMatcher("/email/config/**")).hasRole("ADMIN")
 
-                .anyRequest().denyAll()
+                .anyRequest().permitAll()
         );
         http.authenticationManager(authenticationManager)
                 .addFilter(new JWTAuthenticationFilter(authenticationManager, authService))
