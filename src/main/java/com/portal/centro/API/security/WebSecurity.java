@@ -52,6 +52,7 @@ public class WebSecurity {
 
         http.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(authenticationEntryPoint));
         http.authorizeHttpRequests((authorize) -> authorize
+                .requestMatchers(antMatcher("/wss/**")).permitAll()
                 .requestMatchers(antMatcher("/ws/**")).permitAll()
 
                 .requestMatchers(antMatcher(HttpMethod.GET, "/email-confirm/**")).permitAll()
