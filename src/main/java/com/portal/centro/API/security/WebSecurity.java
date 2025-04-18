@@ -54,53 +54,53 @@ public class WebSecurity {
         http.authorizeHttpRequests((authorize) -> authorize
                 .requestMatchers(antMatcher("/wss/**")).permitAll()
                 .requestMatchers(antMatcher("/ws/**")).permitAll()
-
+//
                 .requestMatchers(antMatcher(HttpMethod.GET, "/email-confirm/**")).permitAll()
                 .requestMatchers(antMatcher("/open/**")).permitAll()
+//
+//                .requestMatchers(antMatcher("/usuarios/**")).authenticated()
+//
+//                .requestMatchers(antMatcher(HttpMethod.GET, "/termos-de-uso")).authenticated()
+//                .requestMatchers(antMatcher("/termos-de-uso/**")).hasRole("ADMIN")
+//
+//                .requestMatchers(
+//                        antMatcher("/vinculos"),
+//                        antMatcher("/vinculos/**")
+//                ).authenticated()
+//
+//                .requestMatchers(antMatcher("/solicitar/save")).authenticated()
+//                .requestMatchers(antMatcher("/solicitar/**")).denyAll()
+//
+//                .requestMatchers(
+//                        antMatcher("/solicitacoes/atualizar-status")
+//                ).hasRole("PROFESSOR")
+//                .requestMatchers(
+//                        antMatcher("/solicitacoes/atualizar-status"),
+//                        antMatcher("/solicitacoes/salvar/solicitacao-amostra-analise"),
+//                        antMatcher("/solicitacoes/salvar/solicitacao-amostra-finalizar")
+//                ).hasRole("ADMIN")
+//                .requestMatchers(
+//                        antMatcher("/solicitacoes"),
+//                        antMatcher("/solicitacoes/**")
+//                ).authenticated()
+//
+//                .requestMatchers(
+//                        antMatcher("/projetos"),
+//                        antMatcher("/projetos/**")
+//                ).authenticated()
+//
+//                .requestMatchers(antMatcher("/parceiros/**")).hasRole("ADMIN")
+//                .requestMatchers(antMatcher("/minio/**")).authenticated()
+//
+//                .requestMatchers(antMatcher("/equipamentos")).authenticated()
+//                .requestMatchers(antMatcher("/equipamentos/**")).hasRole("ADMIN")
+//
+//                .requestMatchers(antMatcher("/email-config/**")).hasRole("ADMIN")
+//                .requestMatchers(antMatcher("/dominios/**")).hasRole("ADMIN")
+//
+//                .requestMatchers(antMatcher("/email/config/**")).hasRole("ADMIN")
 
-                .requestMatchers(antMatcher("/usuarios/**")).authenticated()
-
-                .requestMatchers(antMatcher(HttpMethod.GET, "/termos-de-uso")).authenticated()
-                .requestMatchers(antMatcher("/termos-de-uso/**")).hasRole("ADMIN")
-
-                .requestMatchers(
-                        antMatcher("/vinculos"),
-                        antMatcher("/vinculos/**")
-                ).authenticated()
-
-                .requestMatchers(antMatcher("/solicitar/save")).authenticated()
-                .requestMatchers(antMatcher("/solicitar/**")).denyAll()
-
-                .requestMatchers(
-                        antMatcher("/solicitacoes/atualizar-status")
-                ).hasRole("PROFESSOR")
-                .requestMatchers(
-                        antMatcher("/solicitacoes/atualizar-status"),
-                        antMatcher("/solicitacoes/salvar/solicitacao-amostra-analise"),
-                        antMatcher("/solicitacoes/salvar/solicitacao-amostra-finalizar")
-                ).hasRole("ADMIN")
-                .requestMatchers(
-                        antMatcher("/solicitacoes"),
-                        antMatcher("/solicitacoes/**")
-                ).authenticated()
-
-                .requestMatchers(
-                        antMatcher("/projetos"),
-                        antMatcher("/projetos/**")
-                ).authenticated()
-
-                .requestMatchers(antMatcher("/parceiros/**")).hasRole("ADMIN")
-                .requestMatchers(antMatcher("/minio/**")).authenticated()
-
-                .requestMatchers(antMatcher("/equipamentos")).authenticated()
-                .requestMatchers(antMatcher("/equipamentos/**")).hasRole("ADMIN")
-
-                .requestMatchers(antMatcher("/email-config/**")).hasRole("ADMIN")
-                .requestMatchers(antMatcher("/dominios/**")).hasRole("ADMIN")
-
-                .requestMatchers(antMatcher("/email/config/**")).hasRole("ADMIN")
-
-                .anyRequest().permitAll()
+                .anyRequest().authenticated()
         );
         http.authenticationManager(authenticationManager)
                 .addFilter(new JWTAuthenticationFilter(authenticationManager, authService))
