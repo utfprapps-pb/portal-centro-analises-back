@@ -116,16 +116,18 @@ public class WebSecurity {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("*"));
+//        configuration.setAllowedOrigins(List.of("*"));
 //                configuration.setAllowedOrigins(List.of("http://127.0.0.1:5173"));
 //                configuration..setAllowedOrigins(List.of("http://localhost:5173"));
-//                configuration..setAllowedOrigins(List.of("https://ca-dev.app.pb.utfpr.edu.br"));
+        configuration..setAllowedOrigins(List.of("https://ca-dev.app.pb.utfpr.edu.br"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "TRACE", "CONNECT"));
         configuration.setAllowedHeaders(List.of("Authorization", "x-xsrf-token",
                 "Access-Control-Allow-Headers", "Origin",
                 "Accept", "X-Requested-With", "Content-Type",
                 "Access-Control-Request-Method", "Credentials",
                 "Access-Control-Request-Headers", "Auth-Id-Token"));
+        configuration.setAllowCredentials(true);
+        
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
 
