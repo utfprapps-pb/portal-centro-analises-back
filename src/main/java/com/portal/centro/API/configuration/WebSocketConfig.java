@@ -16,7 +16,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // WebSocket real
         registry.addEndpoint("/api/ws")
                 .addInterceptors(new AuthHandshakeInterceptor())
-                .setAllowedOriginPatterns("http://localhost:4200", "https://ca-api-dev.app.pb.utfpr.edu.br", "https://ca-dev.app.pb.utfpr.edu.br/");
+                .setAllowedOriginPatterns("*")
+                .withSockJS();
     }
 
     @Override
