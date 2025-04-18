@@ -72,6 +72,9 @@ public class WebSecurity {
                 .requestMatchers(antMatcher("/solicitar/**")).denyAll()
 
                 .requestMatchers(
+                        antMatcher("/solicitacoes/atualizar-status")
+                ).hasRole("PROFESSOR")
+                .requestMatchers(
                         antMatcher("/solicitacoes/atualizar-status"),
                         antMatcher("/solicitacoes/salvar/solicitacao-amostra-analise"),
                         antMatcher("/solicitacoes/salvar/solicitacao-amostra-finalizar")
@@ -95,7 +98,7 @@ public class WebSecurity {
                 .requestMatchers(antMatcher("/email-config/**")).hasRole("ADMIN")
                 .requestMatchers(antMatcher("/dominios/**")).hasRole("ADMIN")
 
-                        .requestMatchers(antMatcher("/email/config/**")).hasRole("ADMIN")
+                .requestMatchers(antMatcher("/email/config/**")).hasRole("ADMIN")
 
                 .anyRequest().permitAll()
         );
