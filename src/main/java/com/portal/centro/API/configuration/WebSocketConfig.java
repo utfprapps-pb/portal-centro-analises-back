@@ -13,10 +13,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // WebSocket real
         registry.addEndpoint("/wss")
                 .addInterceptors(new AuthHandshakeInterceptor())
-                .setAllowedOriginPatterns("https://ca-dev.app.pb.utfpr.edu.br", "http://localhost:4200")
+                .setAllowedOriginPatterns("https://ca-dev.app.pb.utfpr.edu.br")
+                .withSockJS();
+
+        registry.addEndpoint("/ws")
+                .addInterceptors(new AuthHandshakeInterceptor())
+                .setAllowedOriginPatterns("http://localhost:4200")
                 .withSockJS();
     }
 

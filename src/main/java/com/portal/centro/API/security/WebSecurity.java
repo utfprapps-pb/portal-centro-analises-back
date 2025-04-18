@@ -51,7 +51,6 @@ public class WebSecurity {
 
         http.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(authenticationEntryPoint));
         http.authorizeHttpRequests((authorize) -> authorize
-                .requestMatchers(antMatcher("/api/ws/**")).permitAll()
                 .requestMatchers(antMatcher("/wss/**")).permitAll()
                 .requestMatchers(antMatcher("/ws/**")).permitAll()
 //
