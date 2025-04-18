@@ -15,8 +15,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // WebSocket real
         registry.addEndpoint("/api/ws")
-                // .addInterceptors(new AuthHandshakeInterceptor())
-                .setAllowedOriginPatterns("*")
+                .addInterceptors(new AuthHandshakeInterceptor())
+                .setAllowedOriginPatterns("https://ca-dev.app.pb.utfpr.edu.br", "http://localhost:4200")
                 .withSockJS();
     }
 
