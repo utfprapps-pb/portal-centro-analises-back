@@ -119,7 +119,7 @@ public class WebSecurity {
 //        configuration.setAllowedOrigins(List.of("*"));
 //                configuration.setAllowedOrigins(List.of("http://127.0.0.1:5173"));
 //                configuration..setAllowedOrigins(List.of("http://localhost:5173"));
-        config.setAllowedOrigins(List.of("https://ca-dev.app.pb.utfpr.edu.br/"));
+        configuration.setAllowedOrigins(List.of("https://ca-dev.app.pb.utfpr.edu.br/"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "TRACE", "CONNECT"));
         configuration.setAllowedHeaders(List.of("Authorization", "x-xsrf-token",
                 "Access-Control-Allow-Headers", "Origin",
