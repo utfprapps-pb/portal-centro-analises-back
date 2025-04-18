@@ -45,6 +45,11 @@ services:
       - "traefik.http.routers.ca-api-dev.tls.certresolver=letsencrypt"
       - "traefik.http.routers.ca-api-dev.entrypoints=websecure"
       - "traefik.http.services.ca-api-dev.loadbalancer.server.port=8810"
+      # Em labels do seu serviço:
+      - "traefik.http.routers.ca-api-dev.middlewares=websocket-headers"
+      - "traefik.http.middlewares.websocket-headers.headers.customrequestheaders.Upgrade=websocket"
+      - "traefik.http.middlewares.websocket-headers.headers.customrequestheaders.Connection=Upgrade"
+
     restart: unless-stopped
     networks:
       - web
