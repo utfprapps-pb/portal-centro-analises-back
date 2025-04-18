@@ -119,7 +119,8 @@ public class WebSecurity {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("*"));
+        configuration.setAllowedOrigins(List.of("https://ca-dev.app.pb.utfpr.edu.br/", "*"));
+//        configuration.setAllowedOrigins(List.of("*"));
 //                configuration.setAllowedOrigins(List.of("http://127.0.0.1:5173"));
 //                configuration..setAllowedOrigins(List.of("http://localhost:5173"));
 //                configuration..setAllowedOrigins(List.of("https://ca-dev.app.pb.utfpr.edu.br"));
