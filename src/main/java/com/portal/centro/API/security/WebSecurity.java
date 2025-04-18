@@ -47,7 +47,9 @@ public class WebSecurity {
         AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
 
         http.csrf(AbstractHttpConfigurer::disable);
-
+        http.csrf(csrf -> csrf
+            .ignoringRequestMatchers("/api/ws/**")
+        );
         http.cors(cors -> corsConfigurationSource());
 
         http.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(authenticationEntryPoint));
