@@ -36,6 +36,15 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain chain) throws IOException, ServletException {
+
+        String path = request.getRequestURI();
+
+        // Ignora o WebSocket e qualquer outra rota pública
+        if (path.startsWith("/api/ws") || path.startsWith("/ws") || path.startsWith("/wss")) {
+            chain.doFilter(request, response);
+            return;
+        }
+        
         String header = request.getHeader(SecurityConstants.HEADER_STRING);
         if (header == null || !header.startsWith(SecurityConstants.TOKEN_PREFIX)) {
             chain.doFilter(request, response);
