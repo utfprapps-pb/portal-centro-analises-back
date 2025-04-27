@@ -30,7 +30,6 @@ public class SolicitationAmostraAnalise extends IModel {
 
     @ManyToOne
     @JoinColumn(name = "equipment_id")
-    @JsonIgnoreProperties(value = "analise", allowSetters = true)
     private Equipment equipment;
 
 }

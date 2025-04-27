@@ -7,6 +7,7 @@ import com.portal.centro.API.exceptions.GenericException;
 import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.model.*;
 import com.portal.centro.API.repository.SolicitationAmostraAnaliseRepository;
+import com.portal.centro.API.repository.SolicitationAmostraFotoRepository;
 import com.portal.centro.API.repository.SolicitationAmostraRepository;
 import com.portal.centro.API.repository.SolicitationRepository;
 import jakarta.persistence.EntityManager;
@@ -26,6 +27,7 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
     private final SolicitationRepository solicitationRepository;
     private final SolicitationAmostraRepository solicitationAmostraRepository;
     private final SolicitationAmostraAnaliseRepository solicitationAmostraAnaliseRepository;
+    private final SolicitationAmostraFotoRepository solicitationAmostraFotoRepository;
     private final WebsocketService websocketService;
 
     @PersistenceContext
@@ -33,13 +35,16 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
 
     public SolicitationService(SolicitationRepository solicitationRepository, SolicitationHistoricService solicitationHistoricService,
                                UserService userService, SolicitationAmostraAnaliseRepository solicitationAmostraAnaliseRepository,
-                               SolicitationAmostraRepository solicitationAmostraRepository, WebsocketService websocketService) {
+                               SolicitationAmostraRepository solicitationAmostraRepository,
+                                 SolicitationAmostraFotoRepository solicitationAmostraFotoRepository,
+                               WebsocketService websocketService) {
         super(solicitationRepository);
         this.solicitationRepository = solicitationRepository;
         this.solicitationHistoricService = solicitationHistoricService;
         this.userService = userService;
         this.solicitationAmostraAnaliseRepository = solicitationAmostraAnaliseRepository;
         this.solicitationAmostraRepository = solicitationAmostraRepository;
+        this.solicitationAmostraFotoRepository = solicitationAmostraFotoRepository;
         this.websocketService = websocketService;
     }
 
@@ -175,4 +180,25 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         amostra.setConcluida(!amostra.getConcluida());
         return this.salvarAnalise(amostra);
     }
+
+//    @Override
+//    public Solicitation findOneById(Long id) {
+//        Solicitation solicitation = super.findOneById(id);
+//        if (solicitation != null) {
+//            SolicitationForm form = solicitation.getForm();
+//            if (form != null) {
+//                List<SolicitationAmostra> amostras = solicitationAmostraRepository.findAllByFormId(form.getId());
+//                for (SolicitationAmostra amostra : amostras) {
+//                    List<SolicitationAmostraAnalise> analises = solicitationAmostraAnaliseRepository.findAllByAmostraId(amostra.getId());
+//                    amostra.setAnalises(analises);
+//
+//                    List<SolicitationAmostraFoto> fotos = solicitationAmostraFotoRepository.findAllByAmostraId(amostra.getId());
+//                    amostra.setFotos(fotos);
+//                }
+//                form.setAmostras(amostras);
+//                solicitation.setForm(form);
+//            }
+//        }
+//        return solicitation;
+//    }
 }

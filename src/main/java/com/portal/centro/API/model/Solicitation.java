@@ -64,11 +64,6 @@ public class Solicitation extends IModelCrud {
 
     private Integer amountSamples;
 
-//    @OneToMany(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "solicitation_id")
-//    @JsonIgnoreProperties(value = "solicitation", allowSetters = true)
-//    private List<SolicitationAttachments> solicitationAttachments; //adicionar coluna nova no banco
-
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "solicitation_id")
     @JsonIgnoreProperties(value = "solicitation", allowSetters = true)
@@ -76,18 +71,7 @@ public class Solicitation extends IModelCrud {
 
     private String observation;
 
-    private BigDecimal price;
-
-    private BigDecimal amountHours;
-
     @Column(name = "total_price")
     private BigDecimal totalPrice;
-
-    /**
-     * Caso seja usuário externo o laboratório deverá marcar como pago para
-     * liberar o relatório com o resultado da análise.
-     */
-    @Column(updatable = false)
-    private boolean paid;
 
 }

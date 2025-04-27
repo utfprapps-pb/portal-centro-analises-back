@@ -5,18 +5,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.portal.centro.API.enums.StatusInactiveActive;
 import com.portal.centro.API.enums.Type;
 import com.portal.centro.API.enums.UserType;
+import com.portal.centro.API.generic.base.IModel;
 import com.portal.centro.API.generic.crud.GenericModel;
 import com.portal.centro.API.validations.user.UserUniqueConstraint;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,7 +31,7 @@ import java.util.List;
 })
 @UserUniqueConstraint
 @Builder
-public class User implements GenericModel, UserDetails {
+public class User extends IModel implements GenericModel, UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

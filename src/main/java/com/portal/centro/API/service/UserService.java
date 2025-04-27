@@ -4,33 +4,24 @@ import com.portal.centro.API.dto.ChangePasswordDTO;
 import com.portal.centro.API.dto.EmailDto;
 import com.portal.centro.API.dto.RecoverPasswordDTO;
 import com.portal.centro.API.enums.StatusInactiveActive;
-import com.portal.centro.API.enums.TransactionType;
 import com.portal.centro.API.enums.Type;
 import com.portal.centro.API.exceptions.GenericException;
 import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.model.*;
-import com.portal.centro.API.repository.ProjectRepository;
 import com.portal.centro.API.repository.UserRepository;
 import com.portal.centro.API.responses.DefaultResponse;
 import com.portal.centro.API.utils.DateTimeUtil;
 import com.portal.centro.API.utils.UtilsService;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Random;
-import java.util.concurrent.RecursiveTask;
-
-import static com.portal.centro.API.enums.Type.ROLE_ADMIN;
 
 @Service
 public class UserService extends GenericService<User, Long> {
@@ -41,7 +32,6 @@ public class UserService extends GenericService<User, Long> {
     private final RecoverPasswordService recoverPasswordService;
     private final EmailCodeService emailCodeService;
     private final EmailService emailService;
-    private final ProjectRepository projectRepository;
 
     @Autowired
     public UserService(
@@ -49,15 +39,13 @@ public class UserService extends GenericService<User, Long> {
             UtilsService utilsService,
             EmailCodeService emailCodeService,
             RecoverPasswordService recoverPasswordService,
-            EmailService emailService,
-            ProjectRepository projectRepository) {
+            EmailService emailService) {
         super(userRepository);
         this.userRepository = userRepository;
         this.utilsService = utilsService;
         this.emailCodeService = emailCodeService;
         this.recoverPasswordService = recoverPasswordService;
         this.emailService = emailService;
-        this.projectRepository = projectRepository;
         passwordEncoder = new BCryptPasswordEncoder();
     }
 

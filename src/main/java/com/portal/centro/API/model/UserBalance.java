@@ -1,22 +1,26 @@
 package com.portal.centro.API.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.portal.centro.API.generic.base.IModel;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.math.BigDecimal;
 
+
+@Entity(name = "tb_user_balance")
+@Table(uniqueConstraints = {
+        @UniqueConstraint(name = "set_unique_user", columnNames = "user_id")
+})
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
-public class UserBalance {
+@AllArgsConstructor
+public class UserBalance extends IModel {
 
-    public UserBalance(BigDecimal old, BigDecimal current) {
-        this.old = old;
-        this.current = current;
-    }
+    @ManyToOne
+    private User user;
 
-    private BigDecimal old;
-    private BigDecimal current;
+    private BigDecimal balance;
 
 }

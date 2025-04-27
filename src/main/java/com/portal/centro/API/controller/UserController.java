@@ -8,7 +8,9 @@ import com.portal.centro.API.exceptions.GenericException;
 import com.portal.centro.API.generic.crud.GenericController;
 import com.portal.centro.API.model.ObjectReturn;
 import com.portal.centro.API.model.User;
+import com.portal.centro.API.model.UserBalance;
 import com.portal.centro.API.responses.DefaultResponse;
+import com.portal.centro.API.service.UserBalanceService;
 import com.portal.centro.API.service.UserService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
@@ -17,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,12 +31,14 @@ public class UserController extends GenericController<User, Long> {
 
     private final UserService userService;
     private final ModelMapper modelMapper;
+    private final UserBalanceService userBalanceService;
 
     @Autowired
-    public UserController(UserService userService, ModelMapper modelMapper) {
+    public UserController(UserService userService, ModelMapper modelMapper, UserBalanceService userBalanceService) {
         super(userService);
         this.userService = userService;
         this.modelMapper = modelMapper;
+        this.userBalanceService = userBalanceService;
     }
     @PostMapping(path = "/change-password")
     public ResponseEntity<DefaultResponse> changePassword(@RequestBody @Valid ChangePasswordDTO changePasswordDTO) throws Exception {
@@ -49,6 +54,16 @@ public class UserController extends GenericController<User, Long> {
     @GetMapping(path = "/domain/{domain}")
     public ResponseEntity<List<UserRawDto>> findUsersByDomain(@PathVariable("domain") String domain) throws Exception {
         return ResponseEntity.ok(convertEntityListToRawDto(userService.findUsersByDomain(domain)));
+    }
+
+    @GetMapping(path = "/balance")
+    public ResponseEntity<BigDecimal> findBalance() throws Exception {
+        return ResponseEntity.ok(userBalanceService.getUserBalance());
+    }
+
+    @GetMapping(path = "/global-balance")
+    public ResponseEntity<List<UserBalance>> findGlobalBalance() throws Exception {
+        return ResponseEntity.ok(userBalanceService.getAll());
     }
 
     private List<UserRawDto> convertEntityListToRawDto(List<User> users) {
