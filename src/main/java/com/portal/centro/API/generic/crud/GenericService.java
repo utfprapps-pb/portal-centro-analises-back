@@ -42,7 +42,7 @@ public abstract class GenericService<T extends GenericModel, ID> {
     }
 
 
-    public T findOneById(ID id) {
+    public T findOneById(ID id) throws Exception {
         Optional<T> optional = genericRepository.findById(id);
         if (optional.isPresent()) {
             return optional.get();

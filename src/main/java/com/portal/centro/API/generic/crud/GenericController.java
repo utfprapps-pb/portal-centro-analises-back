@@ -40,7 +40,7 @@ public abstract class GenericController<T extends GenericModel, ID extends Seria
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<T> findOneById(@PathVariable ID id) {
+    public ResponseEntity<T> findOneById(@PathVariable ID id) throws Exception {
         return ResponseEntity.ok(genericService.findOneById(id));
     }
 
