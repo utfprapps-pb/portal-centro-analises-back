@@ -25,8 +25,6 @@ public class FinanceService extends GenericService<Finance, Long> {
     private final SolicitationHistoricService solicitationHistoricService;
     private final SolicitationService solicitationService;
     private final UserBalanceService userBalanceService;
-    @PersistenceContext
-    private EntityManager entityManager;
 
     public FinanceService(FinanceRepository financeRepository,
                           UserService userService,
@@ -40,7 +38,6 @@ public class FinanceService extends GenericService<Finance, Long> {
         this.solicitationHistoricService = solicitationHistoricService;
         this.solicitationService = solicitationService;
         this.userBalanceService = userBalanceService;
-        this.entityManager = entityManager;
     }
 
     private void throwIfUserNotIsAdmin() throws Exception {
@@ -62,15 +59,19 @@ public class FinanceService extends GenericService<Finance, Long> {
     @Override
     public Finance findOneById(Long id) throws Exception {
         Finance oneById = super.findOneById(id);
+
         User selfUser = userService.findSelfUser();
+        if (Objects.equals(selfUser.getRole(), Type.ROLE_ADMIN)) {
+            return oneById;
+        }
 
         if (oneById != null) {
-            if (oneById.getResponsavel() == null || !oneById.getResponsavel().getId().equals(selfUser.getId()) ||
-                    (oneById.getPagador() == null || !oneById.getPagador().getId().equals(selfUser.getId()))) {
-                this.throwIfUserNotIsAdmin();
+            if (oneById.getResponsavel() != null && oneById.getResponsavel().getId().equals(selfUser.getId()) ||
+                    (oneById.getPagador() != null && oneById.getPagador().getId().equals(selfUser.getId()))) {
+                return oneById;
             }
         }
-        return oneById;
+        throw new GenericException("Você não pode fazer isso!");
     }
 
     @Override
