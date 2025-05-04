@@ -114,7 +114,7 @@ public class SolicitationAmostra extends IModel {
     private BigDecimal taxaAquecimento;
 
     @Column(name = "intervalo_temperatura")
-    private BigDecimal intervaloTemperatura;
+    private String intervaloTemperatura;
 
     // MEV
     @Column(name = "tipo_amostra")

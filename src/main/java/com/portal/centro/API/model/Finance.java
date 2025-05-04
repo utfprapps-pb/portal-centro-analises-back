@@ -33,6 +33,9 @@ public class Finance extends IModelCrud {
     @JoinColumn(name = "pagador_id")
     private User pagador;
 
+    @Column(name = "alterar_saldo")
+    private Boolean alterarSaldo = true;
+
     @ManyToOne
     @JoinColumn(name = "solicitation_id")
     private Solicitation solicitation;

@@ -12,6 +12,7 @@ import com.portal.centro.API.repository.UserRepository;
 import com.portal.centro.API.responses.DefaultResponse;
 import com.portal.centro.API.utils.DateTimeUtil;
 import com.portal.centro.API.utils.UtilsService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,24 +34,30 @@ public class UserService extends GenericService<User, Long> {
     private final EmailCodeService emailCodeService;
     private final EmailService emailService;
 
+    private final EmailConfigService emailConfigService;
+
     @Autowired
     public UserService(
             UserRepository userRepository,
             UtilsService utilsService,
             EmailCodeService emailCodeService,
             RecoverPasswordService recoverPasswordService,
-            EmailService emailService) {
+            EmailService emailService,
+            EmailConfigService emailConfigService) {
         super(userRepository);
         this.userRepository = userRepository;
         this.utilsService = utilsService;
         this.emailCodeService = emailCodeService;
         this.recoverPasswordService = recoverPasswordService;
         this.emailService = emailService;
+        this.emailConfigService = emailConfigService;
         passwordEncoder = new BCryptPasswordEncoder();
     }
 
     @Override
+    @Transactional
     public User save(User requestBody) throws Exception {
+        emailConfigService.validateIfExistsEmailConfig();
         encryptPassword(requestBody);
         Type role = utilsService.getRoleType(requestBody.getEmail());
         requestBody.setPermissions(utilsService.getPermissionsByRole(role));
@@ -66,6 +73,7 @@ public class UserService extends GenericService<User, Long> {
 
     @Override
     public User update(User requestBody) throws Exception {
+        emailConfigService.validateIfExistsEmailConfig();
         User usuario = findOneById(requestBody.getId());
         usuario.setStatus(requestBody.getStatus());
         usuario.setType(requestBody.getType());

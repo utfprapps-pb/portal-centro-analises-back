@@ -87,8 +87,10 @@ public class SolicitationForm extends IModel {
     @Column(name = "composicao_fase_movel")
     private String composicaoFaseMovel;
 
-    @Column(name = "condicoes_gradiente")
-    private String condicoesGradiente;
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "form_id")
+    @OrderColumn(name = "index")
+    private List<SolicitationFormGradiente> grandientes = new ArrayList<>();
 
     // COR
     @Column(name = "location_med")
@@ -109,10 +111,13 @@ public class SolicitationForm extends IModel {
     private FTMIRServico servico;
 
     @Column(name = "faixa_varredura")
-    private Long faixaVarredura;
+    private String faixaVarredura;
 
     @Column(name = "resolucao")
     private Long resolucao;
+
+    @Column(name = "scans")
+    private Long scans;
 
     @Enumerated
     @Column(name = "registros_espectos")

@@ -24,6 +24,7 @@ public class WebsocketService {
 
     public void atualizarUserbalance(UserBalance balance) {
         messagingTemplate.convertAndSend("/topic/user/balance/" + balance.getUser().getId(), balance.getBalance());
+        messagingTemplate.convertAndSend("/topic/balance", balance);
     }
 
 }

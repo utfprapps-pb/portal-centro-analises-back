@@ -4,9 +4,11 @@ import com.portal.centro.API.enums.SolicitationStatus;
 import com.portal.centro.API.enums.Type;
 import com.portal.centro.API.exceptions.GenericException;
 import com.portal.centro.API.generic.crud.GenericService;
+import com.portal.centro.API.model.Solicitation;
 import com.portal.centro.API.model.SolicitationHistoric;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.SolicitationHistoricRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,11 +19,15 @@ public class SolicitationHistoricService extends GenericService<SolicitationHist
 
     private final SolicitationHistoricRepository solicitationHistoricRepository;
     private final UserService userService;
+    private final EmailService emailService;
 
-    public SolicitationHistoricService(SolicitationHistoricRepository solicitationHistoricRepository, UserService userService) {
+    public SolicitationHistoricService(SolicitationHistoricRepository solicitationHistoricRepository,
+                                       UserService userService,
+                                       EmailService emailService) {
         super(solicitationHistoricRepository);
         this.solicitationHistoricRepository = solicitationHistoricRepository;
         this.userService = userService;
+        this.emailService = emailService;
     }
 
     @Override
@@ -52,4 +58,20 @@ public class SolicitationHistoricService extends GenericService<SolicitationHist
             }
         }
     }
+
+    @Override
+    @Transactional
+    public SolicitationHistoric save(SolicitationHistoric requestBody) throws Exception {
+        Solicitation solicitation = requestBody.getSolicitation();
+        SolicitationStatus oldStatus = solicitation.getStatus();
+        SolicitationStatus newStatus = requestBody.getStatus();
+        SolicitationHistoric save = super.save(requestBody);
+        if (oldStatus != newStatus) {
+            emailService.sendUpdateSolicitationStatus(solicitation, newStatus, oldStatus, requestBody.getObservation());
+        }
+
+        return save;
+    }
+
+
 }

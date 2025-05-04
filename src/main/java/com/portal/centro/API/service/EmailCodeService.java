@@ -7,6 +7,7 @@ import com.portal.centro.API.model.User;
 import com.portal.centro.API.provider.ConfigFrontProvider;
 import com.portal.centro.API.repository.EmailCodeRepository;
 import com.portal.centro.API.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +18,6 @@ import java.time.LocalDateTime;
 public class EmailCodeService extends GenericService<EmailCode, Long> {
     private final HashingService hashingService;
     private final EmailService emailService;
-    private final ConfigFrontProvider configFrontProvider;
     private final EmailCodeRepository emailCodeRepository;
     private final UserRepository userRepository;
     private final EmailConfigService emailConfigService;
@@ -26,13 +26,16 @@ public class EmailCodeService extends GenericService<EmailCode, Long> {
     private String backBaseURL;
 
     @Autowired
-    public EmailCodeService(EmailCodeRepository emailCodeRepository, HashingService hashingService, UserRepository userRepository, EmailService emailService, ConfigFrontProvider configFrontProvider, EmailConfigService emailConfigService) {
+    public EmailCodeService(EmailCodeRepository emailCodeRepository,
+                            HashingService hashingService,
+                            UserRepository userRepository,
+                            EmailService emailService,
+                            EmailConfigService emailConfigService) {
         super(emailCodeRepository);
         this.hashingService = hashingService;
         this.emailCodeRepository = emailCodeRepository;
         this.userRepository = userRepository;
         this.emailService = emailService;
-        this.configFrontProvider = configFrontProvider;
         this.emailConfigService = emailConfigService;
     }
 
@@ -41,6 +44,7 @@ public class EmailCodeService extends GenericService<EmailCode, Long> {
         return super.save(emailCode);
     }
 
+    @Transactional
     public EmailCode createCode(User user) throws Exception {
         this.emailConfigService.validateIfExistsEmailConfig();
         LocalDateTime dateTime = LocalDateTime.now();
@@ -51,7 +55,7 @@ public class EmailCodeService extends GenericService<EmailCode, Long> {
         //ENVIO DE EMAIL
         EmailDto emailDto = new EmailDto();
         emailDto.setEmailTo(user.getEmail());
-        emailDto.setSubject("Confirmação de email - LAB CA");
+        emailDto.setSubject("Confirmação de email");
         emailDto.setSubjectBody("Codigo para confirmação");
         String link = backBaseURL + "/email-confirm/" + hashKey;
 
