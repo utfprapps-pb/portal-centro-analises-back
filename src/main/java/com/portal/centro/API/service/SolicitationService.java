@@ -26,25 +26,23 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
     private final UserService userService;
     private final SolicitationRepository solicitationRepository;
     private final SolicitationAmostraRepository solicitationAmostraRepository;
-    private final SolicitationAmostraAnaliseRepository solicitationAmostraAnaliseRepository;
-    private final SolicitationAmostraFotoRepository solicitationAmostraFotoRepository;
+    private final EmailService emailService;
     private final WebsocketService websocketService;
 
     @PersistenceContext
     private EntityManager entityManager;
 
     public SolicitationService(SolicitationRepository solicitationRepository, SolicitationHistoricService solicitationHistoricService,
-                               UserService userService, SolicitationAmostraAnaliseRepository solicitationAmostraAnaliseRepository,
+                               UserService userService,
                                SolicitationAmostraRepository solicitationAmostraRepository,
-                                 SolicitationAmostraFotoRepository solicitationAmostraFotoRepository,
+                               EmailService emailService,
                                WebsocketService websocketService) {
         super(solicitationRepository);
         this.solicitationRepository = solicitationRepository;
         this.solicitationHistoricService = solicitationHistoricService;
         this.userService = userService;
-        this.solicitationAmostraAnaliseRepository = solicitationAmostraAnaliseRepository;
         this.solicitationAmostraRepository = solicitationAmostraRepository;
-        this.solicitationAmostraFotoRepository = solicitationAmostraFotoRepository;
+        this.emailService = emailService;
         this.websocketService = websocketService;
     }
 
@@ -64,6 +62,7 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
             solicitationHistoric.setStatus(SolicitationStatus.AWAITING_LAB_CONFIRMATION);
         } else {
             solicitationHistoric.setStatus(SolicitationStatus.AWAITING_RESPONSIBLE_CONFIRMATION);
+            emailService.sendEmailProjectResponsible(solicitation);
         }
         solicitationHistoricService.save(solicitationHistoric);
         solicitation.setStatus(solicitationHistoric.getStatus());
@@ -83,7 +82,7 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         return solicitation;
     }
 
-    @Transactional(value = Transactional.TxType.REQUIRES_NEW)
+    @Transactional()
     protected void completeSolicitation(Solicitation solicitation) throws Exception {
         User loggedUser = userService.findSelfUser();
         // Verifica se a Natureza do projeto é outra, se sim, verifica se o campo de outra natureza foi preenchido.
@@ -132,6 +131,10 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         } else {
             genericRepository.saveAndFlush(solicitation);
 
+        }
+
+        if (SolicitationStatus.AWAITING_RESPONSIBLE_CONFIRMATION.equals(solicitation.getStatus())) {
+            emailService.sendEmailProjectResponsible(solicitation);
         }
 
         solicitationHistoricService.save(solicitationHistoric);

@@ -102,4 +102,23 @@ public class EmailService {
             this.sendEmail(emailDto);
         }
     }
+
+    @Transactional
+    public void sendEmailProjectResponsible(Solicitation solicitation) throws Exception {
+        this.emailConfigService.validateIfExistsEmailConfig();
+
+        EmailDto emailDto = new EmailDto();
+        emailDto.setEmailTo(solicitation.getResponsavel().getEmail());
+
+        emailDto.setSubject("Solicitação de autorização de formulário");
+        String contentBody = this.emailMessageGenerator.generateHTML(
+                emailDto.getSubject(),
+                "Solicitação <strong>Código " + solicitation.getId() + "</strong><br>" +
+                        "Solicitação " + solicitation.getId() + " está aguardando sua autorização para avançar."
+                , null);
+
+        emailDto.setContentBody(contentBody);
+
+        this.sendEmail(emailDto);
+    }
 }
