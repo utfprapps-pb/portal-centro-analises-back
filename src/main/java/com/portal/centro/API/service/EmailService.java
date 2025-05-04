@@ -1,11 +1,13 @@
 package com.portal.centro.API.service;
 
+import com.portal.centro.API.configuration.ApplicationContextProvider;
 import com.portal.centro.API.dto.EmailDto;
 import com.portal.centro.API.enums.SolicitationStatus;
 import com.portal.centro.API.enums.Type;
 import com.portal.centro.API.exceptions.GenericException;
 import com.portal.centro.API.model.EmailConfig;
 import com.portal.centro.API.model.Solicitation;
+import com.portal.centro.API.model.User;
 import com.portal.centro.API.utils.EmailMessageGenerator;
 import com.portal.centro.API.utils.UtilsService;
 import jakarta.transaction.Transactional;
@@ -106,13 +108,14 @@ public class EmailService {
     @Transactional
     public void sendEmailProjectResponsible(Solicitation solicitation) throws Exception {
         this.emailConfigService.validateIfExistsEmailConfig();
+        UserService userService = ApplicationContextProvider.getBean(UserService.class);
+        User responsavel = userService.findOneById(solicitation.getResponsavel().getId());
 
         EmailDto emailDto = new EmailDto();
-        emailDto.setEmailTo(solicitation.getResponsavel().getEmail());
-
+        emailDto.setEmailTo(responsavel.getEmail());
         emailDto.setSubject("Solicitação de autorização de formulário");
         String contentBody = this.emailMessageGenerator.generateHTML(
-                emailDto.getSubject(),
+                "Solicitação de autorização de formulário",
                 "Solicitação <strong>Código " + solicitation.getId() + "</strong><br>" +
                         "Solicitação " + solicitation.getId() + " está aguardando sua autorização para avançar."
                 , null);
