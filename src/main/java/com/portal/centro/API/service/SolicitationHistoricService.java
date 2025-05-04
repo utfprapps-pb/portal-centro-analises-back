@@ -8,7 +8,7 @@ import com.portal.centro.API.model.Solicitation;
 import com.portal.centro.API.model.SolicitationHistoric;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.SolicitationHistoricRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

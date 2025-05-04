@@ -7,7 +7,7 @@ import com.portal.centro.API.model.User;
 import com.portal.centro.API.provider.ConfigFrontProvider;
 import com.portal.centro.API.repository.EmailCodeRepository;
 import com.portal.centro.API.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;

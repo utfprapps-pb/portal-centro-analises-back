@@ -12,7 +12,7 @@ import com.portal.centro.API.repository.SolicitationAmostraRepository;
 import com.portal.centro.API.repository.SolicitationRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 
@@ -126,11 +126,16 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
                     entityManager.persist(amostra);
                 }
             }
+            if (ObjectUtils.isNotEmpty(form.getGrandientes())) {
+                for (SolicitationFormGradiente grandiente : form.getGrandientes()) {
+                    grandiente.setForm(form);
+                    entityManager.persist(grandiente);
+                }
+            }
             entityManager.persist(solicitation);
             genericRepository.saveAndFlush(solicitation);
         } else {
             genericRepository.saveAndFlush(solicitation);
-
         }
 
         if (SolicitationStatus.AWAITING_RESPONSIBLE_CONFIRMATION.equals(solicitation.getStatus())) {

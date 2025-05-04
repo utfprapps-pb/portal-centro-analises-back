@@ -8,9 +8,9 @@ import com.portal.centro.API.exceptions.GenericException;
 import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.model.*;
 import com.portal.centro.API.repository.FinanceRepository;
-import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -77,7 +77,7 @@ public class FinanceService extends GenericService<Finance, Long> {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRES_NEW)
+    @Transactional
     public Finance save(Finance requestBody) throws Exception {
         this.throwIfUserNotIsAdmin();
         Finance finance = super.save(requestBody);
@@ -117,7 +117,7 @@ public class FinanceService extends GenericService<Finance, Long> {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRES_NEW)
+    @Transactional
     public Finance update(Finance requestBody) throws Exception {
         this.throwIfUserNotIsAdmin();
         Finance oldFinance = this.findOneById(requestBody.getId());
@@ -154,7 +154,7 @@ public class FinanceService extends GenericService<Finance, Long> {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRES_NEW)
+    @Transactional
     public ObjectReturn deleteById(Long aLong) throws Exception {
         this.throwIfUserNotIsAdmin();
         final Finance finance = this.findOneById(aLong);

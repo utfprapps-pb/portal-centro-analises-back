@@ -9,7 +9,7 @@ import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.model.*;
 import com.portal.centro.API.repository.FinanceRepository;
 import com.portal.centro.API.repository.FinanceTransactionRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 

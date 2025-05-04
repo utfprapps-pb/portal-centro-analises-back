@@ -10,7 +10,7 @@ import com.portal.centro.API.model.Solicitation;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.utils.EmailMessageGenerator;
 import com.portal.centro.API.utils.UtilsService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;

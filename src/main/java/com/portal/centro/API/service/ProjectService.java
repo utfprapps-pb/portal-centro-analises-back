@@ -6,9 +6,12 @@ import com.portal.centro.API.model.Project;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.ProjectRepository;
 import com.portal.centro.API.security.AuthService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -20,6 +23,10 @@ public class ProjectService extends GenericService<Project, Long> {
     private final UserService userService;
     private final ProjectRepository projectRepository;
     private final AuthService authService;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
 
     public ProjectService(UserService userService, ProjectRepository projectRepository, AuthService authService) {
         super(projectRepository);
@@ -34,6 +41,7 @@ public class ProjectService extends GenericService<Project, Long> {
         return getAllProjects();
     }
 
+    @Transactional(readOnly = true)
     public List<Project> getAllProjects() {
         User user = userService.findSelfUser();
         List<Project> projects;
@@ -63,6 +71,7 @@ public class ProjectService extends GenericService<Project, Long> {
     }
 
     private void cleanUserInformations(User user) {
+        entityManager.detach(user);
         user.setType(null);
         user.setPassword(null);
         user.setStatus(null);
