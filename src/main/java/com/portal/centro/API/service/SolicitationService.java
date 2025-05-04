@@ -126,12 +126,6 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
                     entityManager.persist(amostra);
                 }
             }
-            if (ObjectUtils.isNotEmpty(form.getGrandientes())) {
-                for (SolicitationFormGradiente grandiente : form.getGrandientes()) {
-                    grandiente.setForm(form);
-                    entityManager.persist(grandiente);
-                }
-            }
             entityManager.persist(solicitation);
             genericRepository.saveAndFlush(solicitation);
         } else {

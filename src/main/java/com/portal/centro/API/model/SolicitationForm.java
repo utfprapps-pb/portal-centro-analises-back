@@ -1,11 +1,8 @@
 package com.portal.centro.API.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.portal.centro.API.enums.*;
 import com.portal.centro.API.generic.base.IModel;
-import com.portal.centro.API.generic.base.IModelCrud;
-import com.portal.centro.API.generic.serialization.OnlyIdSerializer;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -90,7 +87,7 @@ public class SolicitationForm extends IModel {
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "form_id")
     @OrderColumn(name = "index")
-    private List<SolicitationFormGradiente> grandientes = new ArrayList<>();
+    private List<SolicitationFormGradiente> gradientes = new ArrayList<>();
 
     // COR
     @Column(name = "location_med")

@@ -1,11 +1,9 @@
 package com.portal.centro.API.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.portal.centro.API.generic.base.IModel;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Immutable;
 
@@ -21,7 +19,8 @@ public class SolicitationFormGradiente extends IModel {
 
     @ManyToOne
     @JoinColumn(name = "form_id")
-    @JsonIgnoreProperties(value = "grandientes")
+    @JsonIgnoreProperties(value = {"gradientes", "amostras"}, allowSetters = true)
+    @JsonIdentityReference(alwaysAsId = true)
     private SolicitationForm form;
 
     @Immutable

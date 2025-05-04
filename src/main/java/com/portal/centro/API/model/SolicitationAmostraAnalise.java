@@ -1,5 +1,6 @@
 package com.portal.centro.API.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.portal.centro.API.generic.base.IModel;
 import jakarta.persistence.*;
