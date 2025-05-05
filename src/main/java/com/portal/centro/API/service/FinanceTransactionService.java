@@ -14,9 +14,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class FinanceTransactionService extends GenericService<FinanceTransaction, Long> {
@@ -67,8 +65,13 @@ public class FinanceTransactionService extends GenericService<FinanceTransaction
         UserBalance userBalance = userBalanceService.findByUser(user);
         BigDecimal balance = financeTransactionRepository.getUserBalance(user);
         userBalance.setBalance(balance);
+        if (balance.compareTo(userBalance.getNegativeLimit().multiply(new BigDecimal(-1))) < 0) {
+            throw new GenericException(
+                    "Novo saldo ultrapassa o limite do usuário!\n" +
+                    "Novo saldo: " + userBalance.getBalance() + "\n" +
+                    "O limite negativo é: " + userBalance.getNegativeLimit());
+        }
         userBalanceService.save(userBalance);
-
         WebsocketService websocketService = ApplicationContextProvider.getBean(WebsocketService.class);
         websocketService.atualizarUserbalance(userBalance);
     }

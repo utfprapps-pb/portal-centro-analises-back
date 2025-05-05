@@ -1,5 +1,6 @@
 package com.portal.centro.API.service;
 
+import com.portal.centro.API.configuration.ApplicationContextProvider;
 import com.portal.centro.API.dto.ChangePasswordDTO;
 import com.portal.centro.API.dto.EmailDto;
 import com.portal.centro.API.dto.RecoverPasswordDTO;
@@ -33,7 +34,6 @@ public class UserService extends GenericService<User, Long> {
     private final RecoverPasswordService recoverPasswordService;
     private final EmailCodeService emailCodeService;
     private final EmailService emailService;
-
     private final EmailConfigService emailConfigService;
 
     @Autowired
@@ -72,6 +72,7 @@ public class UserService extends GenericService<User, Long> {
     }
 
     @Override
+    @Transactional
     public User update(User requestBody) throws Exception {
         emailConfigService.validateIfExistsEmailConfig();
         User usuario = findOneById(requestBody.getId());
@@ -83,7 +84,26 @@ public class UserService extends GenericService<User, Long> {
         usuario.setName(requestBody.getName());
         usuario.setRaSiape(requestBody.getRaSiape());
         this.validate(usuario);
+
+        User selfUser = findSelfUser();
+        if (Objects.equals(selfUser.getRole(), Type.ROLE_ADMIN)) {
+            if (requestBody.getBalance() != null) {
+                UserBalanceService balanceService = ApplicationContextProvider.getBean(UserBalanceService.class);
+                UserBalance balance = balanceService.findByUser(usuario);
+                balance.setNegativeLimit(requestBody.getBalance());
+                balanceService.update(balance);
+            }
+        }
         return super.update(usuario);
+    }
+
+    @Override
+    @Transactional
+    public User findOneById(Long aLong) throws Exception {
+        User user = super.findOneById(aLong);
+        UserBalance balance = ApplicationContextProvider.getBean(UserBalanceService.class).findByUser(user);
+        user.setBalance(balance.getNegativeLimit());
+        return user;
     }
 
     private void validate(User user) throws Exception {

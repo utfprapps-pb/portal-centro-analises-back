@@ -23,4 +23,7 @@ public class UserBalance extends IModel {
 
     private BigDecimal balance;
 
+    @Column(name = "negative_limit")
+    private BigDecimal negativeLimit;
+
 }
