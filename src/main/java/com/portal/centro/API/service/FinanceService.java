@@ -186,4 +186,5 @@ public class FinanceService extends GenericService<Finance, Long> {
         UserBalance userBalance = userBalanceService.findByUser(user);
         websocketService.atualizarUserbalance(userBalance);
     }
+
 }

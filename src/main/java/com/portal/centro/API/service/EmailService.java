@@ -53,7 +53,7 @@ public class EmailService {
             htmlEmail.setHtmlMsg(emailMessageGenerator.generateHTML(emailTo.getSubjectBody(), emailTo.getContentBody(), ""));
 
             log.info("Enviando email....");
-            htmlEmail.send();
+//            htmlEmail.send();
             log.info("E-mail enviado com sucesso!");
         } catch (Exception e) {
             log.error("E-mail Service -> sendEmail(): Erro ao enviar email:" + e.getMessage());

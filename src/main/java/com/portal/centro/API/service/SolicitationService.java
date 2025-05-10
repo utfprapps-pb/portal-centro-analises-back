@@ -7,14 +7,13 @@ import com.portal.centro.API.exceptions.GenericException;
 import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.model.*;
 import com.portal.centro.API.repository.SolicitationAmostraAnaliseRepository;
-import com.portal.centro.API.repository.SolicitationAmostraFotoRepository;
 import com.portal.centro.API.repository.SolicitationAmostraRepository;
 import com.portal.centro.API.repository.SolicitationRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.springframework.transaction.annotation.Transactional;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -28,6 +27,7 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
     private final SolicitationAmostraRepository solicitationAmostraRepository;
     private final EmailService emailService;
     private final WebsocketService websocketService;
+    private final SolicitationAmostraAnaliseRepository solicitationAmostraAnaliseRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -36,7 +36,8 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
                                UserService userService,
                                SolicitationAmostraRepository solicitationAmostraRepository,
                                EmailService emailService,
-                               WebsocketService websocketService) {
+                               WebsocketService websocketService,
+                               SolicitationAmostraAnaliseRepository solicitationAmostraAnaliseRepository) {
         super(solicitationRepository);
         this.solicitationRepository = solicitationRepository;
         this.solicitationHistoricService = solicitationHistoricService;
@@ -44,6 +45,7 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         this.solicitationAmostraRepository = solicitationAmostraRepository;
         this.emailService = emailService;
         this.websocketService = websocketService;
+        this.solicitationAmostraAnaliseRepository = solicitationAmostraAnaliseRepository;
     }
 
     @Override
@@ -181,6 +183,10 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
     public Long atualizarConclusao(SolicitationAmostra amostra) throws Exception {
         amostra.setConcluida(!amostra.getConcluida());
         return this.salvarAnalise(amostra);
+    }
+
+    public List<SolicitationAmostraAnalise> findAllAnaliseByEquipment(Equipment equipment) throws Exception {
+        return solicitationAmostraAnaliseRepository.findAllByEquipment(equipment);
     }
 
 //    @Override

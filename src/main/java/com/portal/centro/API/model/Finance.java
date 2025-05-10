@@ -1,6 +1,5 @@
 package com.portal.centro.API.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.portal.centro.API.enums.FinanceState;
 import com.portal.centro.API.generic.base.IModelCrud;
 import jakarta.persistence.*;

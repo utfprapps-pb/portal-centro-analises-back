@@ -40,6 +40,7 @@ public class UserController extends GenericController<User, Long> {
         this.modelMapper = modelMapper;
         this.userBalanceService = userBalanceService;
     }
+
     @PostMapping(path = "/change-password")
     public ResponseEntity<DefaultResponse> changePassword(@RequestBody @Valid ChangePasswordDTO changePasswordDTO) throws Exception {
         DefaultResponse defaultResponse = userService.changePassword(changePasswordDTO);
