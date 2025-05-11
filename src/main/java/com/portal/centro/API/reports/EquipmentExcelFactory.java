@@ -22,7 +22,6 @@ public class EquipmentExcelFactory {
     private final EquipmentService equipmentService;
     private final SolicitationService solicitationService;
 
-
     public EquipmentExcelFactory(ExcelFactory excelFactory,
                                  EquipmentService equipmentService,
                                  SolicitationService solicitationService
@@ -84,8 +83,8 @@ public class EquipmentExcelFactory {
         List<ExcelFactoryRow> rows = new ArrayList<>();
 
         ExcelFactoryRow header = new ExcelFactoryRow()
-                .addCell(new ExcelFactoryCell("Código", true))
-                .addCell(new ExcelFactoryCell("Nome", true))
+                .addCell(new ExcelFactoryCell("Código do Equipamento", true))
+                .addCell(new ExcelFactoryCell("Nome do Equipamento", true))
                 .addCell(new ExcelFactoryCell("Data Inicio", true))
                 .addCell(new ExcelFactoryCell("Data Termino", true))
                 .addCell(new ExcelFactoryCell("Tempo de Operação", true));

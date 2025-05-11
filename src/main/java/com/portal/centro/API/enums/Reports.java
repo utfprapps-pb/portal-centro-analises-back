@@ -7,7 +7,8 @@ import lombok.Getter;
 public enum Reports {
 
     _1(1L, ReportContants.FINANCEIROS, "Financeiro"),
-    _2(2L, ReportContants.EQUIPAMENTOS, "Equipamentos");
+    _2(2L, ReportContants.EQUIPAMENTOS, "Equipamentos"),
+    _3(3L, ReportContants.SOLICITACOES, "Solicitações");
 
     private final Long id;
     private final String menu;

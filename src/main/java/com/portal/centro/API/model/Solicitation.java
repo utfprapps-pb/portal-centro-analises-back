@@ -53,14 +53,8 @@ public class Solicitation extends IModelCrud {
     @Column(name = "project_nature", updatable = false)
     private SolicitationProjectNature projectNature;
 
-    /**
-     * Quando a solicitação vem de um projeto que não está no ENUM SolicitationProjectNature.
-     */
     @Column(name = "other_project_nature", updatable = false)
     private String otherProjectNature;
-
-    @Column(name = "schedule_date")
-    private LocalDateTime scheduleDate;
 
     private Integer amountSamples;
 
@@ -70,8 +64,5 @@ public class Solicitation extends IModelCrud {
     private List<SolicitationTermsOfUse> termsOfUses;
 
     private String observation;
-
-    @Column(name = "total_price")
-    private BigDecimal totalPrice;
 
 }

@@ -1,7 +1,9 @@
 package com.portal.centro.API.reports.excelFactory;
 
 import com.portal.centro.API.exceptions.GenericException;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.stereotype.Service;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,24 +114,28 @@ public class ExcelFactory {
     }
 
     private void setValueToCell(ExcelFactoryCell customCell) throws Exception {
-        // Adiciona o valor
         XSSFCell cell = customCell.getCell();
         if (customCell.getValue() != null) {
             if (customCell.getValue() instanceof Long) {
                 cell.setCellValue((Long) customCell.getValue());
+            } else if (customCell.getValue() instanceof Integer) {
+                cell.setCellValue((Integer) customCell.getValue());
             } else if (customCell.getValue() instanceof String) {
                 cell.setCellValue((String) customCell.getValue());
             } else if (customCell.getValue() instanceof BigDecimal) {
                 cell.setCellValue(((BigDecimal) customCell.getValue()).doubleValue());
             } else if (customCell.getValue() instanceof LocalDateTime) {
                 cell.setCellValue((LocalDateTime) customCell.getValue());
+            } else if (customCell.getValue() instanceof Date) {
+                cell.setCellValue((Date) customCell.getValue());
             } else if (customCell.getValue() instanceof Double) {
                 cell.setCellValue((Double) customCell.getValue());
+            } else if (customCell.getValue() instanceof Boolean) {
+                cell.setCellValue((Boolean) customCell.getValue());
             } else {
                 throw new GenericException("Não identificado");
             }
         }
-
 
         cell.setCellStyle(this.getStyleRow(customCell));
     }
@@ -138,28 +145,15 @@ public class ExcelFactory {
     }
 
     private XSSFCellStyle getStyleRow(ExcelFactoryCell cell) {
-        return this.getStyleRow(cell, (short) 11, cell.getBold(), cell.getDataFormat(), cell.getAlignment(), cell.getFontColor(), cell.getForegroundColor(), cell.getVerticalAlignment(),
-                cell.getBorderTop(), cell.getBorderTopColor(), cell.getBorderBottom(), cell.getBorderBottomColor(), cell.getBorderLeft(), cell.getBorderLeftColor(), cell.getBorderRight(), cell.getBorderRightColor());
+        return this.getStyleRow(cell, (short) 11, cell.getBold(), cell.getDataFormat(), cell.getAlignment(), cell.getFontColor());
     }
 
-    private XSSFCellStyle getStyleRow(ExcelFactoryCell cell, short fontSize, boolean bold, String dataFormat, HorizontalAlignment alignment, IndexedColors fontColor, IndexedColors foregroundColor, VerticalAlignment verticalAlignment,
-                                      BorderStyle borderTop, IndexedColors borderTopColor, BorderStyle borderBottom, IndexedColors borderBottomColor, BorderStyle borderLeft, IndexedColors borderLeftColor, BorderStyle borderRight, IndexedColors borderRightColor) {
+    private XSSFCellStyle getStyleRow(ExcelFactoryCell cell, short fontSize, boolean bold, String dataFormat, HorizontalAlignment alignment, IndexedColors fontColor) {
         String key = "fntsz:" + fontSize;
         key += "bl:" + bold;
         key += "alg:" + alignment;
-        key += "vrtalg:" + verticalAlignment;
         key += "dtfmt:" + dataFormat;
         key += "fntclr:" + fontColor.getIndex();
-        key += "frgclr:" + (foregroundColor != null ? foregroundColor.getIndex() : "null");
-        key += "bdtop:" + borderTop;
-        key += "bdtopclr:" + ((borderTop != null && borderTopColor != null) ? borderTopColor.getIndex() : "null");
-        key += "bdbottom:" + borderBottom;
-        key += "bdbottomclr:" + ((borderBottom != null && borderBottomColor != null) ? borderBottomColor.getIndex() : "null");
-        key += "bdleft:" + borderLeft;
-        key += "bdleftclr:" + ((borderLeft != null && borderLeftColor != null) ? borderLeftColor.getIndex() : "null");
-        key += "bdright:" + borderRight;
-        key += "bdrightclr:" + ((borderRight != null && borderRightColor != null) ? borderRightColor.getIndex() : "null");
-
 
         XSSFCellStyle ret;
         XSSFWorkbook workbook = cell.getCell().getSheet().getWorkbook();
@@ -174,34 +168,13 @@ public class ExcelFactory {
 
             ret.setFont(fonte);
             ret.setAlignment(alignment);
-            ret.setVerticalAlignment(verticalAlignment);
+            ret.setVerticalAlignment(VerticalAlignment.CENTER);
 
             if (bold) {
                 fonte.setBold(true);
             }
             if (dataFormat != null) {
                 ret.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(dataFormat));
-            }
-            if (foregroundColor != null) {
-                ret.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-                ret.setFillForegroundColor(foregroundColor.getIndex());
-            }
-            if (borderTop != null) {
-                ret.setBorderTop(borderTop);
-                ret.setTopBorderColor(borderTopColor.getIndex());
-            }
-            if (borderBottom != null) {
-                ret.setBorderBottom(borderBottom);
-                ret.setBottomBorderColor(borderBottomColor.getIndex());
-
-            }
-            if (borderLeft != null) {
-                ret.setBorderLeft(borderLeft);
-                ret.setLeftBorderColor(borderLeftColor.getIndex());
-            }
-            if (borderRight != null) {
-                ret.setBorderRight(borderRight);
-                ret.setRightBorderColor(borderRightColor.getIndex());
             }
 
             this.getStyles().put(key, ret);

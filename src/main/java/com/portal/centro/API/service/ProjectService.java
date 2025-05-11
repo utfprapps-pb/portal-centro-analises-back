@@ -84,10 +84,6 @@ public class ProjectService extends GenericService<Project, Long> {
         user.setUpdatedAt(null);
     }
 
-    /**
-     * Irá setar o usuário apenas quando vindo de um professor.
-     * Quando cadastrado pelo Lab o usuário deverá vir na requisição.
-     */
     @Override
     public Project save(Project project) throws Exception {
         User user = authService.findLoggedUser();

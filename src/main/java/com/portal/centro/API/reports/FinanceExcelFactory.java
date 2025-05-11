@@ -71,16 +71,16 @@ public class FinanceExcelFactory {
                 String responsavel = finance.getResponsavel().getId() + " - " + finance.getResponsavel().getName();
                 row.addCell(new ExcelFactoryCell().setValue(responsavel));
             } else {
-                row.addCell(new ExcelFactoryCell().setValue(null));
+                row.addCell(ReportContants.BLANK_CELL);
             }
-            row.addCell(new ExcelFactoryCell().setValue(null));
+            row.addCell(ReportContants.BLANK_CELL);
         } else {
-            row.addCell(new ExcelFactoryCell().setValue(null));
+            row.addCell(ReportContants.BLANK_CELL);
             if (finance.getPagador() != null) {
                 String responsavel = finance.getResponsavel().getId() + " - " + finance.getResponsavel().getName();
                 row.addCell(new ExcelFactoryCell().setValue(responsavel));
             } else {
-                row.addCell(new ExcelFactoryCell().setValue(null));
+                row.addCell(ReportContants.BLANK_CELL);
             }
         }
         BigDecimal valor = this.getFinanceValue(finance);
@@ -186,7 +186,7 @@ public class FinanceExcelFactory {
         int headerSize = header.getCells().size();
         ExcelFactoryRow row = new ExcelFactoryRow();
         for (int i = 0; i < headerSize - 2; i++) {
-            row.addCell(new ExcelFactoryCell());
+            row.addCell(ReportContants.BLANK_CELL);
         }
         row.addCell(new ExcelFactoryCell("Total", true).setAlignment(HorizontalAlignment.RIGHT));
         row.addCell(new ExcelFactoryCell(total, true).setAlignment(HorizontalAlignment.RIGHT));

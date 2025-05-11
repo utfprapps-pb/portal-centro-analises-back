@@ -17,4 +17,15 @@ public enum Type {
     public String getContent() {
         return content;
     }
+
+    public String toReport() {
+        return switch (content) {
+            case "ROLE_ADMIN" -> "Administrador";
+            case "ROLE_PROFESSOR" -> "Professor";
+            case "ROLE_STUDENT" -> "Aluno";
+            case "ROLE_PARTNER" -> "Parceiro";
+            case "ROLE_EXTERNAL" -> "Externo";
+            default -> "Desconhecido";
+        };
+    }
 }
