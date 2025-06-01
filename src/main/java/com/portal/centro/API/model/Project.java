@@ -1,5 +1,6 @@
 package com.portal.centro.API.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.portal.centro.API.enums.SolicitationProjectNature;
 import com.portal.centro.API.generic.base.IModel;
 import jakarta.persistence.*;
@@ -7,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -30,13 +32,9 @@ public class Project extends IModel {
     @JoinColumn(name = "user_id", updatable = false)
     private User user;
 
-    @ManyToMany
-    @JoinTable(name = "tb_project_student",
-            joinColumns = @JoinColumn(
-                    name = "project_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(
-                    name = "user_id", referencedColumnName = "id"))
-    private List<User> students;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "project_id")
+    private List<ProjectStudent> students = new ArrayList<>();
 
     @Enumerated(value = EnumType.STRING)
     @NotNull(message = "Project nature must not be null")

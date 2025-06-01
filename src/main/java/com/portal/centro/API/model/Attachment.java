@@ -1,5 +1,6 @@
 package com.portal.centro.API.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.portal.centro.API.generic.base.IModel;
 import jakarta.persistence.*;
@@ -18,7 +19,7 @@ public class Attachment extends IModel {
 
     @ManyToOne
     @JoinColumn(name = "finance_id")
-    @JsonIgnoreProperties(value = "attachments", allowSetters = true)
+    @JsonIgnore
     private Finance finance;
 
     @Column(name = "file_name")

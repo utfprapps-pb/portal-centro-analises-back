@@ -3,8 +3,10 @@ package com.portal.centro.API.service;
 import com.portal.centro.API.enums.Type;
 import com.portal.centro.API.generic.crud.GenericService;
 import com.portal.centro.API.model.Project;
+import com.portal.centro.API.model.ProjectStudent;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.repository.ProjectRepository;
+import com.portal.centro.API.repository.ProjectStudentRepository;
 import com.portal.centro.API.security.AuthService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -22,16 +24,18 @@ public class ProjectService extends GenericService<Project, Long> {
 
     private final UserService userService;
     private final ProjectRepository projectRepository;
+    private final ProjectStudentRepository projectStudentRepository;
     private final AuthService authService;
 
     @PersistenceContext
     private EntityManager entityManager;
 
 
-    public ProjectService(UserService userService, ProjectRepository projectRepository, AuthService authService) {
+    public ProjectService(UserService userService, ProjectRepository projectRepository, ProjectStudentRepository projectStudentRepository, AuthService authService) {
         super(projectRepository);
 
         this.projectRepository = projectRepository;
+        this.projectStudentRepository = projectStudentRepository;
         this.userService = userService;
         this.authService = authService;
     }
@@ -49,20 +53,14 @@ public class ProjectService extends GenericService<Project, Long> {
         if (Objects.equals(user.getRole(), Type.ROLE_ADMIN)) {
             projects = projectRepository.findAll();
         } else {
-            projects = projectRepository.findAllByUserEqualsOrStudentsContains(user, user);
+            projects = projectRepository.findAllByUserOrStudent(user);
         }
 
         for (Project project : projects) {
             this.cleanUserInformations(project.getUser());
             if (ObjectUtils.isNotEmpty(project.getStudents())) {
-                project.setStudents(
-                        project.getStudents()
-                                .stream()
-                                .filter(it -> it.getId().equals(user.getId()))
-                                .toList()
-                );
-                for (User student : project.getStudents()) {
-                    this.cleanUserInformations(student);
+                for (ProjectStudent student : project.getStudents()) {
+                    this.cleanUserInformations(student.getUser());
                 }
             }
         }
@@ -85,13 +83,32 @@ public class ProjectService extends GenericService<Project, Long> {
     }
 
     @Override
+    @Transactional
+    public Project update(Project requestBody) throws Exception {
+        projectStudentRepository.findAllByProject(requestBody)
+                .forEach(projectStudent -> {
+                    if (!requestBody.getStudents().contains(projectStudent)) {
+                        projectStudentRepository.delete(projectStudent);
+                    }
+                });
+        return super.update(requestBody);
+    }
+
+    @Override
+    @Transactional
     public Project save(Project project) throws Exception {
         User user = authService.findLoggedUser();
         if (user.getRole().equals(Type.ROLE_PROFESSOR)) {
             project.setUser(user);
         }
         try {
-            projectRepository.save(project);
+            projectRepository.saveAndFlush(project);
+//            if (ObjectUtils.isNotEmpty(project.getStudents())) {
+//                for (ProjectStudent student : project.getStudents()) {
+//                    student.setProject(project);
+//                }
+//            }
+//            projectRepository.saveAndFlush(project);
         } catch (Exception e) {
             log.error(e.getMessage());
         }

@@ -3,6 +3,7 @@ package com.portal.centro.API.service;
 import com.portal.centro.API.model.User;
 import com.portal.centro.API.model.UserBalance;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -23,7 +24,9 @@ public class WebsocketService {
     }
 
     public void atualizarUserbalance(UserBalance balance) {
-        messagingTemplate.convertAndSend("/topic/user/balance/" + balance.getUser().getId(), balance.getBalance());
+        if (balance.getUser().getEmail().equals(SecurityContextHolder.getContext().getAuthentication().getPrincipal())) {
+            messagingTemplate.convertAndSend("/topic/user/balance/" + balance.getUser().getId(), balance.getBalance());
+        }
         messagingTemplate.convertAndSend("/topic/balance", balance);
     }
 

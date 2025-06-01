@@ -18,7 +18,7 @@ public class FinanceDetails extends IModelCrud {
 
     @ManyToOne
     @JoinColumn(name = "finance_id")
-    @JsonIgnoreProperties(value = "details", allowSetters = true)
+    @JsonIgnoreProperties(value = {"attachments", "details"})
     private Finance finance;
 
     @ManyToOne
