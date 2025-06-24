@@ -11,9 +11,9 @@ import com.portal.centro.API.repository.SolicitationAmostraRepository;
 import com.portal.centro.API.repository.SolicitationRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -25,22 +25,27 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
     private final UserService userService;
     private final SolicitationRepository solicitationRepository;
     private final SolicitationAmostraRepository solicitationAmostraRepository;
-    private final SolicitationAmostraAnaliseRepository solicitationAmostraAnaliseRepository;
+    private final EmailService emailService;
     private final WebsocketService websocketService;
+    private final SolicitationAmostraAnaliseRepository solicitationAmostraAnaliseRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
 
     public SolicitationService(SolicitationRepository solicitationRepository, SolicitationHistoricService solicitationHistoricService,
-                               UserService userService, SolicitationAmostraAnaliseRepository solicitationAmostraAnaliseRepository,
-                               SolicitationAmostraRepository solicitationAmostraRepository, WebsocketService websocketService) {
+                               UserService userService,
+                               SolicitationAmostraRepository solicitationAmostraRepository,
+                               EmailService emailService,
+                               WebsocketService websocketService,
+                               SolicitationAmostraAnaliseRepository solicitationAmostraAnaliseRepository) {
         super(solicitationRepository);
         this.solicitationRepository = solicitationRepository;
         this.solicitationHistoricService = solicitationHistoricService;
         this.userService = userService;
-        this.solicitationAmostraAnaliseRepository = solicitationAmostraAnaliseRepository;
         this.solicitationAmostraRepository = solicitationAmostraRepository;
+        this.emailService = emailService;
         this.websocketService = websocketService;
+        this.solicitationAmostraAnaliseRepository = solicitationAmostraAnaliseRepository;
     }
 
     @Override
@@ -59,6 +64,7 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
             solicitationHistoric.setStatus(SolicitationStatus.AWAITING_LAB_CONFIRMATION);
         } else {
             solicitationHistoric.setStatus(SolicitationStatus.AWAITING_RESPONSIBLE_CONFIRMATION);
+            emailService.sendEmailProjectResponsible(solicitation);
         }
         solicitationHistoricService.save(solicitationHistoric);
         solicitation.setStatus(solicitationHistoric.getStatus());
@@ -78,7 +84,7 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         return solicitation;
     }
 
-    @Transactional(value = Transactional.TxType.REQUIRES_NEW)
+    @Transactional()
     protected void completeSolicitation(Solicitation solicitation) throws Exception {
         User loggedUser = userService.findSelfUser();
         // Verifica se a Natureza do projeto é outra, se sim, verifica se o campo de outra natureza foi preenchido.
@@ -126,7 +132,10 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
             genericRepository.saveAndFlush(solicitation);
         } else {
             genericRepository.saveAndFlush(solicitation);
+        }
 
+        if (SolicitationStatus.AWAITING_RESPONSIBLE_CONFIRMATION.equals(solicitation.getStatus())) {
+            emailService.sendEmailProjectResponsible(solicitation);
         }
 
         solicitationHistoricService.save(solicitationHistoric);
@@ -175,4 +184,29 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         amostra.setConcluida(!amostra.getConcluida());
         return this.salvarAnalise(amostra);
     }
+
+    public List<SolicitationAmostraAnalise> findAllAnaliseByEquipment(Equipment equipment) throws Exception {
+        return solicitationAmostraAnaliseRepository.findAllByEquipment(equipment);
+    }
+
+//    @Override
+//    public Solicitation findOneById(Long id) {
+//        Solicitation solicitation = super.findOneById(id);
+//        if (solicitation != null) {
+//            SolicitationForm form = solicitation.getForm();
+//            if (form != null) {
+//                List<SolicitationAmostra> amostras = solicitationAmostraRepository.findAllByFormId(form.getId());
+//                for (SolicitationAmostra amostra : amostras) {
+//                    List<SolicitationAmostraAnalise> analises = solicitationAmostraAnaliseRepository.findAllByAmostraId(amostra.getId());
+//                    amostra.setAnalises(analises);
+//
+//                    List<SolicitationAmostraFoto> fotos = solicitationAmostraFotoRepository.findAllByAmostraId(amostra.getId());
+//                    amostra.setFotos(fotos);
+//                }
+//                form.setAmostras(amostras);
+//                solicitation.setForm(form);
+//            }
+//        }
+//        return solicitation;
+//    }
 }

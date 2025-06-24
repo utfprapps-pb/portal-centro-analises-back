@@ -3,14 +3,15 @@ package com.portal.centro.API.enums;
 import lombok.Getter;
 
 @Getter
-public enum TransactionType {
+public enum FinanceState {
 
-    DEPOSIT("+"),
-    WITHDRAW("-");
+    PENDING("Pendente"),
+    PAID("Pago"),
+    RECEIVED("Recebido");
 
     private final String content;
 
-    TransactionType (String content) {
+    FinanceState(String content) {
         this.content = content;
     }
 

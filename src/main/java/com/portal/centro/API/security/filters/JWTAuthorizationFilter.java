@@ -3,12 +3,13 @@ package com.portal.centro.API.security.filters;
 import cn.hutool.json.JSONObject;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.portal.centro.API.model.User;
+import com.portal.centro.API.security.AuthService;
 import com.portal.centro.API.security.AuthenticationToken;
 import com.portal.centro.API.security.AuthenticationTokenDetails;
 import com.portal.centro.API.security.SecurityConstants;
-import com.portal.centro.API.security.AuthService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,7 +45,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             chain.doFilter(request, response);
             return;
         }
-        
+
         String header = request.getHeader(SecurityConstants.HEADER_STRING);
         if (header == null || !header.startsWith(SecurityConstants.TOKEN_PREFIX)) {
             chain.doFilter(request, response);
@@ -55,7 +56,12 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         String decodedStr = new String(decoded, StandardCharsets.ISO_8859_1);
         JSONObject json = new JSONObject(decodedStr);
 
-        AuthenticationToken authenticationToken = getAuthentication(request);
+        AuthenticationToken authenticationToken;
+        try {
+            authenticationToken = getAuthentication(request);
+        } catch (Exception e) {
+            throw new RuntimeException("mapped|TokenExpiredException|" + "Sessão expirou, Por favor faça login novamente!");
+        }
 
         assert authenticationToken != null;
         if (authenticationToken.getAuthorities().stream().noneMatch(it -> it.getAuthority().equals(json.get("role")))) {

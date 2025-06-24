@@ -1,5 +1,6 @@
 package com.portal.centro.API.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.portal.centro.API.enums.DRXStep;
 import com.portal.centro.API.enums.EnumBoolean;
@@ -20,9 +21,9 @@ import java.util.List;
 @Entity(name = "tb_solicitation_amostra")
 public class SolicitationAmostra extends IModel {
 
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(name = "form_id")
-    @JsonIgnoreProperties(value = "amostras")
+    @JsonIgnoreProperties(value = {"gradientes", "amostras"}, allowSetters = true)
     private SolicitationForm form;
 
     @Immutable
@@ -114,7 +115,7 @@ public class SolicitationAmostra extends IModel {
     private BigDecimal taxaAquecimento;
 
     @Column(name = "intervalo_temperatura")
-    private BigDecimal intervaloTemperatura;
+    private String intervaloTemperatura;
 
     // MEV
     @Column(name = "tipo_amostra")

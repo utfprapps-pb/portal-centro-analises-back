@@ -53,21 +53,10 @@ public class Solicitation extends IModelCrud {
     @Column(name = "project_nature", updatable = false)
     private SolicitationProjectNature projectNature;
 
-    /**
-     * Quando a solicitação vem de um projeto que não está no ENUM SolicitationProjectNature.
-     */
     @Column(name = "other_project_nature", updatable = false)
     private String otherProjectNature;
 
-    @Column(name = "schedule_date")
-    private LocalDateTime scheduleDate;
-
     private Integer amountSamples;
-
-//    @OneToMany(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "solicitation_id")
-//    @JsonIgnoreProperties(value = "solicitation", allowSetters = true)
-//    private List<SolicitationAttachments> solicitationAttachments; //adicionar coluna nova no banco
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "solicitation_id")
@@ -75,19 +64,5 @@ public class Solicitation extends IModelCrud {
     private List<SolicitationTermsOfUse> termsOfUses;
 
     private String observation;
-
-    private BigDecimal price;
-
-    private BigDecimal amountHours;
-
-    @Column(name = "total_price")
-    private BigDecimal totalPrice;
-
-    /**
-     * Caso seja usuário externo o laboratório deverá marcar como pago para
-     * liberar o relatório com o resultado da análise.
-     */
-    @Column(updatable = false)
-    private boolean paid;
 
 }

@@ -8,12 +8,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EquipmentService extends GenericService<Equipment, Long> {
-    private final EquipmentRepository equipmentRepository;
 
     @Autowired
     public EquipmentService(EquipmentRepository equipmentRepository) {
         super(equipmentRepository);
-        this.equipmentRepository = equipmentRepository;
     }
 
 }

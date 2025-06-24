@@ -1,8 +1,8 @@
 package com.portal.centro.API.model;
 
-import com.portal.centro.API.configuration.ApplicationContextProvider;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.portal.centro.API.generic.base.IModel;
-import com.portal.centro.API.minio.service.impl.MinioServiceImpl;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,6 +16,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class Attachment extends IModel {
+
+    @ManyToOne
+    @JoinColumn(name = "finance_id")
+    @JsonIgnore
+    private Finance finance;
 
     @Column(name = "file_name")
     private String fileName;

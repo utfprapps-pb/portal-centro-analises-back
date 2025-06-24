@@ -78,8 +78,7 @@ public class GlobalExceptionHandlerAdvice {
     @ExceptionHandler({DataIntegrityViolationException.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     private ApiError handlerDataIntegrityViolationExceptionError(DataIntegrityViolationException exception, HttpServletRequest request) throws GenericException {
-        if (exception.getCause() instanceof ConstraintViolationException) {
-            ConstraintViolationException cause = (ConstraintViolationException) exception.getCause();
+        if (exception.getCause() instanceof ConstraintViolationException cause) {
             if (cause.getMessage().contains("uplicate key value violates unique constraint")) {
                 String message = cause.getMessage();
                 Pattern pattern = Pattern.compile("\\((.*?)\\)=\\((.*?)\\)");
@@ -101,6 +100,33 @@ public class GlobalExceptionHandlerAdvice {
                         default -> key = "GlobalExceptionHandlerAdvice: 99 - KEY NAO MAPEADA";
                     }
                     GenericException aux = new GenericException(key + " já utilizado(a) por outro registro!");
+                    return new ApiError(aux, request.getServletPath());
+                }
+            } else if (cause.getMessage().contains("is still referenced from table")) {
+                String tableReferenciada = cause.getMessage().substring(cause.getMessage().lastIndexOf("table") + 7, cause.getMessage().indexOf("\".]"));
+
+                String nomeDaTabela = null;
+                switch (tableReferenciada) {
+                    case "tb_domain_role" -> nomeDaTabela = "Cadastro de Domínio";
+
+                    case "tb_solicitation" -> nomeDaTabela = "Cadastro de Solicitação";
+                    case "tb_solicitation_form" -> nomeDaTabela = "Formulário de Solicitação";
+                    case "tb_solicitation_form_gradiente" -> nomeDaTabela = "Formulário de Solicitação Gradiente";
+                    case "tb_solicitation_amostra" -> nomeDaTabela = "Solicitação de Amostra";
+                    case "tb_solicitation_amostra_foto" -> nomeDaTabela = "Solicitação de Amostra Foto";
+                    case "tb_solicitation_amostra_analise" -> nomeDaTabela = "Solicitação de Amostra Análise";
+                    case "tb_termsofuse" -> nomeDaTabela = "Termo de Uso";
+                    case "tb_email_config" -> nomeDaTabela = "Configuração de E-mail";
+                    case "tb_equipment" -> nomeDaTabela = "Cadastro de Equipamentos";
+                    case "tb_project" -> nomeDaTabela = "Cadastro de Projeto";
+                    case "tb_analysis" -> nomeDaTabela = "Análise";
+                }
+
+                if (nomeDaTabela != null) {
+                    GenericException aux = new GenericException("Não é possível excluir o registro, pois ele está vinculado a outro registro na tabela " + nomeDaTabela + "!");
+                    return new ApiError(aux, request.getServletPath());
+                } else {
+                    GenericException aux = new GenericException("Não é possível excluir o registro, pois ele está vinculado a outro registro!");
                     return new ApiError(aux, request.getServletPath());
                 }
             }

@@ -1,5 +1,6 @@
 package com.portal.centro.API.generic.base;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.portal.centro.API.generic.crud.GenericModel;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class IModel implements GenericModel, Serializable {
 
     @Id

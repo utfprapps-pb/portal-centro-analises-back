@@ -3,7 +3,7 @@ package com.portal.centro.API.repository;
 import com.portal.centro.API.enums.StudentTeacherApproved;
 import com.portal.centro.API.generic.crud.GenericRepository;
 import com.portal.centro.API.model.StudentProfessor;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
