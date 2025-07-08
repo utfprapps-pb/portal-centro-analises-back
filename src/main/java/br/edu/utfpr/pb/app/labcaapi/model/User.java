@@ -73,7 +73,7 @@ public class User extends IModel implements GenericModel, UserDetails {
     @JoinColumn(name = "partner_id")
     private Partner partner;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private List<Permission> permissions;
 
