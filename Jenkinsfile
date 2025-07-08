@@ -1,14 +1,15 @@
 pipeline {
     agent any
     environment {
+        SPRING_PROFILES_ACTIVE=prod
         SERVER_PORT=8813
         POSTGRESQL_CRED = credentials('postgres-id')
-        DATABASE_URL="jdbc:postgresql://postgresql:5432/ca_lab"
+        DATABASE_URL="jdbc:postgresql://postgresql:5432/lab_ca"
         DATABASE_USERNAME="${POSTGRESQL_CRED_USR}"
         DATABASE_PASSWORD="${POSTGRESQL_CRED_PSW}"
 
-        FRONT_BASE_URL="https://ca-dev.app.pb.utfpr.edu.br"
-        BACK_BASE_URL="https://ca-api-dev.app.pb.utfpr.edu.br/api"
+        FRONT_BASE_URL="https://lab-ca.app.pb.utfpr.edu.br"
+        BACK_BASE_URL="https://lab-ca-api.app.pb.utfpr.edu.br/api"
         FRONT_PORT=""
         MINIO_CRED = credentials('ca-minio-id')
         MINIO_ACCESS_KEY = "${MINIO_CRED_USR}"
@@ -16,7 +17,7 @@ pipeline {
         MINIO_ENDPOINT = "https://minio.app.pb.utfpr.edu.br"
         MINIO_PORT=443
         MINIO_SECURE=true
-        MINIO_BUCKET_NAME="ca-lab"
+        MINIO_BUCKET_NAME="lab-ca"
     }
     stages {
         stage('Docker Compose UP') {

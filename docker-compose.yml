@@ -14,15 +14,16 @@ networks:
     attachable: true
 
 services:
-  ca-api-dev:
-    image: ca-api-dev:${BUILD_NUMBER}
-    container_name: ca-api-dev
+  lab-ca-api:
+    image: lab-ca-api:${BUILD_NUMBER}
+    container_name: lab-ca-api
     build:
       context: ./
       dockerfile: Dockerfile
     ports:
       - "8813:8813"
     environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
       - SERVER_PORT=${SERVER_PORT}
       - DATABASE_URL=${DATABASE_URL}
       - DATABASE_USERNAME=${DATABASE_USERNAME}
@@ -40,9 +41,9 @@ services:
     labels:
       # Traefik Config
       - "traefik.enable=true"
-      - "traefik.http.routers.ca-api-dev.rule=Host(`ca-api-dev.app.pb.utfpr.edu.br`)"
-      - "traefik.http.routers.ca-api-dev.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.ca-api-dev.entrypoints=websecure"
+      - "traefik.http.routers.lab-ca-api.rule=Host(`lab-ca-api.app.pb.utfpr.edu.br`)"
+      - "traefik.http.routers.lab-ca-api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.lab-ca-api.entrypoints=websecure"
     restart: unless-stopped
     networks:
       - web
