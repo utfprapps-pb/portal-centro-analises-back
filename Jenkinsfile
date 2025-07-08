@@ -8,6 +8,8 @@ pipeline {
         DATABASE_USERNAME="${POSTGRESQL_CRED_USR}"
         DATABASE_PASSWORD="${POSTGRESQL_CRED_PSW}"
 
+        SPRING_FLYWAY_ENABLED=true
+
         FRONT_BASE_URL="https://lab-ca.app.pb.utfpr.edu.br"
         BACK_BASE_URL="https://lab-ca-api.app.pb.utfpr.edu.br/api"
         FRONT_PORT=""
