@@ -33,6 +33,7 @@ public class Permission extends IModel implements GrantedAuthority {
 
     @ManyToOne
     @JoinColumn(name = "user_id", updatable = false)
+    @JsonIgnore
     private User user;
 
     @Override
