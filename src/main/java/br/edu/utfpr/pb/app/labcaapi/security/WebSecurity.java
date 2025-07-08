@@ -51,11 +51,11 @@ public class WebSecurity {
 
         http.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(authenticationEntryPoint));
         http.authorizeHttpRequests((authorize) -> authorize
-                .requestMatchers(antMatcher("/wss/**")).permitAll()
-                .requestMatchers(antMatcher("/ws/**")).permitAll()
+                .requestMatchers("/wss/**").permitAll()
+                .requestMatchers("/ws/**").permitAll()
 //
-                .requestMatchers(antMatcher(HttpMethod.GET, "/email-confirm/**")).permitAll()
-                .requestMatchers(antMatcher("/open/**")).permitAll()
+                .requestMatchers(HttpMethod.GET, "/email-confirm/**").permitAll()
+                .requestMatchers("/open/**").permitAll()
 //
 //                .requestMatchers(antMatcher("/usuarios/**")).authenticated()
 //
@@ -118,7 +118,10 @@ public class WebSecurity {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
-        configuration.setAllowedOrigins(List.of("https://ca-dev.app.pb.utfpr.edu.br", "http://localhost:4200"));
+        configuration.setAllowedOrigins(List.of(
+                "https://ca-dev.app.pb.utfpr.edu.br",
+                "https://lab-ca.app.pb.utfpr.edu.br/",
+                "http://localhost:4200"));
 //        configuration.setAllowedOrigins(List.of("*"));
 //                configuration.setAllowedOrigins(List.of("http://127.0.0.1:5173"));
 //                configuration..setAllowedOrigins(List.of("http://localhost:5173"));
