@@ -96,7 +96,7 @@ public class UserService extends GenericService<User, Long> {
                 balanceService.update(balance);
             }
         }
-        return super.update(usuario);
+        return userRepository.save(usuario);
     }
 
     @Override
