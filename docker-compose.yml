@@ -21,7 +21,7 @@ services:
       context: ./
       dockerfile: Dockerfile
     ports:
-      - "8813:8813"
+      - "8810:8810"
     environment:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
       - SERVER_PORT=${SERVER_PORT}
@@ -44,6 +44,11 @@ services:
       - "traefik.http.routers.lab-ca-api.rule=Host(`lab-ca-api.app.pb.utfpr.edu.br`)"
       - "traefik.http.routers.lab-ca-api.tls.certresolver=letsencrypt"
       - "traefik.http.routers.lab-ca-api.entrypoints=websecure"
+      - "traefik.http.services.lab-ca-api.loadbalancer.server.port=8810"
+      # Em labels do seu serviço:
+      - "traefik.http.routers.lab-ca-api.middlewares=websocket-headers"
+      - "traefik.http.middlewares.websocket-headers.headers.customrequestheaders.Upgrade=websocket"
+      - "traefik.http.middlewares.websocket-headers.headers.customrequestheaders.Connection=Upgrade"
     restart: unless-stopped
     networks:
       - web
