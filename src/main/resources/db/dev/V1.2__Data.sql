@@ -1,5 +1,5 @@
-INSERT INTO public.tb_user (id, email_verified, "role", status, "type", created_at, partner_id, updated_at, cpf_cnpj, email, "name", "password", ra_siape) VALUES(-1, true, 0, 1, 0, '2024-04-09 19:00:13.407', NULL, '2024-04-09 19:20:12.952', '00000000000', 'lab@gmail.com', 'Laboratorio', '$2a$10$TZM4SIGTPefmOOTK1L9AMupCHuw7SgXp7BetKYJNBw2T8brnuybse', NULL);
-
+INSERT INTO public.tb_user (id, email_verified, "role", status, "type", created_at, partner_id, updated_at, cpf_cnpj, email, "name", "password", ra_siape) VALUES(-1, true, 0, 1, 0, '2024-04-09 19:00:13.407', NULL, '2024-04-09 19:20:12.952', '00000000000', 'lab@gmail.com', 'Laboratorio', '$2a$10$gcG2.2qrzSErOwQ3Pd.hY.5OuRwMFf4lR3Sf5jVR6AFNPsamMdjoa', NULL);
+--- senha do admin = Asd123
 INSERT INTO public.tb_permission ("action", id, user_id, description) VALUES(0, 1, -1, 'Criação');
 INSERT INTO public.tb_permission ("action", id, user_id, description) VALUES(1, 2, -1, 'Leitura');
 INSERT INTO public.tb_permission ("action", id, user_id, description) VALUES(2, 3, -1, 'Atualização');

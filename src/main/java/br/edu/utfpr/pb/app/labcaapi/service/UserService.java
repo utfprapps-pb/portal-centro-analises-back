@@ -164,15 +164,14 @@ public class UserService extends GenericService<User, Long> {
     private void updateUserNewPasswordByEmail(User user, String newPassword) throws Exception {
         if (Objects.isNull(user))
             return;
-
         user.setPassword(newPassword);
         encryptPassword(user);
-        super.save(user);
+        userRepository.save(user);
     }
 
-    private void encryptPassword(User entity) {
-        if (entity.getPassword() != null) {
-            entity.setPassword(passwordEncoder.encode(entity.getPassword()));
+    private void encryptPassword(User user) {
+        if (user.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
     }
 
@@ -182,8 +181,7 @@ public class UserService extends GenericService<User, Long> {
 
     public User findSelfUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = userRepository.findByEmail(principal.toString());
-        return user;
+        return userRepository.findByEmail(principal.toString());
     }
 
     public User findByEmail(String email) {
