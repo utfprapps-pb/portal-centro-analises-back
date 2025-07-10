@@ -49,15 +49,14 @@ public class EmailService {
             htmlEmail.setStartTLSEnabled(true);
             htmlEmail.setFrom(emailConfig.getEmail());
             htmlEmail.addTo(emailTo.getEmailTo());
-            htmlEmail.setSubject("Lab. Central - " + emailTo.getSubject());
+            htmlEmail.setSubject("Laboratório Central de Análises (UTFPR-PB) - " + emailTo.getSubject());
             htmlEmail.setHtmlMsg(emailMessageGenerator.generateHTML(emailTo.getSubjectBody(), emailTo.getContentBody(), ""));
 
             log.info("Enviando email....");
-//            htmlEmail.send();
+            htmlEmail.send();
             log.info("E-mail enviado com sucesso!");
         } catch (Exception e) {
-            log.error("E-mail Service -> sendEmail(): Erro ao enviar email:" + e.getMessage());
-            e.printStackTrace();
+            log.error("E-mail Service -> sendEmail(): Erro ao enviar email:{}", e.getMessage());
             throw new GenericException("Erro ao enviar email");
         }
 
