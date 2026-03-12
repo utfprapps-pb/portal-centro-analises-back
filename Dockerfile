@@ -10,6 +10,6 @@ RUN sed -i 's/\r$//' mvnw
 
 RUN /bin/sh mvnw package -DskipTests
 
-FROM openjdk:21-jdk-alpine
+FROM openjdk:21-ea-jdk
 COPY --from=build /workspace/ca/target/lab-ca-1.jar lab-ca.jar
 ENTRYPOINT ["java", "-jar", "lab-ca.jar"]
