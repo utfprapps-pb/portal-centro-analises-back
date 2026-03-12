@@ -15,7 +15,7 @@ networks:
 
 services:
   lab-ca-api:
-    image: lab-ca-api:${BUILD_NUMBER}
+    image: lab-ca-api
     container_name: lab-ca-api
     build:
       context: ./
