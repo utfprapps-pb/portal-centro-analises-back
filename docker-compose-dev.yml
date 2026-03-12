@@ -13,8 +13,8 @@ networks:
 
 services:
   ca-api-dev:
-    image: ca-api-dev:${BUILD_NUMBER}
-    container_name: ca-api-dev
+    image: lab-ca-api-dev
+    container_name: lab-ca-api-dev
     build:
       context: ./
       dockerfile: Dockerfile
