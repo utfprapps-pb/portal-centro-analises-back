@@ -52,3 +52,49 @@ services:
     networks:
       - web
       - database
+
+  postgresql:
+    image: postgres:15-alpine
+    container_name: postgresql
+    restart: always
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ca_lab
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - database
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    ports:
+      - "5050:80"
+    networks:
+      - database
+    depends_on:
+      - postgresql
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - web
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    restart: always
+
+volumes:
+  postgres_data:
+  minio_data:
