@@ -2,7 +2,7 @@ package br.edu.utfpr.pb.app.labcaapi.controller;
 
 import br.edu.utfpr.pb.app.labcaapi.dto.RecoverPasswordDTO;
 import br.edu.utfpr.pb.app.labcaapi.dto.RequestCodeEmailDto;
-import br.edu.utfpr.pb.app.labcaapi.exceptions.GenericException;
+import br.edu.utfpr.pb.app.labcaapi.exceptions.NotFoundException;
 import br.edu.utfpr.pb.app.labcaapi.model.ObjectReturn;
 import br.edu.utfpr.pb.app.labcaapi.model.SendEmailCodeRecoverPassword;
 import br.edu.utfpr.pb.app.labcaapi.model.User;
@@ -48,7 +48,7 @@ public class PublicController {
             this.emailCodeService.createCode(user);
             return ResponseEntity.ok(new ObjectReturn("OK"));
         }
-        throw new GenericException("E-mail não encontrado");
+        throw new NotFoundException("E-mail não encontrado");
     }
 
     @PostMapping("/recover-password")
