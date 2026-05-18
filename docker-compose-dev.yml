@@ -19,7 +19,7 @@ services:
       context: ./
       dockerfile: Dockerfile
     ports:
-      - "8810:8810"
+      - "8085:8810"
     environment:
       - SERVER_PORT=${SERVER_PORT}
       - DATABASE_URL=${DATABASE_URL}
@@ -39,14 +39,14 @@ services:
     labels:
       # Traefik Config
       - "traefik.enable=true"
-      - "traefik.http.routers.ca-api-dev.rule=Host(`ca-api-dev.app.pb.utfpr.edu.br`)"
-      - "traefik.http.routers.ca-api-dev.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.ca-api-dev.entrypoints=websecure"
+      - "traefik.http.routers.ca-api-dev.rule=Host(`localhost`) && PathPrefix(`/api`)"
+      #- "traefik.http.routers.ca-api-dev.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.ca-api-dev.entrypoints=web"
       - "traefik.http.services.ca-api-dev.loadbalancer.server.port=8810"
       # Em labels do seu serviço:
-      - "traefik.http.routers.ca-api-dev.middlewares=websocket-headers"
-      - "traefik.http.middlewares.websocket-headers.headers.customrequestheaders.Upgrade=websocket"
-      - "traefik.http.middlewares.websocket-headers.headers.customrequestheaders.Connection=Upgrade"
+      #- "traefik.http.routers.ca-api-dev.middlewares=websocket-headers"
+      #- "traefik.http.middlewares.websocket-headers.headers.customrequestheaders.Upgrade=websocket"
+      #- "traefik.http.middlewares.websocket-headers.headers.customrequestheaders.Connection=Upgrade"
 
     restart: unless-stopped
     networks:
