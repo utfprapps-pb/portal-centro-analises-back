@@ -95,6 +95,16 @@ services:
       - "9001:9001"
     restart: always
 
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: mailhog
+    restart: always
+    ports:
+      - 1025:1025
+      - 8025:8025
+    networks:
+      - web
+
 volumes:
   postgres_data:
   minio_data:
