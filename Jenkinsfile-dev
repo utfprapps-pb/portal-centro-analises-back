@@ -1,9 +1,10 @@
 pipeline {
     agent any
     environment {
-        SERVER_PORT=8810
+        SPRING_PROFILES_ACTIVE="prod"
+        SERVER_PORT=8812
         POSTGRESQL_CRED = credentials('postgres-id')
-        DATABASE_URL="jdbc:postgresql://postgresql:5432/ca_lab_dev"
+        DATABASE_URL="jdbc:postgresql://postgresql:5432/lab_ca_dev"
         DATABASE_USERNAME="${POSTGRESQL_CRED_USR}"
         DATABASE_PASSWORD="${POSTGRESQL_CRED_PSW}"
 
