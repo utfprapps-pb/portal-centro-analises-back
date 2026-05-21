@@ -1,16 +1,3 @@
-### NETWORKS ###
-networks:
-  web:
-    name: web
-    driver: bridge
-    external: false
-    attachable: true
-  database:
-    name: database
-    driver: bridge
-    external: false
-    attachable: true
-
 services:
   ca-api-dev:
     image: lab-ca-api-dev
@@ -52,3 +39,16 @@ services:
     networks:
       - web
       - database
+
+########################### NETWORKS
+networks:
+  web:
+    name: web
+    driver: bridge
+    external: true
+    attachable: true
+  database:
+    name: database
+    driver: bridge
+    external: false
+    attachable: true
