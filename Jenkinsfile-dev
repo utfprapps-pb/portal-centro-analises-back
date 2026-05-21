@@ -10,8 +10,8 @@ pipeline {
 
         SPRING_FLYWAY_ENABLED=true
 
-        FRONT_BASE_URL="https://ca-dev.app.pb.utfpr.edu.br"
-        BACK_BASE_URL="https://ca-api-dev.app.pb.utfpr.edu.br/api"
+        FRONT_BASE_URL="https://lab-ca-dev.app.pb.utfpr.edu.br"
+        BACK_BASE_URL="https://lab-ca-api-dev.app.pb.utfpr.edu.br/api"
         FRONT_PORT=""
 
         MINIO_CRED = credentials('ca-minio-id')
@@ -20,7 +20,7 @@ pipeline {
         MINIO_ENDPOINT = "https://minio.app.pb.utfpr.edu.br"
         MINIO_PORT=443
         MINIO_SECURE=true
-        MINIO_BUCKET_NAME="ca-lab-dev"
+        MINIO_BUCKET_NAME="lab-ca-dev"
     }
     stages {
         stage('Docker Compose UP') {
