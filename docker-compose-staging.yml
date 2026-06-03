@@ -1,3 +1,4 @@
+### NETWORKS ###
 services:
   ca-api-dev:
     image: lab-ca-api-dev
@@ -39,7 +40,6 @@ services:
     networks:
       - web
       - database
-
 ########################### NETWORKS
 networks:
   web:
