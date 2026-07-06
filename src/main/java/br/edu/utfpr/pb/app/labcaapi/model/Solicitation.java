@@ -30,7 +30,7 @@ public class Solicitation extends IModelCrud {
     private SolicitationStatus status;
 
     @ManyToOne
-    @NotNull(message = "Project must not be null")
+    //@NotNull(message = "Project must not be null")
     @JoinColumn(name = "project_id", updatable = false)
     private Project project;
 
@@ -45,7 +45,7 @@ public class Solicitation extends IModelCrud {
     private SolicitationFormType solicitationType;
 
     @Enumerated(value = EnumType.STRING)
-    @NotNull(message = "Project nature must not be null")
+    //@NotNull(message = "Project nature must not be null")
     @Column(name = "project_nature", updatable = false)
     private SolicitationProjectNature projectNature;
 
