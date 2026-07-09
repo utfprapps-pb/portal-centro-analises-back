@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -76,8 +77,8 @@ public class SolicitationExcelFactory {
                     .addCell(new ExcelFactoryCell().setValue(solicitation.getCreatedBy().getType().getContent()))
                     .addCell(new ExcelFactoryCell().setValue(solicitation.getCreatedAt()))
                     .addCell(new ExcelFactoryCell().setValue(solicitation.getSolicitationType().getContent()))
-                    .addCell(new ExcelFactoryCell().setValue(solicitation.getProjectNature().getContent()));
-            if (solicitation.getProjectNature().equals(SolicitationProjectNature.OTHER)) {
+                    .addCell(new ExcelFactoryCell().setValue(solicitation.getProjectNature() != null ? solicitation.getProjectNature().getContent() : "Sem vínculo"));
+            if (SolicitationProjectNature.OTHER.equals(solicitation.getProjectNature())) {
                 row.addCell(new ExcelFactoryCell().setValue(solicitation.getOtherProjectNature()));
             } else {
                 row.addCell(ReportContants.BLANK_CELL);
@@ -121,17 +122,19 @@ public class SolicitationExcelFactory {
                 for (SolicitationProjectNature nature : solicitationsNatures) {
                     long total = solicitations.stream()
                             .filter(s -> s.getSolicitationType().equals(type))
-                            .filter(s -> s.getProjectNature().equals(nature))
+                            .filter(s -> Objects.equals(s.getProjectNature(), nature))
                             .count();
 
                     if (total == 0) {
                         continue;
                     }
 
+                    String natureContent = nature != null ? nature.getContent() : "Sem vínculo";
+
                     ExcelFactoryRow row = new ExcelFactoryRow()
                             .addCell(new ExcelFactoryCell().setValue(ano))
                             .addCell(new ExcelFactoryCell().setValue(type.getContent()))
-                            .addCell(new ExcelFactoryCell().setValue(nature.getContent()))
+                            .addCell(new ExcelFactoryCell().setValue(natureContent))
                             .addCell(new ExcelFactoryCell().setValue(total));
 
                     rows.add(row);
@@ -164,29 +167,40 @@ public class SolicitationExcelFactory {
                     .distinct()
                     .toList();
 
+            List<SolicitationProjectNature> solicitationsNatures = solicitations.stream()
+                    .map(Solicitation::getProjectNature)
+                    .distinct()
+                    .toList();
+
             List<Type> roles = solicitations.stream()
                     .map(it -> it.getCreatedBy().getRole())
                     .distinct()
                     .toList();
 
             for (SolicitationFormType type : solicitationsTypes) {
-                for (Type role : roles) {
-                    long total = solicitations.stream()
-                            .filter(s -> s.getSolicitationType().equals(type))
-                            .filter(s -> s.getCreatedBy().getRole().equals(role))
-                            .count();
+                for (SolicitationProjectNature nature : solicitationsNatures) {
+                    for (Type role : roles) {
+                        long total = solicitations.stream()
+                                .filter(s -> s.getSolicitationType().equals(type))
+                                .filter(s -> Objects.equals(s.getProjectNature(), nature))
+                                .filter(s -> s.getCreatedBy().getRole().equals(role))
+                                .count();
 
-                    if (total == 0) {
-                        continue;
+                        if (total == 0) {
+                            continue;
+                        }
+
+                        String natureContent = nature != null ? nature.getContent() : "Sem vínculo";
+
+                        ExcelFactoryRow row = new ExcelFactoryRow()
+                                .addCell(new ExcelFactoryCell().setValue(ano))
+                                .addCell(new ExcelFactoryCell().setValue(type.getContent()))
+                                .addCell(new ExcelFactoryCell().setValue(natureContent))
+                                .addCell(new ExcelFactoryCell().setValue(role.toReport()))
+                                .addCell(new ExcelFactoryCell().setValue(total));
+
+                        rows.add(row);
                     }
-
-                    ExcelFactoryRow row = new ExcelFactoryRow()
-                            .addCell(new ExcelFactoryCell().setValue(ano))
-                            .addCell(new ExcelFactoryCell().setValue(type.getContent()))
-                            .addCell(new ExcelFactoryCell().setValue(role.toReport()))
-                            .addCell(new ExcelFactoryCell().setValue(total));
-
-                    rows.add(row);
                 }
             }
         }
@@ -232,7 +246,7 @@ public class SolicitationExcelFactory {
                     for (Type role : roles) {
                         long total = solicitations.stream()
                                 .filter(s -> s.getSolicitationType().equals(type))
-                                .filter(s -> s.getProjectNature().equals(nature))
+                                .filter(s -> Objects.equals(s.getProjectNature(), nature))
                                 .filter(s -> s.getCreatedBy().getRole().equals(role))
                                 .count();
 
@@ -243,7 +257,7 @@ public class SolicitationExcelFactory {
                         ExcelFactoryRow row = new ExcelFactoryRow()
                                 .addCell(new ExcelFactoryCell().setValue(ano))
                                 .addCell(new ExcelFactoryCell().setValue(type.getContent()))
-                                .addCell(new ExcelFactoryCell().setValue(nature.getContent()))
+                                .addCell(new ExcelFactoryCell().setValue(nature != null ? nature.getContent() : "Sem vínculo"))
                                 .addCell(new ExcelFactoryCell().setValue(role.toReport()))
                                 .addCell(new ExcelFactoryCell().setValue(total));
 

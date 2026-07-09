@@ -19,7 +19,7 @@ services:
       context: ./
       dockerfile: Dockerfile
     ports:
-      - "8810:8810"
+      - "8085:8810"
     environment:
       - SERVER_PORT=${SERVER_PORT}
       - DATABASE_URL=${DATABASE_URL}
@@ -39,16 +39,72 @@ services:
     labels:
       # Traefik Config
       - "traefik.enable=true"
-      - "traefik.http.routers.ca-api-dev.rule=Host(`ca-api-dev.app.pb.utfpr.edu.br`)"
-      - "traefik.http.routers.ca-api-dev.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.ca-api-dev.entrypoints=websecure"
+      - "traefik.http.routers.ca-api-dev.rule=Host(`localhost`) && PathPrefix(`/api`)"
+      #- "traefik.http.routers.ca-api-dev.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.ca-api-dev.entrypoints=web"
       - "traefik.http.services.ca-api-dev.loadbalancer.server.port=8810"
       # Em labels do seu serviço:
-      - "traefik.http.routers.ca-api-dev.middlewares=websocket-headers"
-      - "traefik.http.middlewares.websocket-headers.headers.customrequestheaders.Upgrade=websocket"
-      - "traefik.http.middlewares.websocket-headers.headers.customrequestheaders.Connection=Upgrade"
+      #- "traefik.http.routers.ca-api-dev.middlewares=websocket-headers"
+      #- "traefik.http.middlewares.websocket-headers.headers.customrequestheaders.Upgrade=websocket"
+      #- "traefik.http.middlewares.websocket-headers.headers.customrequestheaders.Connection=Upgrade"
 
     restart: unless-stopped
     networks:
       - web
       - database
+
+  postgresql:
+    image: postgres:15-alpine
+    container_name: postgresql
+    restart: always
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ca_lab
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - database
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    ports:
+      - "5050:80"
+    networks:
+      - database
+    depends_on:
+      - postgresql
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - web
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    restart: always
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: mailhog
+    restart: always
+    ports:
+      - 1025:1025
+      - 8025:8025
+    networks:
+      - web
+
+volumes:
+  postgres_data:
+  minio_data:

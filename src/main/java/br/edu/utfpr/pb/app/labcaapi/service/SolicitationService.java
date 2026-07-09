@@ -60,11 +60,11 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         User loggedUser = userService.findSelfUser();
         SolicitationHistoric solicitationHistoric = new SolicitationHistoric();
         solicitationHistoric.setSolicitation(solicitation);
-        if (solicitation.getProject().getUser().getId().equals(loggedUser.getId())) {
-            solicitationHistoric.setStatus(SolicitationStatus.AWAITING_LAB_CONFIRMATION);
-        } else {
+        if (solicitation.getProject() != null && !solicitation.getProject().getUser().getId().equals(loggedUser.getId())) {
             solicitationHistoric.setStatus(SolicitationStatus.AWAITING_RESPONSIBLE_CONFIRMATION);
             emailService.sendEmailProjectResponsible(solicitation);
+        } else {
+            solicitationHistoric.setStatus(SolicitationStatus.AWAITING_LAB_CONFIRMATION);
         }
         solicitationHistoricService.save(solicitationHistoric);
         solicitation.setStatus(solicitationHistoric.getStatus());
@@ -87,8 +87,9 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
     @Transactional()
     protected void completeSolicitation(Solicitation solicitation) throws Exception {
         User loggedUser = userService.findSelfUser();
+
         // Verifica se a Natureza do projeto é outra, se sim, verifica se o campo de outra natureza foi preenchido.
-        if (solicitation.getProjectNature().equals(SolicitationProjectNature.OTHER)
+        if (SolicitationProjectNature.OTHER.equals(solicitation.getProjectNature())
                 && (solicitation.getOtherProjectNature() == null || solicitation.getOtherProjectNature().isEmpty())) {
             throw new GenericException("O campo 'Outra natureza de projeto' deve ser preenchido quando a natureza do projeto for 'Outro'.");
         }
@@ -98,12 +99,12 @@ public class SolicitationService extends GenericService<Solicitation, Long> {
         solicitationHistoric.setSolicitation(solicitation);
 
         if (solicitation.getId() == null) {
-            if (solicitation.getProject().getUser().getId().equals(loggedUser.getId())) {
-                solicitation.setStatus(SolicitationStatus.AWAITING_LAB_CONFIRMATION);
-                solicitationHistoric.setStatus(SolicitationStatus.AWAITING_LAB_CONFIRMATION);
-            } else {
+            if (solicitation.getProject() != null && !solicitation.getProject().getUser().getId().equals(loggedUser.getId())) {
                 solicitation.setStatus(SolicitationStatus.AWAITING_RESPONSIBLE_CONFIRMATION);
                 solicitationHistoric.setStatus(SolicitationStatus.AWAITING_RESPONSIBLE_CONFIRMATION);
+            } else {
+                solicitation.setStatus(SolicitationStatus.AWAITING_LAB_CONFIRMATION);
+                solicitationHistoric.setStatus(SolicitationStatus.AWAITING_LAB_CONFIRMATION);
             }
         }
 

@@ -1,27 +1,14 @@
 ### NETWORKS ###
-networks:
-  web:
-    name: web
-    driver: bridge
-    external: false
-    attachable: true
-  database:
-    name: database
-    driver: bridge
-    external: false
-    attachable: true
-
 services:
-  lab-ca-api:
-    image: lab-ca-api
-    container_name: lab-ca-api
+  ca-api-dev:
+    image: lab-ca-api-dev
+    container_name: lab-ca-api-dev
     build:
       context: ./
       dockerfile: Dockerfile
     ports:
-      - "8810:8810"
+      - "8812:8812"
     environment:
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
       - SERVER_PORT=${SERVER_PORT}
       - DATABASE_URL=${DATABASE_URL}
       - DATABASE_USERNAME=${DATABASE_USERNAME}
@@ -33,23 +20,35 @@ services:
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
       - MINIO_SECURE=${MINIO_SECURE}
       - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME}
+      - BACK_BASE_URL=${BACK_BASE_URL}
       - FRONT_BASE_URL=${FRONT_BASE_URL}
       - FRONT_PORT=${FRONT_PORT}
-      - BACK_BASE_URL=${BACK_BASE_URL}
       - TZ=America/Sao_Paulo
     labels:
       # Traefik Config
       - "traefik.enable=true"
-      - "traefik.http.routers.lab-ca-api.rule=Host(`lab-ca-api.app.pb.utfpr.edu.br`)"
-      - "traefik.http.routers.lab-ca-api.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.lab-ca-api.entrypoints=websecure"
-      - "traefik.http.services.lab-ca-api.loadbalancer.server.port=8810"
+      - "traefik.http.routers.ca-api-dev.rule=Host(`lab-ca-api-dev.app.pb.utfpr.edu.br`)"
+      - "traefik.http.routers.ca-api-dev.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.ca-api-dev.entrypoints=websecure"
+      - "traefik.http.services.ca-api-dev.loadbalancer.server.port=8812"
       # Em labels do seu serviço:
-      - "traefik.http.routers.lab-ca-api.middlewares=websocket-headers"
+      - "traefik.http.routers.ca-api-dev.middlewares=websocket-headers"
       - "traefik.http.middlewares.websocket-headers.headers.customrequestheaders.Upgrade=websocket"
       - "traefik.http.middlewares.websocket-headers.headers.customrequestheaders.Connection=Upgrade"
+
     restart: unless-stopped
     networks:
       - web
       - database
-      
+########################### NETWORKS
+networks:
+  web:
+    name: web
+    driver: bridge
+    external: true
+    attachable: true
+  database:
+    name: database
+    driver: bridge
+    external: true
+    attachable: true
