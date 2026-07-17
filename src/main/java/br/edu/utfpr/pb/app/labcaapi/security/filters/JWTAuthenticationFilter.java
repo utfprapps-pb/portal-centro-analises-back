@@ -12,10 +12,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -25,11 +24,9 @@ import java.util.Date;
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
-    private final AuthService authService;
 
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager, AuthService authService) {
         this.authenticationManager = authenticationManager;
-        this.authService = authService;
     }
 
     @Override
@@ -38,22 +35,14 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         try {
             User credentials = new ObjectMapper().readValue(request.getInputStream(), User.class);
 
-            User user = (User) authService.loadUserByUsername(credentials.getEmail());
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                    credentials.getEmail(),
+                    credentials.getPassword()
+            );
 
-            if (user.getEmailVerified() == null || !user.getEmailVerified()) {
-                throw new RuntimeException("mapped|GenericException|E-mail do usuário não foi validado!");
-            } else {
-                UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                        credentials.getEmail(),
-                        credentials.getPassword(),
-                        user.getAuthorities()
-                );
-                return authenticationManager.authenticate(token);
-            }
-        } catch (UsernameNotFoundException | BadCredentialsException e) {
-            throw new RuntimeException("mapped|GenericException|" + e.getMessage());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            return authenticationManager.authenticate(token);
+        } catch (IOException e) {
+            throw new InternalAuthenticationServiceException("Falha ao ler os dados da requisição", e);
         }
     }
 
@@ -67,9 +56,35 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .withSubject(authResult.getName())
                 .withExpiresAt(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
                 .sign(Algorithm.HMAC512(SecurityConstants.SECRET));
+
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
+
         response.getWriter().write(new ObjectMapper().writeValueAsString(
                 new AuthenticationResponse(token, new UserLoginDTO((User) authResult.getPrincipal()))
         ));
+    }
+
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request,
+                                              HttpServletResponse response,
+                                              AuthenticationException failed) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
+
+        String message;
+
+        if (failed instanceof DisabledException) {
+            message = "Sua conta está desativada. Verifique seu e-mail.";
+        } else if (failed instanceof LockedException) {
+            message = "Sua conta está bloqueada.";
+        } else if (failed instanceof BadCredentialsException) {
+            message = "Credenciais inválidas. E-mail ou senha incorretos.";
+        } else {
+            message = "Falha na autenticação: " + failed.getMessage();
+        }
+
+        response.getWriter().write(String.format("{\"message\":\"%s\"}", message));
     }
 }
