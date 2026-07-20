@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -93,7 +94,7 @@ class AuthServiceTest {
                 () -> authService.loadUserByUsername("user@utfpr.edu.br")
         );
 
-        assertEquals("Sua conta está inativa. Entre em contato com o administrador.", exception.getMessage());
+        assertEquals("Sua conta está inativa. Entre em contato com o administrador do sistema caso achar que isso é um erro.", exception.getMessage());
     }
 
     @Test
@@ -102,12 +103,12 @@ class AuthServiceTest {
         validUser.setEmailVerified(false);
         when(userRepository.findByEmail("user@utfpr.edu.br")).thenReturn(validUser);
 
-        DisabledException exception = assertThrows(
-                DisabledException.class,
+        LockedException exception = assertThrows(
+                LockedException.class,
                 () -> authService.loadUserByUsername("user@utfpr.edu.br")
         );
 
-        assertEquals("Seu email ainda não foi verificado. Confirme seu endereço de email.", exception.getMessage());
+        assertEquals("Seu e-mail ainda não foi verificado. Por favor, confirme seu endereço de e-mail para acessar o sistema.", exception.getMessage());
     }
 
     @Test
@@ -116,7 +117,7 @@ class AuthServiceTest {
         validUser.setEmailVerified(null);
         when(userRepository.findByEmail("user@utfpr.edu.br")).thenReturn(validUser);
 
-        assertThrows(DisabledException.class, () -> authService.loadUserByUsername("user@utfpr.edu.br"));
+        assertThrows(LockedException.class, () -> authService.loadUserByUsername("user@utfpr.edu.br"));
     }
 
     // FindLoggedUser
