@@ -6,14 +6,14 @@ import br.edu.utfpr.pb.app.labcaapi.model.User;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends GenericRepository<User, Long> {
 
-    User findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
     List<User> findAllByRole(Type role);
 
     List<User> findAllByEmailContainingIgnoreCase(String domain);
-
 }

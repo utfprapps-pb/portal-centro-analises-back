@@ -20,6 +20,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -60,7 +62,7 @@ class AuthServiceTest {
     @Test
     @DisplayName("Deve carregar UserDetails com sucesso para usuário ativo e verificado")
     void loadUserByUsername_Success() {
-        when(userRepository.findByEmail("user@utfpr.edu.br")).thenReturn(validUser);
+        when(userRepository.findByEmail("user@utfpr.edu.br")).thenReturn(Optional.of(validUser));
 
         UserDetails userDetails = authService.loadUserByUsername("user@utfpr.edu.br");
 
@@ -72,7 +74,7 @@ class AuthServiceTest {
     @Test
     @DisplayName("Deve lançar UsernameNotFoundException quando usuário não for encontrado")
     void loadUserByUsername_ThrowsUsernameNotFoundException() {
-        when(userRepository.findByEmail("notfound@utfpr.edu.br")).thenReturn(null);
+        when(userRepository.findByEmail("notfound@utfpr.edu.br")).thenReturn(Optional.empty());
 
         UsernameNotFoundException exception = assertThrows(
                 UsernameNotFoundException.class,
@@ -87,7 +89,7 @@ class AuthServiceTest {
     @DisplayName("Deve lançar DisabledException quando usuário estiver inativo")
     void loadUserByUsername_ThrowsDisabledException_WhenInactive() {
         validUser.setStatus(StatusInactiveActive.INACTIVE);
-        when(userRepository.findByEmail("user@utfpr.edu.br")).thenReturn(validUser);
+        when(userRepository.findByEmail("user@utfpr.edu.br")).thenReturn(Optional.of(validUser));
 
         DisabledException exception = assertThrows(
                 DisabledException.class,
@@ -101,7 +103,7 @@ class AuthServiceTest {
     @DisplayName("Deve lançar DisabledException quando email não estiver verificado")
     void loadUserByUsername_ThrowsDisabledException_WhenEmailNotVerified() {
         validUser.setEmailVerified(false);
-        when(userRepository.findByEmail("user@utfpr.edu.br")).thenReturn(validUser);
+        when(userRepository.findByEmail("user@utfpr.edu.br")).thenReturn(Optional.of(validUser));
 
         LockedException exception = assertThrows(
                 LockedException.class,
@@ -115,7 +117,7 @@ class AuthServiceTest {
     @DisplayName("Deve lançar DisabledException quando flag de email verificado for nula")
     void loadUserByUsername_ThrowsDisabledException_WhenEmailVerifiedIsNull() {
         validUser.setEmailVerified(null);
-        when(userRepository.findByEmail("user@utfpr.edu.br")).thenReturn(validUser);
+        when(userRepository.findByEmail("user@utfpr.edu.br")).thenReturn(Optional.of(validUser));
 
         assertThrows(LockedException.class, () -> authService.loadUserByUsername("user@utfpr.edu.br"));
     }
@@ -129,7 +131,7 @@ class AuthServiceTest {
         when(authentication.getPrincipal()).thenReturn("user@utfpr.edu.br");
         SecurityContextHolder.setContext(securityContext);
 
-        when(userRepository.findByEmail("user@utfpr.edu.br")).thenReturn(validUser);
+        when(userRepository.findByEmail("user@utfpr.edu.br")).thenReturn(Optional.of(validUser));
 
         User loggedUser = authService.findLoggedUser();
 

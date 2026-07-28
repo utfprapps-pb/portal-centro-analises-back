@@ -22,10 +22,8 @@ public class AuthService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("Usuário não encontrado!");
-        }
+        User user = userRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado!"));
 
         if (user.getStatus() != StatusInactiveActive.ACTIVE) {
             throw new DisabledException("Sua conta está inativa. Entre em contato com o administrador do sistema caso achar que isso é um erro.");
@@ -50,12 +48,7 @@ public class AuthService implements UserDetailsService {
             throw new RuntimeException("Não foi possível identificar a sessão do usuário.");
         }
 
-        User user = userRepository.findByEmail(email);
-        if (user == null) {
-            throw new UsernameNotFoundException("Usuário autenticado não encontrado na base de dados.");
-        }
-
-        return user;
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário autenticado não encontrado na base de dados."));
     }
-
 }

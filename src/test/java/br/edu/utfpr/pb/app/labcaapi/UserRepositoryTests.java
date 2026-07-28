@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -51,9 +52,11 @@ class UserRepositoryTests {
             entityManager.persist(user);
             entityManager.flush();
 
-            User foundUser = userRepository.findByEmail("teste@utfpr.edu.br");
+            Optional<User> foundUserOpt = userRepository.findByEmail("teste@utfpr.edu.br");
 
-            assertThat(foundUser).isNotNull();
+            assertThat(foundUserOpt).isPresent(); // Check if optional has value
+
+            User foundUser = foundUserOpt.get();
             assertThat(foundUser.getEmail()).isEqualTo("teste@utfpr.edu.br");
             assertThat(foundUser.getName()).isEqualTo("Nome Teste");
             assertThat(foundUser.getCpfCnpj()).isEqualTo("12345678901");
@@ -63,9 +66,9 @@ class UserRepositoryTests {
         @Test
         @DisplayName("Deve retornar null quando o e-mail não existir na base de dados")
         void findByEmail_NotFound_ShouldReturnNull() {
-            User foundUser = userRepository.findByEmail("inexistente@utfpr.edu.br");
+            Optional<User> foundUserOpt = userRepository.findByEmail("inexistente@utfpr.edu.br");
 
-            assertThat(foundUser).isNull();
+            assertThat(foundUserOpt).isEmpty();
         }
     }
 

@@ -97,7 +97,7 @@ class UserServiceTests {
             User newUser = createValidUser(null, "Novo Usuário", "novo@utfpr.edu.br", "11111111111", null, "senha123");
 
             when(utilsService.getRoleType(anyString())).thenReturn(Type.ROLE_STUDENT);
-            when(userRepository.findByEmail(newUser.getEmail())).thenReturn(null);
+            when(userRepository.findByEmail(newUser.getEmail())).thenReturn(Optional.empty());
             when(userRepository.saveAndFlush(any(User.class))).thenAnswer(i -> {
                 User userToSave = i.getArgument(0);
                 userToSave.setId(1L);
@@ -136,7 +136,7 @@ class UserServiceTests {
             User userDb = createValidUser(2L, "Antigo", "existente@utfpr.edu.br", "22222222222", Type.ROLE_STUDENT, "senhaAntiga");
 
             when(utilsService.getRoleType(anyString())).thenReturn(Type.ROLE_STUDENT);
-            when(userRepository.findByEmail(newUser.getEmail())).thenReturn(userDb);
+            when(userRepository.findByEmail(newUser.getEmail())).thenReturn(Optional.of(userDb));
 
             assertThatThrownBy(() -> userService.save(newUser))
                     .isInstanceOf(GenericException.class)
@@ -180,7 +180,7 @@ class UserServiceTests {
         @DisplayName("Deve enviar código para o email de recuperação com sucesso")
         void sendEmailCodeRecoverPassword_Success() throws Exception {
             User user = createValidUser(1L, "Teste", "teste@utfpr.edu.br", "111", Type.ROLE_STUDENT, "senha");
-            when(userRepository.findByEmail("teste@utfpr.edu.br")).thenReturn(user);
+            when(userRepository.findByEmail("teste@utfpr.edu.br")).thenReturn(Optional.of(user));
 
             SendEmailCodeRecoverPassword response = userService.sendEmailCodeRecoverPassword("teste@utfpr.edu.br");
 
@@ -195,7 +195,7 @@ class UserServiceTests {
         @Test
         @DisplayName("Deve lançar exceção ao tentar enviar código para usuário não encontrado")
         void sendEmailCodeRecoverPassword_UserNotFound_ShouldThrowException() {
-            when(userRepository.findByEmail("inexistente@utfpr.edu.br")).thenReturn(null);
+            when(userRepository.findByEmail("inexistente@utfpr.edu.br")).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> userService.sendEmailCodeRecoverPassword("inexistente@utfpr.edu.br"))
                     .isInstanceOf(GenericException.class)
