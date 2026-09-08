@@ -142,14 +142,17 @@ public class UserService extends GenericService<User, Long> {
         User user = userRepository.findByEmail(recoverPasswordDTO.getEmail())
                 .orElseThrow(() -> new GenericException("Usuário não encontrado."));
 
-        RecoverPassword recoverPassword = recoverPasswordService.getCodeSentByEmail().getOrDefault(recoverPasswordDTO.getEmail(), new RecoverPassword());
-        Boolean codesMatch = Objects.equals(recoverPasswordDTO.getCode(), recoverPassword.getCode());
-        if (!codesMatch) {
-            throw new GenericException("Código inválido.");
+        boolean isValid = recoverPasswordService.verifyAndConsumeCode(
+                recoverPasswordDTO.getEmail(),
+                recoverPasswordDTO.getCode()
+        );
+
+        if (!isValid) {
+            return new DefaultResponse(HttpStatus.BAD_REQUEST.value(), "Código inválido");
         }
 
         updateUserNewPasswordByEmail(user, recoverPasswordDTO.getNewPassword());
-        recoverPasswordService.getCodeSentByEmail().remove(recoverPasswordDTO.getEmail());
+
         return new DefaultResponse(HttpStatus.OK.value(), "Senha recuperada com sucesso.");
     }
 
