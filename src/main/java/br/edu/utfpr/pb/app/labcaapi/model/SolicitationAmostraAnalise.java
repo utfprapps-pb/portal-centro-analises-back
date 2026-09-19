@@ -4,8 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import br.edu.utfpr.pb.app.labcaapi.generic.base.IModel;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Getter
 @Setter
@@ -21,15 +20,12 @@ public class SolicitationAmostraAnalise extends IModel {
     private SolicitationAmostra amostra;
 
     @Column(name = "start_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime dataini;
+    private OffsetDateTime dataini;
 
     @Column(name = "end_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime datafin;
+    private OffsetDateTime datafin;
 
     @ManyToOne
     @JoinColumn(name = "equipment_id")
     private Equipment equipment;
-
 }
