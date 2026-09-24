@@ -94,14 +94,24 @@ public class EquipmentExcelFactory {
             List<SolicitationAmostraAnalise> analises = solicitationService.findAllAnaliseByEquipment(equipment);
 
             for (SolicitationAmostraAnalise analise : analises) {
-                long segundos = ChronoUnit.SECONDS.between(analise.getDataini(), analise.getDatafin());
+                if (analise.getDataini() == null || analise.getDatafin() == null) {
+                    ExcelFactoryRow row = new ExcelFactoryRow()
+                            .addCell(new ExcelFactoryCell().setValue(equipment.getId()))
+                            .addCell(new ExcelFactoryCell().setValue(equipment.getName()))
+                            .addCell(new ExcelFactoryCell().setValue(analise.getDataini()).setDataFormat("dd/mm/yyyy HH:mm:ss"))
+                            .addCell(new ExcelFactoryCell().setValue(analise.getDatafin()))
+                            .addCell(new ExcelFactoryCell().setValue("Em andamento"));
+                    rows.add(row);
+                    continue;
+                }
 
+                long segundos = ChronoUnit.SECONDS.between(analise.getDataini(), analise.getDatafin());
 
                 ExcelFactoryRow row = new ExcelFactoryRow()
                         .addCell(new ExcelFactoryCell().setValue(equipment.getId()))
                         .addCell(new ExcelFactoryCell().setValue(equipment.getName()))
-                        .addCell(new ExcelFactoryCell().setValue(analise.getDataini()))
-                        .addCell(new ExcelFactoryCell().setValue(analise.getDatafin()))
+                        .addCell(new ExcelFactoryCell().setValue(analise.getDataini()).setDataFormat("dd/mm/yyyy HH:mm:ss"))
+                        .addCell(new ExcelFactoryCell().setValue(analise.getDatafin()).setDataFormat("dd/mm/yyyy HH:mm:ss"))
                         .addCell(new ExcelFactoryCell().setValue(segundos / 86400.0).setDataFormat("[h]:mm:ss;@"));
                 rows.add(row);
             }
