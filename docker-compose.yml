@@ -3,12 +3,12 @@ networks:
   web:
     name: web
     driver: bridge
-    external: false
+    external: true
     attachable: true
   database:
     name: database
     driver: bridge
-    external: false
+    external: true
     attachable: true
 
 services:
