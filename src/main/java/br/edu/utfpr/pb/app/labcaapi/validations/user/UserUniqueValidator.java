@@ -16,7 +16,7 @@ public record UserUniqueValidator(UserRepository userRepository) implements Cons
     public boolean isValid(User user, ConstraintValidatorContext constraintValidatorContext) {
         constraintValidatorContext.disableDefaultConstraintViolation();
         return userValid(user,
-                Optional.ofNullable(userRepository.findByEmail(user.getEmail())),
+                userRepository.findByEmail(user.getEmail()),
                 constraintValidatorContext,
                 String.format(messageConstraint, "E-mail"),
                 "email"

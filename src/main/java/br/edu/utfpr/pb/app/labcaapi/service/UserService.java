@@ -23,9 +23,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
+import java.util.Optional;
 
 @Service
 public class UserService extends GenericService<User, Long> {
@@ -65,8 +66,6 @@ public class UserService extends GenericService<User, Long> {
         requestBody.setPermissions(utilsService.getPermissionsByRole(role));
         requestBody.setRole(role);
         requestBody.setStatus(StatusInactiveActive.ACTIVE);
-        requestBody.setType(requestBody.getType());
-        requestBody.setCpfCnpj(requestBody.getCpfCnpj());
         this.validate(requestBody);
         User user = super.save(requestBody);
         this.emailCodeService.createCode(user);
@@ -100,7 +99,7 @@ public class UserService extends GenericService<User, Long> {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public User findOneById(Long aLong) throws Exception {
         User user = super.findOneById(aLong);
         UserBalance balance = ApplicationContextProvider.getBean(UserBalanceService.class).findByUser(user);
@@ -109,19 +108,23 @@ public class UserService extends GenericService<User, Long> {
     }
 
     private void validate(User user) throws Exception {
-        User userDb = this.userRepository.findByEmail(user.getEmail());
-        if (userDb != null && !Objects.equals(userDb.getId(), user.getId())) {
+        Optional<User> userDb = this.userRepository.findByEmail(user.getEmail());
+
+        if (userDb.isPresent() && !Objects.equals(userDb.get().getId(), user.getId())) {
             throw new GenericException("Email já cadastrado.");
         }
     }
 
     public SendEmailCodeRecoverPassword sendEmailCodeRecoverPassword(String email) throws Exception {
-        User user = userRepository.findByEmail(email);
-        if (Objects.isNull(user))
-            throwExceptionUserNotFound();
-        Integer code = new Random().nextInt(1000000);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new GenericException("Usuário não encontrado."));
+
+        SecureRandom secureRandom = new SecureRandom();
+        Integer code = 100000 + secureRandom.nextInt(900000);
+
         recoverPasswordService.addCode(email, new RecoverPassword(email, code, DateTimeUtil.getCurrentDateTime()));
         emailService.sendEmail(getEmailDtoToSendEmailWithCode(user.getEmail(), code));
+
         return new SendEmailCodeRecoverPassword("Código enviado com sucesso para o e-mail " + user.getEmail() + ".", user.getEmail());
     }
 
@@ -134,22 +137,26 @@ public class UserService extends GenericService<User, Long> {
         return emailDto;
     }
 
+    @Transactional
     public DefaultResponse recoverPassword(RecoverPasswordDTO recoverPasswordDTO) throws Exception {
-        User user = userRepository.findByEmail(recoverPasswordDTO.getEmail());
-        if (Objects.isNull(user))
-            throwExceptionUserNotFound();
+        User user = userRepository.findByEmail(recoverPasswordDTO.getEmail())
+                .orElseThrow(() -> new GenericException("Usuário não encontrado."));
 
-        RecoverPassword recoverPassword = recoverPasswordService.getCodeSentByEmail().getOrDefault(recoverPasswordDTO.getEmail(), new RecoverPassword());
-        Boolean codesMatch = Objects.equals(recoverPasswordDTO.getCode(), recoverPassword.getCode());
-        if (!codesMatch) {
-            throw new GenericException("Código inválido.");
+        boolean isValid = recoverPasswordService.verifyAndConsumeCode(
+                recoverPasswordDTO.getEmail(),
+                recoverPasswordDTO.getCode()
+        );
+
+        if (!isValid) {
+            return new DefaultResponse(HttpStatus.BAD_REQUEST.value(), "Código inválido");
         }
 
         updateUserNewPasswordByEmail(user, recoverPasswordDTO.getNewPassword());
-        recoverPasswordService.getCodeSentByEmail().remove(recoverPasswordDTO.getEmail());
+
         return new DefaultResponse(HttpStatus.OK.value(), "Senha recuperada com sucesso.");
     }
 
+    @Transactional
     public DefaultResponse changePassword(ChangePasswordDTO changePasswordDTO) throws Exception {
         User user = findSelfUser();
         if (!passwordEncoder.matches(changePasswordDTO.getOldPassword(), user.getPassword())) {
@@ -158,7 +165,6 @@ public class UserService extends GenericService<User, Long> {
             updateUserNewPasswordByEmail(user, changePasswordDTO.getNewPassword());
             return new DefaultResponse(HttpStatus.OK.value(), "Senha alterada com sucesso.");
         }
-
     }
 
     private void updateUserNewPasswordByEmail(User user, String newPassword) throws Exception {
@@ -175,17 +181,14 @@ public class UserService extends GenericService<User, Long> {
         }
     }
 
-    private void throwExceptionUserNotFound() throws Exception {
-        throw new GenericException("Usuário não encontrado.");
-    }
-
     public User findSelfUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return userRepository.findByEmail(principal.toString());
+        return userRepository.findByEmail(principal.toString())
+                .orElse(null);
     }
 
     public User findByEmail(String email) {
-        return this.userRepository.findByEmail(email);
+        return this.userRepository.findByEmail(email).orElse(null);
     }
 
     public List<User> findUsersByRole(String role) throws Exception {
@@ -201,5 +204,4 @@ public class UserService extends GenericService<User, Long> {
     public List<User> findUsersByDomain(String domain) throws Exception {
         return userRepository.findAllByEmailContainingIgnoreCase(domain);
     }
-
 }

@@ -183,6 +183,13 @@
             <version>5.8.39</version>
         </dependency>
 
+        <!-- h2 para testes -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
