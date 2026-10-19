@@ -18,7 +18,7 @@ public class SolicitationAmostraFoto extends IModel {
 
     @ManyToOne
     @JoinColumn(name = "sample_id")
-    @JsonIgnoreProperties(value = "analises")
+    @JsonIgnoreProperties(value = {"fotos", "analises"}, allowSetters = true)
     private SolicitationAmostra amostra;
 
     @Column(name = "approximations")
