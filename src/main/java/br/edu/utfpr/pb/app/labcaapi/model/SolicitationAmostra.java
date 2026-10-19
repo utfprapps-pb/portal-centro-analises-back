@@ -124,6 +124,7 @@ public class SolicitationAmostra extends IModel {
     private String objetivo;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "sample_id")
     @JsonIgnoreProperties(value = "sample", allowSetters = true)
     private List<SolicitationAmostraFoto> fotos = new ArrayList<>();
 
