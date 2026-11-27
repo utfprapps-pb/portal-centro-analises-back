@@ -8,11 +8,13 @@ import br.edu.utfpr.pb.app.labcaapi.exceptions.GenericException;
 import br.edu.utfpr.pb.app.labcaapi.generic.crud.GenericService;
 import br.edu.utfpr.pb.app.labcaapi.model.*;
 import br.edu.utfpr.pb.app.labcaapi.repository.FinanceRepository;
+import io.hypersistence.utils.common.StringUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Objects;
 
@@ -80,6 +82,9 @@ public class FinanceService extends GenericService<Finance, Long> {
     @Transactional
     public Finance save(Finance requestBody) throws Exception {
         this.throwIfUserNotIsAdmin();
+        if (ObjectUtils.isEmpty(requestBody.getId())) {
+            this.validateAdjustment(requestBody);
+        }
         Finance finance = super.save(requestBody);
         if (finance.getSolicitation() != null) {
             if (SolicitationStatus.AWAITING_PAYMENT.equals(finance.getSolicitation().getStatus())) {
@@ -121,6 +126,8 @@ public class FinanceService extends GenericService<Finance, Long> {
     public Finance update(Finance requestBody) throws Exception {
         this.throwIfUserNotIsAdmin();
         Finance oldFinance = this.findOneById(requestBody.getId());
+        requestBody.setAdjustmentValue(oldFinance.getAdjustmentValue());
+        requestBody.setAdjustmentReason(oldFinance.getAdjustmentReason());
         FinanceState oldFinanceState = oldFinance.getState();
         Finance newFinance = super.update(requestBody);
 
@@ -185,6 +192,44 @@ public class FinanceService extends GenericService<Finance, Long> {
         WebsocketService websocketService = ApplicationContextProvider.getBean(WebsocketService.class);
         UserBalance userBalance = userBalanceService.findByUser(user);
         websocketService.atualizarUserbalance(userBalance);
+    }
+
+    private void validateAdjustment(Finance finance) throws Exception {
+        if (finance.getAdjustmentValue() == null) {
+            finance.setAdjustmentValue(BigDecimal.ZERO);
+        }
+        BigDecimal adjustment = finance.getAdjustmentValue().setScale(2, RoundingMode.HALF_UP);
+        boolean hasAdjustment = adjustment.compareTo(BigDecimal.ZERO) != 0;
+        boolean hasDetails = finance.getDetails() != null && !finance.getDetails().isEmpty();
+
+        if (!hasAdjustment) {
+            finance.setAdjustmentReason(null);
+        } else {
+            if (StringUtils.isBlank(finance.getAdjustmentReason())) {
+                throw new GenericException("Informe o motivo da alteração de valor!");
+            }
+            if (!hasDetails) {
+                throw new GenericException("Alteração de valor só é permitida em cobranças com detalhes!");
+            }
+            finance.setAdjustmentReason(finance.getAdjustmentReason().trim());
+        }
+
+        if (hasDetails) {
+            BigDecimal sum = finance.getDetails().stream()
+                    .map(FinanceDetails::getValue)
+                    .filter(Objects::nonNull)
+                    .map(v -> v.setScale(2, RoundingMode.HALF_UP))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal expected = sum.add(adjustment);
+
+            if (expected.compareTo(BigDecimal.ZERO) < 0) {
+                throw new GenericException("O desconto não pode ser maior que o valor calculado!");
+            }
+            if (finance.getValue() == null
+                    || finance.getValue().setScale(2, RoundingMode.HALF_UP).compareTo(expected) != 0) {
+                throw new GenericException("O valor total não confere com os detalhes e a alteração informada!");
+            }
+        }
     }
 
 }

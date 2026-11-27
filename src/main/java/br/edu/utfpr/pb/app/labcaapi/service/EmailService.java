@@ -49,6 +49,9 @@ public class EmailService {
             htmlEmail.setStartTLSEnabled(true);
             htmlEmail.setFrom(emailConfig.getEmail());
             htmlEmail.addTo(emailTo.getEmailTo());
+
+            htmlEmail.setCharset("UTF-8");
+
             htmlEmail.setSubject("Laboratório Central de Análises (UTFPR-PB) - " + emailTo.getSubject());
             htmlEmail.setHtmlMsg(emailMessageGenerator.generateHTML(emailTo.getSubjectBody(), emailTo.getContentBody(), ""));
 
@@ -59,7 +62,6 @@ public class EmailService {
             log.error("E-mail Service -> sendEmail(): Erro ao enviar email:{}", e.getMessage());
             throw new GenericException("Erro ao enviar email");
         }
-
     }
 
     @Transactional
@@ -76,6 +78,14 @@ public class EmailService {
             emails.add(solicitation.getResponsavel().getEmail());
         }
 
+        String projectName = (solicitation.getProject() != null && solicitation.getProject().getDescription() != null)
+                ? solicitation.getProject().getDescription()
+                : "Não informado";
+
+        String formType = (solicitation.getSolicitationType() != null)
+                ? solicitation.getSolicitationType().getContent()
+                : "Não informado";
+
         Map<String, EmailDto> mapUserEmail = new HashMap<>();
 
         for (String email : emails) {
@@ -89,7 +99,9 @@ public class EmailService {
             emailDto.setSubject("Atualização de solicitação");
             String contentBody = this.emailMessageGenerator.generateHTML(
                     "Atualização de solicitação",
-                    "A solicitação de <strong>Código " + solicitation.getId() + "</strong> teve seu <strong>status</strong> alterado<br>" +
+                    "A solicitação de <strong>Código " + solicitation.getId() + "</strong> " +
+                            "(Projeto: <strong>" + projectName + "</strong> | Tipo: <strong>" + formType + "</strong>) " +
+                            "teve seu <strong>status</strong> alterado<br>" +
                             "De: <strong>" + oldStatus.getContent() + "</strong><br>" +
                             "Para: <strong>" + newStatus.getContent() + "</strong>.", null);
 
@@ -110,13 +122,23 @@ public class EmailService {
         UserService userService = ApplicationContextProvider.getBean(UserService.class);
         User responsavel = userService.findOneById(solicitation.getResponsavel().getId());
 
+        String projectName = (solicitation.getProject() != null && solicitation.getProject().getDescription() != null)
+                ? solicitation.getProject().getDescription()
+                : "Não informado";
+
+        String formType = (solicitation.getSolicitationType() != null)
+                ? solicitation.getSolicitationType().getContent()
+                : "Não informado";
+
         EmailDto emailDto = new EmailDto();
         emailDto.setEmailTo(responsavel.getEmail());
         emailDto.setSubject("Solicitação de autorização de formulário");
         String contentBody = this.emailMessageGenerator.generateHTML(
                 "Solicitação de autorização de formulário",
                 "Solicitação <strong>Código " + solicitation.getId() + "</strong><br>" +
-                        "Solicitação " + solicitation.getId() + " está aguardando sua autorização para avançar."
+                        "Projeto: <strong>" + projectName + "</strong><br>" +
+                        "Tipo de Formulário: <strong>" + formType + "</strong><br><br>" +
+                        "A solicitação " + solicitation.getId() + " está aguardando sua autorização para avançar."
                 , null);
 
         emailDto.setContentBody(contentBody);

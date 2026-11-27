@@ -74,7 +74,7 @@ public class SolicitationAmostra extends IModel {
 
     // DRX
     @Column(name = "scan_range")
-    private Long faixaVarredura;
+    private String faixaVarredura;
 
     @Enumerated
     @Column(name = "step")
