@@ -58,4 +58,11 @@ public class Finance extends IModelCrud {
     @JoinColumn(name = "finance_id")
 //    @JsonIgnoreProperties(value = "finance", allowSetters = true, allowGetters = true)
     private List<Attachment> attachments;
+
+    @Builder.Default
+    @Column(name = "adjustment_value", nullable = false)
+    private BigDecimal adjustmentValue = BigDecimal.ZERO;
+
+    @Column(name = "adjustment_reason")
+    private String adjustmentReason;
 }

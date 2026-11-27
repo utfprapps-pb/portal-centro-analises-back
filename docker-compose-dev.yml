@@ -80,7 +80,7 @@ services:
       - postgresql
 
   minio:
-    image: minio/minio
+    image: cgr.dev/chainguard/minio:latest    # <-- Switched to Chainguard's public mirror
     container_name: minio
     environment:
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
